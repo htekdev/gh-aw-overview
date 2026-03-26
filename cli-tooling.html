@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLI & Tooling — GitHub Agentic Workflows</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:#58a6ff;text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,.cmd{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:0.92em}
+  .cmd{color:#3fb950}
+  .page-wrap{max-width:1400px;margin:0 auto;padding:80px 24px 60px}
+  /* Hero */
+  .hero{text-align:center;padding:64px 0 48px}
+  .hero-icon{font-size:56px;margin-bottom:16px}
+  .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;background:linear-gradient(135deg,#58a6ff 0%,#3fb950 50%,#bc8cff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero p{color:#8b949e;font-size:1.15rem;max-width:720px;margin:12px auto 0}
+  /* Section */
+  .section{margin-bottom:56px}
+  .section-title{font-size:1.6rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .section-sub{color:#8b949e;font-size:1rem;margin-bottom:24px}
+  /* Cards grid */
+  .cards{display:grid;gap:20px}
+  .cards-2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .cards-3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .cards-4{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:24px;transition:border-color .2s}
+  .card:hover{border-color:#58a6ff}
+  .card h3{font-size:1.1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .card p,.card li{color:#8b949e;font-size:0.93rem}
+  .card ul{padding-left:18px;margin-top:8px}
+  .card ul li{margin-bottom:4px}
+  /* Badge */
+  .badge{display:inline-block;font-size:0.7rem;padding:2px 8px;border-radius:12px;font-weight:600;vertical-align:middle}
+  .badge-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+  .badge-green{background:rgba(63,185,80,.15);color:#3fb950}
+  .badge-purple{background:rgba(188,140,255,.15);color:#bc8cff}
+  .badge-orange{background:rgba(210,153,34,.15);color:#d29922}
+  /* Terminal code blocks */
+  .terminal{background:#0d1117;border:1px solid #30363d;border-radius:10px;overflow:hidden;margin:16px 0}
+  .terminal-bar{background:#161b22;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d}
+  .terminal-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .terminal-dot.r{background:#ff5f57}.terminal-dot.y{background:#febc2e}.terminal-dot.g{background:#28c840}
+  .terminal-title{color:#8b949e;font-size:0.8rem;margin-left:8px;font-family:monospace}
+  .terminal pre{padding:16px 20px;overflow-x:auto;font-size:0.88rem;line-height:1.7;color:#e6edf3}
+  .terminal pre .comment{color:#8b949e}
+  .terminal pre .prompt{color:#8b949e}
+  .terminal pre .flag{color:#d29922}
+  .terminal pre .val{color:#a5d6ff}
+  /* Command ref cards */
+  .cmd-group{margin-bottom:40px}
+  .cmd-group-title{font-size:1.25rem;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #30363d;display:flex;align-items:center;gap:8px}
+  .cmd-card{background:#161b22;border:1px solid #30363d;border-radius:12px;margin-bottom:16px;overflow:hidden}
+  .cmd-header{padding:16px 20px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .cmd-name{font-family:monospace;font-size:1.05rem;color:#3fb950;font-weight:700}
+  .cmd-desc{color:#8b949e;font-size:0.9rem}
+  .cmd-body{padding:16px 20px}
+  .cmd-body h4{font-size:0.85rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;margin-top:16px}
+  .cmd-body h4:first-child{margin-top:0}
+  /* Options table */
+  .opt-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.88rem}
+  .opt-table th{text-align:left;color:#8b949e;font-weight:600;padding:6px 12px 6px 0;border-bottom:1px solid #21262d}
+  .opt-table td{padding:6px 12px 6px 0;border-bottom:1px solid #21262d;vertical-align:top}
+  .opt-table td:first-child{font-family:monospace;color:#d29922;white-space:nowrap}
+  .opt-table td:last-child{color:#8b949e}
+  /* Pipeline */
+  .pipeline{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:24px 0}
+  .pipe-step{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px 20px;text-align:center;min-width:140px;position:relative}
+  .pipe-step .step-num{font-size:0.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .pipe-step .step-label{font-weight:700;font-size:0.95rem}
+  .pipe-step .step-detail{color:#8b949e;font-size:0.8rem;margin-top:4px}
+  .pipe-arrow{color:#30363d;font-size:1.5rem;padding:0 4px;flex-shrink:0}
+  /* Tip box */
+  .tip{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:16px 20px;margin:16px 0;font-size:0.93rem}
+  .tip strong{color:#3fb950}
+  .warn{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.3);border-radius:10px;padding:16px 20px;margin:16px 0;font-size:0.93rem}
+  .warn strong{color:#d29922}
+  /* Footer */
+  .footer{text-align:center;padding:40px 0 32px;border-top:1px solid #30363d;color:#8b949e;font-size:0.85rem;margin-top:40px}
+  /* Responsive */
+  @media(max-width:768px){
+    .page-wrap{padding:70px 16px 40px}
+    .pipeline{flex-direction:column;align-items:stretch}
+    .pipe-arrow{transform:rotate(90deg);text-align:center}
+    .hero{padding:40px 0 32px}
+    .cards-4,.cards-3,.cards-2{grid-template-columns:1fr}
+  }
+  /* Scroll anchor offset */
+  [id]{scroll-margin-top:80px}
+  /* Collapsible */
+  details{background:#161b22;border:1px solid #30363d;border-radius:10px;margin-bottom:12px}
+  details summary{padding:14px 20px;cursor:pointer;font-weight:600;font-size:0.95rem;list-style:none;display:flex;align-items:center;gap:8px}
+  details summary::before{content:'▸';color:#8b949e;font-size:0.9rem;transition:transform .2s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details summary::-webkit-details-marker{display:none}
+  details .detail-body{padding:0 20px 16px}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #30363d;padding:12px 24px;">
+  <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <a href="index.html" style="color:#e6edf3;text-decoration:none;font-weight:600;font-size:18px;">⚡ GH Agentic Workflows</a>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:14px;">
+      <a href="index.html" style="color:#8b949e;text-decoration:none;">Home</a>
+      <a href="core-concepts.html" style="color:#8b949e;text-decoration:none;">Core Concepts</a>
+      <a href="architecture.html" style="color:#8b949e;text-decoration:none;">Architecture</a>
+      <a href="configuration.html" style="color:#8b949e;text-decoration:none;">Configuration</a>
+      <a href="security.html" style="color:#8b949e;text-decoration:none;">Security</a>
+      <a href="ecosystem.html" style="color:#8b949e;text-decoration:none;">Ecosystem</a>
+      <a href="use-cases.html" style="color:#8b949e;text-decoration:none;">Use Cases</a>
+      <a href="cli-tooling.html" style="color:#3fb950;text-decoration:none;">CLI &amp; Tooling</a>
+      <a href="videos.html" style="color:#8b949e;text-decoration:none;">Videos</a>
+      <a href="resources.html" style="color:#8b949e;text-decoration:none;">Resources</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-icon">🛠️</div>
+  <h1>CLI &amp; Tooling</h1>
+  <p>The <code class="cmd">gh aw</code> CLI extension — your command-line interface for creating, compiling, validating, running, and managing GitHub Agentic Workflows.</p>
+</div>
+
+<div class="warn">
+  <strong>⚠️ Important distinction:</strong> <code class="cmd">gh aw</code> is <em>not</em> the GitHub Copilot CLI. It is a separate Go-based extension for the GitHub CLI (<code>gh</code>) focused exclusively on agentic workflow lifecycle management. Copilot CLI is the runtime AI engine; <code class="cmd">gh aw</code> is the authoring-time tool.
+</div>
+
+<!-- ═══════════════ QUICK START ═══════════════ -->
+<div class="section" id="quick-start">
+  <h2 class="section-title">🚀 Quick Start</h2>
+  <p class="section-sub">Get up and running in three commands.</p>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
+      <span class="terminal-title">Terminal</span>
+    </div>
+    <pre><span class="comment"># 1. Install the GitHub CLI (if you don't have it)</span>
+<span class="comment">#    → https://cli.github.com/</span>
+
+<span class="comment"># 2. Install the gh-aw extension</span>
+<span class="prompt">$</span> <span class="cmd">gh extension install github/gh-aw</span>
+
+<span class="comment"># 3. Initialize your repository</span>
+<span class="prompt">$</span> <span class="cmd">gh aw init</span>
+
+<span class="comment"># That's it! Now create your first workflow:</span>
+<span class="prompt">$</span> <span class="cmd">gh aw new</span> <span class="val">my-first-workflow</span> <span class="flag">--engine copilot</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="val">my-first-workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">my-first-workflow</span> <span class="flag">--push</span></pre>
+  </div>
+</div>
+
+<!-- ═══════════════ INSTALLATION METHODS ═══════════════ -->
+<div class="section" id="installation">
+  <h2 class="section-title">📦 Installation Methods</h2>
+  <p class="section-sub">Four ways to install, depending on your environment.</p>
+
+  <div class="cards cards-2">
+    <!-- Extension Install -->
+    <div class="card">
+      <h3>🔌 Extension Install <span class="badge badge-green">Recommended</span></h3>
+      <p>Standard installation via the GitHub CLI extension manager. Requires <code>gh</code> to be installed and authenticated.</p>
+      <div class="terminal" style="margin-top:12px">
+        <pre><span class="prompt">$</span> <span class="cmd">gh extension install</span> <span class="val">github/gh-aw</span>
+<span class="prompt">$</span> <span class="cmd">gh aw version</span></pre>
+      </div>
+    </div>
+
+    <!-- Pinned Version -->
+    <div class="card">
+      <h3>📌 Pinned Version <span class="badge badge-blue">Production</span></h3>
+      <p>Lock to a specific release tag or commit SHA for reproducible environments and team consistency.</p>
+      <div class="terminal" style="margin-top:12px">
+        <pre><span class="prompt">$</span> <span class="cmd">gh extension install</span> <span class="val">github/gh-aw@v0.57.0</span>
+
+<span class="comment"># Upgrade a pinned version</span>
+<span class="prompt">$</span> <span class="cmd">gh extension remove</span> <span class="val">gh-aw</span>
+<span class="prompt">$</span> <span class="cmd">gh extension install</span> <span class="val">github/gh-aw@v0.58.0</span></pre>
+      </div>
+    </div>
+
+    <!-- Standalone -->
+    <div class="card">
+      <h3>📥 Standalone Installer <span class="badge badge-orange">Fallback</span></h3>
+      <p>For Codespaces, restricted networks, or when <code>gh extension install</code> fails. Supports Linux, macOS, FreeBSD, Windows (WSL), and Android.</p>
+      <div class="terminal" style="margin-top:12px">
+        <pre><span class="comment"># Latest version</span>
+<span class="prompt">$</span> curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash
+
+<span class="comment"># Pinned version</span>
+<span class="prompt">$</span> curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash -s <span class="val">v0.57.0</span></pre>
+      </div>
+    </div>
+
+    <!-- Actions Setup -->
+    <div class="card">
+      <h3>⚙️ GitHub Actions Setup <span class="badge badge-purple">CI/CD</span></h3>
+      <p>For pipelines — includes automatic checksum verification and platform detection.</p>
+      <div class="terminal" style="margin-top:12px">
+        <pre><span class="comment"># In your workflow YAML:</span>
+- name: Install gh-aw CLI
+  uses: <span class="val">github/gh-aw/actions/setup-cli@main</span>
+  with:
+    version: <span class="val">v0.57.0</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip" style="margin-top:16px">
+    <strong>💡 Global Flags:</strong> All commands support <code class="cmd">-h</code> / <code class="cmd">--help</code> for help and <code class="cmd">-v</code> / <code class="cmd">--verbose</code> for debug output. Use <code class="cmd">gh aw help [command]</code> for command-specific docs.
+  </div>
+</div>
+
+<!-- ═══════════════ CORE COMMANDS REFERENCE ═══════════════ -->
+<div class="section" id="commands">
+  <h2 class="section-title">📖 Command Reference</h2>
+  <p class="section-sub">Complete reference for every <code class="cmd">gh aw</code> command with syntax, options, and examples.</p>
+
+  <!-- ── Core Commands ── -->
+  <div class="cmd-group">
+    <div class="cmd-group-title">⚡ Core Commands</div>
+
+    <!-- init -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw init</span>
+        <span class="cmd-desc">Initialize a repository for agentic workflows</span>
+      </div>
+      <div class="cmd-body">
+        <h4>What it creates</h4>
+        <p style="color:#8b949e;font-size:.9rem"><code>.gitattributes</code> (marks <code>.lock.yml</code> as generated), <code>.github/agents/agentic-workflows.agent.md</code> (dispatcher agent), <code>.gitignore</code> entries, and MCP server config.</p>
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--no-mcp</td><td>Skip MCP server integration</td></tr>
+          <tr><td>--codespaces [repos]</td><td>Configure devcontainer for current or specified repos</td></tr>
+          <tr><td>--completions</td><td>Install shell completions</td></tr>
+          <tr><td>--create-pull-request</td><td>Initialize via pull request instead of direct commit</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw init</span>                              <span class="comment"># Interactive mode</span>
+<span class="prompt">$</span> <span class="cmd">gh aw init</span> <span class="flag">--no-mcp</span>                     <span class="comment"># Skip MCP server</span>
+<span class="prompt">$</span> <span class="cmd">gh aw init</span> <span class="flag">--codespaces</span> <span class="val">repo1,repo2</span>     <span class="comment"># Configure devcontainer for repos</span>
+<span class="prompt">$</span> <span class="cmd">gh aw init</span> <span class="flag">--create-pull-request</span>         <span class="comment"># Initialize via PR</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- compile -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw compile</span>
+        <span class="cmd-desc">Compile Markdown to GitHub Actions YAML (.lock.yml)</span>
+        <span class="badge badge-green">Core</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">The <strong style="color:#e6edf3">heart of gh-aw</strong>. Transforms <code>.md</code> workflow files into security-hardened <code>.lock.yml</code> files with schema validation, action SHA pinning, and guardrail configuration.</p>
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--validate</td><td>Validate the workflow schema before compiling</td></tr>
+          <tr><td>--strict</td><td>Enforce security best practices (no write perms, explicit network, pinned Actions, no wildcards, no deprecated fields)</td></tr>
+          <tr><td>--fix</td><td>Run codemods before compilation</td></tr>
+          <tr><td>--zizmor</td><td>Run zizmor security scanner against generated YAML</td></tr>
+          <tr><td>--dependabot</td><td>Generate Dependabot-compatible dependency manifests</td></tr>
+          <tr><td>--watch</td><td>Watch for file changes and auto-recompile</td></tr>
+          <tr><td>--purge</td><td>Remove orphaned <code>.lock.yml</code> files</td></tr>
+          <tr><td>--json</td><td>Output results in JSON format</td></tr>
+          <tr><td>--stats</td><td>Output compilation statistics</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw compile</span>                              <span class="comment"># Compile all workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="val">my-workflow</span>                  <span class="comment"># Compile a specific workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--watch</span>                      <span class="comment"># Auto-recompile on changes</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--validate --strict</span>          <span class="comment"># Schema + strict security</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--strict --zizmor</span>            <span class="comment"># Security scan (fail on findings)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--dependabot --purge</span>         <span class="comment"># Dependabot + cleanup</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- validate -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw validate</span>
+        <span class="cmd-desc">Validate workflows with all linters enabled (no output generated)</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Runs the compiler with <strong style="color:#e6edf3">all linters always-on</strong> — zizmor, actionlint, poutine — plus <code>--validate</code> and <code>--no-emit</code>. The go-to command for CI/CD gates.</p>
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--strict</td><td>Enforce strict mode</td></tr>
+          <tr><td>--fail-fast</td><td>Stop at first error</td></tr>
+          <tr><td>--dir &lt;path&gt;</td><td>Validate from a custom directory</td></tr>
+          <tr><td>--engine &lt;name&gt;</td><td>Override AI engine for validation</td></tr>
+          <tr><td>--json</td><td>Output results in JSON</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw validate</span>                              <span class="comment"># Validate all workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw validate</span> <span class="val">my-workflow</span>                  <span class="comment"># Validate specific workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw validate</span> <span class="flag">--strict --fail-fast</span>         <span class="comment"># Strict + stop on first error</span>
+<span class="prompt">$</span> <span class="cmd">gh aw validate</span> <span class="flag">--json</span>                       <span class="comment"># JSON output for CI</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- run -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw run</span>
+        <span class="cmd-desc">Trigger workflow execution in GitHub Actions</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--push</td><td>Auto-commit, push, then dispatch (combines compile → stage → commit → push → run)</td></tr>
+          <tr><td>--ref &lt;branch&gt;</td><td>Push to specific branch</td></tr>
+          <tr><td>--repeat &lt;n&gt;</td><td>Repeat execution n times</td></tr>
+          <tr><td>--dry-run</td><td>Preview without executing</td></tr>
+          <tr><td>--enable-if-needed</td><td>Enable disabled workflow before running</td></tr>
+          <tr><td>--auto-merge-prs</td><td>Auto-merge PRs created by workflow</td></tr>
+          <tr><td>--engine &lt;name&gt;</td><td>Override AI engine</td></tr>
+          <tr><td>--raw-field key=val</td><td>Pass custom inputs</td></tr>
+          <tr><td>--repo owner/repo</td><td>Run in a different repository</td></tr>
+          <tr><td>--json</td><td>Output triggered results as JSON</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">workflow</span>                          <span class="comment"># Run a workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">workflow</span> <span class="flag">--push</span>                  <span class="comment"># Compile → push → dispatch</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">workflow</span> <span class="flag">--repeat 3</span>              <span class="comment"># Run 3 times</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">workflow</span> <span class="flag">--dry-run</span>               <span class="comment"># Preview only</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">w1 w2</span> <span class="flag">--push --ref main</span>         <span class="comment"># Run multiple, push to main</span></pre>
+        </div>
+        <div class="tip">
+          <strong>💡 Power move:</strong> <code class="cmd">gh aw run --push</code> is the ultimate local-dev shortcut — it recompiles outdated lock files, stages imports, commits, pushes, and dispatches in one command.
+        </div>
+      </div>
+    </div>
+
+    <!-- list -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw list</span>
+        <span class="cmd-desc">List workflows (fast, no API queries)</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--json</td><td>Output in JSON</td></tr>
+          <tr><td>--label &lt;name&gt;</td><td>Filter by label</td></tr>
+          <tr><td>--dir &lt;path&gt;</td><td>List from a custom directory</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw list</span>                                  <span class="comment"># List all workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw list</span> <span class="val">ci-</span>                               <span class="comment"># Filter by pattern</span>
+<span class="prompt">$</span> <span class="cmd">gh aw list</span> <span class="flag">--label automation --json</span>          <span class="comment"># Filter + JSON</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- status -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw status</span>
+        <span class="cmd-desc">Detailed workflow status with run info</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--ref &lt;branch&gt;</td><td>Include latest run info for the specified branch</td></tr>
+          <tr><td>--label &lt;name&gt;</td><td>Filter by label</td></tr>
+          <tr><td>--repo owner/repo</td><td>Check a different repository</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw status</span>                                <span class="comment"># All workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw status</span> <span class="flag">--ref main</span>                      <span class="comment"># Include latest run for main</span>
+<span class="prompt">$</span> <span class="cmd">gh aw status</span> <span class="flag">--repo owner/other-repo</span>         <span class="comment"># Different repo</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- version -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw version</span>
+        <span class="cmd-desc">Show CLI version</span>
+      </div>
+      <div class="cmd-body">
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw version</span>
+gh-aw v0.57.0 (2026-03-15)</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Workflow Lifecycle ── -->
+  <div class="cmd-group">
+    <div class="cmd-group-title">🔄 Workflow Lifecycle</div>
+
+    <!-- add -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw add</span>
+        <span class="cmd-desc">Add workflows from The Agentics collection or any repository</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--dir/-d &lt;path&gt;</td><td>Organize in a subdirectory</td></tr>
+          <tr><td>--repo/-r &lt;repo&gt;</td><td>Source repository</td></tr>
+          <tr><td>--create-pull-request</td><td>Add via pull request</td></tr>
+          <tr><td>--append</td><td>Append to existing workflow</td></tr>
+          <tr><td>--engine/-e &lt;name&gt;</td><td>Override engine</td></tr>
+          <tr><td>--force/-f</td><td>Overwrite existing</td></tr>
+          <tr><td>--name/-n &lt;name&gt;</td><td>Custom workflow name</td></tr>
+          <tr><td>--stop-after &lt;min&gt;</td><td>Set max duration in minutes</td></tr>
+          <tr><td>--no-stop-after</td><td>Remove duration limit</td></tr>
+          <tr><td>--disable-security-scanner</td><td>Skip security scanner setup</td></tr>
+          <tr><td>--no-gitattributes</td><td>Skip <code>.gitattributes</code> update</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw add</span> <span class="val">githubnext/agentics/ci-doctor</span>           <span class="comment"># Add from Agentics</span>
+<span class="prompt">$</span> <span class="cmd">gh aw add</span> <span class="val">"githubnext/agentics/ci-*"</span>              <span class="comment"># Wildcard match</span>
+<span class="prompt">$</span> <span class="cmd">gh aw add</span> <span class="val">ci-doctor</span> <span class="flag">--dir shared --force</span>         <span class="comment"># Into subdirectory</span>
+<span class="prompt">$</span> <span class="cmd">gh aw add</span> <span class="val">ci-doctor</span> <span class="flag">--create-pull-request</span>        <span class="comment"># Add via PR</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- add-wizard -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw add-wizard</span>
+        <span class="cmd-desc">Interactive guided setup for adding workflows</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem">Walks through engine selection, configuration, and compilation interactively.</p>
+        <div class="terminal" style="margin-top:12px">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw add-wizard</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- new -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw new</span>
+        <span class="cmd-desc">Create a new workflow template</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--force</td><td>Overwrite existing workflow</td></tr>
+          <tr><td>--engine &lt;name&gt;</td><td>Inject engine into frontmatter</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw new</span>                              <span class="comment"># Interactive mode</span>
+<span class="prompt">$</span> <span class="cmd">gh aw new</span> <span class="val">my-workflow</span>                   <span class="comment"># Create named template</span>
+<span class="prompt">$</span> <span class="cmd">gh aw new</span> <span class="val">my-workflow</span> <span class="flag">--engine claude</span>   <span class="comment"># With engine preset</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- fix -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw fix</span>
+        <span class="cmd-desc">Auto-fix deprecated fields (dry-run by default)</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--write</td><td>Apply fixes (without this, only previews changes)</td></tr>
+          <tr><td>--list-codemods</td><td>List available codemods</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw fix</span>                              <span class="comment"># Check all (dry-run)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw fix</span> <span class="flag">--write</span>                       <span class="comment"># Apply fixes</span>
+<span class="prompt">$</span> <span class="cmd">gh aw fix</span> <span class="val">my-workflow</span> <span class="flag">--write</span>          <span class="comment"># Fix specific workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw fix</span> <span class="flag">--list-codemods</span>               <span class="comment"># Show available codemods</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- update -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw update</span>
+        <span class="cmd-desc">Update workflows from upstream (3-way merge by default)</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--no-merge</td><td>Override local changes with upstream</td></tr>
+          <tr><td>--major --force</td><td>Allow major version updates</td></tr>
+          <tr><td>--create-pull-request</td><td>Update via PR</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw update</span>                              <span class="comment"># Update all sourced workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw update</span> <span class="val">ci-doctor</span>                    <span class="comment"># Update specific (3-way merge)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw update</span> <span class="val">ci-doctor</span> <span class="flag">--no-merge</span>         <span class="comment"># Force upstream version</span>
+<span class="prompt">$</span> <span class="cmd">gh aw update</span> <span class="flag">--create-pull-request</span>        <span class="comment"># Update via PR</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- upgrade -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw upgrade</span>
+        <span class="cmd-desc">Upgrade repository configuration and agent files</span>
+      </div>
+      <div class="cmd-body">
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--no-fix</td><td>Update agent files only, skip codemods</td></tr>
+          <tr><td>--no-actions</td><td>Skip Actions updates</td></tr>
+          <tr><td>--no-compile</td><td>Skip recompilation</td></tr>
+          <tr><td>--create-pull-request</td><td>Upgrade via PR</td></tr>
+          <tr><td>--audit</td><td>Run dependency health audit</td></tr>
+          <tr><td>--json</td><td>Output in JSON</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw upgrade</span>                              <span class="comment"># Full upgrade</span>
+<span class="prompt">$</span> <span class="cmd">gh aw upgrade</span> <span class="flag">--no-fix --no-compile</span>       <span class="comment"># Agent files only</span>
+<span class="prompt">$</span> <span class="cmd">gh aw upgrade</span> <span class="flag">--create-pull-request</span>       <span class="comment"># Upgrade via PR</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- remove -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw remove</span>
+        <span class="cmd-desc">Remove workflow and its compiled .lock.yml</span>
+      </div>
+      <div class="cmd-body">
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw remove</span> <span class="val">my-workflow</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- enable / disable -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw enable</span> / <span class="cmd-name">gh aw disable</span>
+        <span class="cmd-desc">Enable or disable workflows</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px"><code class="cmd">disable</code> also cancels any in-progress runs automatically.</p>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw enable</span> <span class="val">ci-doctor</span>                     <span class="comment"># Enable one workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw disable</span> <span class="val">ci-doctor</span>                    <span class="comment"># Disable + cancel active runs</span>
+<span class="prompt">$</span> <span class="cmd">gh aw enable</span>                               <span class="comment"># Enable all workflows</span>
+<span class="prompt">$</span> <span class="cmd">gh aw disable</span> <span class="flag">--repo owner/repo</span>            <span class="comment"># Disable in a specific repo</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Monitoring & Debugging ── -->
+  <div class="cmd-group">
+    <div class="cmd-group-title">🔍 Monitoring &amp; Debugging</div>
+
+    <!-- logs -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw logs</span>
+        <span class="cmd-desc">Download and analyze workflow run logs</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Downloads and parses logs with tool usage, network patterns, errors, and warnings. Results are <strong style="color:#e6edf3">cached</strong> for 10–100× speedup on subsequent access. Accepts workflow IDs or display names (case-insensitive).</p>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw logs</span> <span class="val">workflow</span>                        <span class="comment"># Download logs</span>
+<span class="prompt">$</span> <span class="cmd">gh aw logs</span> <span class="flag">-c 10 --start-date -1w</span>         <span class="comment"># Last week, 10 results</span>
+<span class="prompt">$</span> <span class="cmd">gh aw logs</span> <span class="flag">--ref main --parse --json</span>      <span class="comment"># Parsed JSON for a branch</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- audit -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw audit</span>
+        <span class="cmd-desc">Deep analysis of a specific workflow run</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Detailed metrics, tool usage, MCP failures, firewall analysis, no-ops, and artifacts. Accepts run IDs, workflow URLs, job URLs, and step-level URLs. Logs saved to <code>logs/run-{id}/</code>.</p>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw audit</span> <span class="val">12345678</span>                                      <span class="comment"># By run ID</span>
+<span class="prompt">$</span> <span class="cmd">gh aw audit</span> <span class="val">https://github.com/owner/repo/actions/runs/123</span>  <span class="comment"># By URL</span>
+<span class="prompt">$</span> <span class="cmd">gh aw audit</span> <span class="val">12345678</span> <span class="flag">--parse</span>                              <span class="comment"># Parse to markdown</span>
+<span class="prompt">$</span> <span class="cmd">gh aw audit</span> <span class="val">12345678</span> <span class="flag">--repo owner/repo</span>                    <span class="comment"># Specify repo</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- health -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw health</span>
+        <span class="cmd-desc">Workflow health metrics and trends</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Displays success rates, trend indicators (<code>↑</code> improving, <code>→</code> stable, <code>↓</code> degrading), execution duration, token usage, costs, and alerts.</p>
+        <h4>Options</h4>
+        <table class="opt-table">
+          <tr><td>--days &lt;n&gt;</td><td>Time range (default: 7 days)</td></tr>
+          <tr><td>--threshold &lt;n&gt;</td><td>Alert if below n% success rate</td></tr>
+          <tr><td>--json</td><td>Output in JSON</td></tr>
+        </table>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw health</span>                       <span class="comment"># Summary (last 7 days)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw health</span> <span class="val">issue-monster</span>         <span class="comment"># Detailed for one workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw health</span> <span class="flag">--days 30</span>             <span class="comment"># Last 30 days</span>
+<span class="prompt">$</span> <span class="cmd">gh aw health</span> <span class="flag">--threshold 90 --json</span> <span class="comment"># Alert below 90%</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- trial -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw trial</span>
+        <span class="cmd-desc">Test workflows in temporary repositories</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Tests workflows in temporary private repos (default) or directly in a specified repo. Results saved to <code>trials/</code>.</p>
+        <h4>Examples</h4>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw trial</span> <span class="val">githubnext/agentics/ci-doctor</span>          <span class="comment"># Test a remote workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw trial</span> <span class="val">./workflow.md</span> <span class="flag">--logical-repo owner/repo</span> <span class="comment"># Act as different repo</span>
+<span class="prompt">$</span> <span class="cmd">gh aw trial</span> <span class="val">./workflow.md</span> <span class="flag">--dry-run</span>                <span class="comment"># Preview only</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MCP & Secrets ── -->
+  <div class="cmd-group">
+    <div class="cmd-group-title">🔌 MCP, Secrets &amp; Domains</div>
+
+    <!-- mcp -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw mcp</span>
+        <span class="cmd-desc">Manage Model Context Protocol (MCP) servers</span>
+      </div>
+      <div class="cmd-body">
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw mcp list</span> <span class="val">workflow</span>                    <span class="comment"># List servers for a workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw mcp list-tools</span> <span class="val">&lt;mcp-server&gt;</span>          <span class="comment"># List tools exposed by server</span>
+<span class="prompt">$</span> <span class="cmd">gh aw mcp inspect</span> <span class="val">workflow</span>                 <span class="comment"># Inspect and test servers</span>
+<span class="prompt">$</span> <span class="cmd">gh aw mcp add</span>                              <span class="comment"># Add an MCP tool to workflow</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- mcp-server -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw mcp-server</span>
+        <span class="cmd-desc">Run gh-aw as an MCP server for IDE integration</span>
+        <span class="badge badge-purple">Bridge</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Exposes gh-aw commands as MCP tools — the key bridge between CLI and IDEs. Configure as an MCP tool source in VS Code to give Copilot live access to workflow status, compilation, logs, and audit.</p>
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px"><strong style="color:#e6edf3">Exposed tools:</strong> <code>status</code>, <code>compile</code>, <code>logs</code>, <code>audit</code>, <code>mcp-inspect</code>, <code>add</code>, <code>update</code></p>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw mcp-server</span>                      <span class="comment"># stdio transport (default)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw mcp-server</span> <span class="flag">--port 8080</span>          <span class="comment"># HTTP server with SSE</span>
+<span class="prompt">$</span> <span class="cmd">gh aw mcp-server</span> <span class="flag">--validate-actor</span>     <span class="comment"># Enable actor validation</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- secrets -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw secrets</span>
+        <span class="cmd-desc">Manage repository secrets for AI engine authentication</span>
+      </div>
+      <div class="cmd-body">
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw secrets set</span> <span class="val">MY_SECRET</span>                                    <span class="comment"># From stdin</span>
+<span class="prompt">$</span> <span class="cmd">gh aw secrets set</span> <span class="val">MY_SECRET</span> <span class="flag">--repo myorg/myrepo</span>                <span class="comment"># Target repo</span>
+<span class="prompt">$</span> <span class="cmd">gh aw secrets set</span> <span class="val">MY_SECRET</span> <span class="flag">--value-from-env MY_TOKEN</span>          <span class="comment"># From env var</span>
+
+<span class="prompt">$</span> <span class="cmd">gh aw secrets bootstrap</span>                                        <span class="comment"># Auto-detect missing</span>
+<span class="prompt">$</span> <span class="cmd">gh aw secrets bootstrap</span> <span class="flag">--engine copilot</span>                       <span class="comment"># Check Copilot only</span>
+<span class="prompt">$</span> <span class="cmd">gh aw secrets bootstrap</span> <span class="flag">--non-interactive</span>                      <span class="comment"># Display, don't prompt</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- domains -->
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">gh aw domains</span>
+        <span class="cmd-desc">List network domains referenced in workflows</span>
+      </div>
+      <div class="cmd-body">
+        <p style="color:#8b949e;font-size:.9rem;margin-bottom:12px">Shows allowed/blocked domains including DNS expansions.</p>
+        <div class="terminal">
+          <pre><span class="prompt">$</span> <span class="cmd">gh aw domains</span>                              <span class="comment"># List all domains</span>
+<span class="prompt">$</span> <span class="cmd">gh aw domains</span> <span class="flag">--json</span>                       <span class="comment"># Output in JSON</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Utilities ── -->
+  <div class="cmd-group">
+    <div class="cmd-group-title">🧰 Utilities</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px">
+      <div class="card" style="padding:16px 20px">
+        <h3 style="font-size:.95rem"><code class="cmd">gh aw completion install</code></h3>
+        <p>Auto-detect shell and install tab completions for commands, workflow names, engines, and paths.</p>
+        <div class="terminal" style="margin-top:8px">
+          <pre style="font-size:.82rem"><span class="prompt">$</span> <span class="cmd">gh aw completion install</span>
+<span class="prompt">$</span> <span class="cmd">gh aw completion uninstall</span></pre>
+        </div>
+      </div>
+      <div class="card" style="padding:16px 20px">
+        <h3 style="font-size:.95rem"><code class="cmd">gh aw project new</code></h3>
+        <p>Create and manage GitHub Projects V2 boards for workflow organization.</p>
+      </div>
+      <div class="card" style="padding:16px 20px">
+        <h3 style="font-size:.95rem"><code class="cmd">gh aw pr transfer</code></h3>
+        <p>Transfer a pull request to another repository.</p>
+      </div>
+      <div class="card" style="padding:16px 20px">
+        <h3 style="font-size:.95rem"><code class="cmd">gh aw hash-frontmatter</code></h3>
+        <p>Compute deterministic SHA-256 hash of workflow frontmatter for change detection.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COMPILATION PIPELINE ═══════════════ -->
+<div class="section" id="compilation">
+  <h2 class="section-title">⚙️ Compilation Pipeline</h2>
+  <p class="section-sub">How <code class="cmd">gh aw compile</code> transforms Markdown into secure GitHub Actions YAML.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="step-num">Step 1</div>
+      <div class="step-label" style="color:#58a6ff">📄 Parse</div>
+      <div class="step-detail">Read <code>.md</code>, extract<br>YAML frontmatter + body</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 2</div>
+      <div class="step-label" style="color:#bc8cff">📦 Resolve</div>
+      <div class="step-detail">Fetch remote imports,<br>cache in <code>.github/aw/imports/</code></div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 3</div>
+      <div class="step-label" style="color:#d29922">✅ Validate</div>
+      <div class="step-detail">Schema validation<br>against AW spec</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 4</div>
+      <div class="step-label" style="color:#f85149">🔒 Harden</div>
+      <div class="step-detail">Pin Actions to SHA,<br>restrict permissions</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 5</div>
+      <div class="step-label" style="color:#3fb950">🛡️ Guardrails</div>
+      <div class="step-detail">Inject staged pipeline<br>(sanitize → execute → detect)</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 6</div>
+      <div class="step-label" style="color:#58a6ff">📝 Generate</div>
+      <div class="step-detail">Output<br><code>.lock.yml</code></div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div class="step-num">Step 7</div>
+      <div class="step-label" style="color:#bc8cff">🔍 Post-Process</div>
+      <div class="step-detail">zizmor, actionlint,<br>poutine, Dependabot</div>
+    </div>
+  </div>
+
+  <!-- File relationships -->
+  <div style="margin-top:32px">
+    <h3 style="margin-bottom:16px">File Relationships</h3>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
+        <span class="terminal-title">Project Structure</span>
+      </div>
+      <pre>.github/
+├── workflows/
+│   ├── <span style="color:#58a6ff">my-workflow.md</span>          <span class="comment">← Source (authored by developer)</span>
+│   └── <span style="color:#3fb950">my-workflow.lock.yml</span>    <span class="comment">← Compiled output (generated)</span>
+├── aw/
+│   └── imports/                  <span class="comment">← Cached remote imports</span>
+├── agents/
+│   └── <span style="color:#bc8cff">agentic-workflows.agent.md</span>  <span class="comment">← Dispatcher agent</span>
+└── <span style="color:#d29922">dependabot.yml</span>              <span class="comment">← Generated with --dependabot</span></pre>
+    </div>
+  </div>
+
+  <!-- Strict Mode -->
+  <div style="margin-top:24px">
+    <h3 style="margin-bottom:12px">Strict Mode Enforcement</h3>
+    <p style="color:#8b949e;margin-bottom:16px">When <code class="cmd">--strict</code> is enabled, the compiler enforces these security requirements:</p>
+    <div class="cards cards-3" style="margin:0">
+      <div class="card" style="padding:16px;border-left:3px solid #f85149">
+        <h3 style="font-size:.9rem;color:#f85149">🚫 No Write Permissions</h3>
+        <p>Workflows cannot have elevated write access to the repository.</p>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid #d29922">
+        <h3 style="font-size:.9rem;color:#d29922">🌐 Explicit Network</h3>
+        <p>All network access must be declared — no implicit internet access.</p>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid #f85149">
+        <h3 style="font-size:.9rem;color:#f85149">🚫 No Wildcards</h3>
+        <p><code>*.example.com</code> patterns are rejected — domains must be explicit.</p>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid #3fb950">
+        <h3 style="font-size:.9rem;color:#3fb950">📌 Pinned Actions</h3>
+        <p>All action references must use full SHA hashes, not version tags.</p>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid #d29922">
+        <h3 style="font-size:.9rem;color:#d29922">⚠️ No Deprecated Fields</h3>
+        <p>Deprecated frontmatter keys are rejected — use <code class="cmd">gh aw fix</code> first.</p>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid #bc8cff">
+        <h3 style="font-size:.9rem;color:#bc8cff">🔗 Shared Workflows</h3>
+        <p>Workflows without <code>on</code> are auto-detected as shared components with relaxed validation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ IDE INTEGRATION ═══════════════ -->
+<div class="section" id="ide">
+  <h2 class="section-title">💻 IDE Integration</h2>
+  <p class="section-sub">Use <code class="cmd">gh aw</code> from your favorite editor.</p>
+
+  <div class="cards cards-3">
+    <!-- VS Code -->
+    <div class="card" style="border-top:3px solid #58a6ff">
+      <h3>🟦 VS Code Agent Mode <span class="badge badge-blue">Primary</span></h3>
+      <p>The <strong style="color:#e6edf3">primary IDE</strong> for authoring agentic workflows. Through GitHub Copilot Agent Mode, create, edit, and debug workflows conversationally.</p>
+      <ul>
+        <li>Open Copilot Chat → switch to <strong style="color:#e6edf3">Agent Mode</strong></li>
+        <li>Prompt: <em>"Create a workflow for GitHub Agentic Workflows..."</em></li>
+        <li>Agent creates the <code>.md</code> file, runs <code class="cmd">gh aw compile</code>, and can commit</li>
+        <li>Use <code>/agent</code> command for <code>create</code>, <code>debug</code>, <code>update</code>, <code>upgrade</code></li>
+      </ul>
+      <div class="tip" style="margin-top:12px;margin-bottom:0">
+        <strong>💡 MCP Bridge:</strong> Configure <code class="cmd">gh aw mcp-server</code> as an MCP tool source in VS Code Chat to give Copilot live access to workflow status, compilation, logs, and audit — all within the editor.
+      </div>
+    </div>
+
+    <!-- JetBrains -->
+    <div class="card" style="border-top:3px solid #bc8cff">
+      <h3>🟪 JetBrains IDEs</h3>
+      <p>IntelliJ, WebStorm, and PyCharm support Copilot Chat and can invoke <code class="cmd">gh aw</code> commands from the integrated terminal.</p>
+      <ul>
+        <li>Custom agents and sub-agents (GA)</li>
+        <li>Plan agent (GA)</li>
+        <li>Agent hooks (preview)</li>
+        <li>Auto-approve support for MCP</li>
+        <li>Expanded agent instruction files</li>
+      </ul>
+      <p style="margin-top:8px"><code class="cmd">gh aw mcp-server</code> works as an MCP tool source in any IDE supporting MCP.</p>
+    </div>
+
+    <!-- Web + Terminal -->
+    <div class="card" style="border-top:3px solid #3fb950">
+      <h3>🌐 Web UI &amp; Any Terminal</h3>
+      <p><strong style="color:#e6edf3">GitHub.com:</strong> Author workflows directly via Copilot chat in the web UI. Great for quick prototyping without local tooling.</p>
+      <p style="margin-top:12px"><strong style="color:#e6edf3">Any IDE with terminal:</strong> The CLI is IDE-agnostic — if it has a terminal, you can use the full <code class="cmd">gh aw</code> CLI for compilation, validation, and execution.</p>
+      <div class="terminal" style="margin-top:12px">
+        <pre><span class="comment"># Works in any terminal</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--watch</span>
+<span class="prompt">$</span> <span class="cmd">gh aw validate</span> <span class="flag">--strict</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">my-workflow</span> <span class="flag">--push</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ AGENTS TAB ═══════════════ -->
+<div class="section" id="agents-tab">
+  <h2 class="section-title">📊 The Agents Tab</h2>
+  <p class="section-sub">A centralized dashboard for managing Copilot coding agent sessions in your repository.</p>
+
+  <div class="card" style="padding:28px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+      <div>
+        <h3 style="font-size:1rem;margin-bottom:8px">👁️ View Sessions</h3>
+        <p>See all active and archived agent sessions in one place. Track what your agents are doing across the repository.</p>
+      </div>
+      <div>
+        <h3 style="font-size:1rem;margin-bottom:8px">➕ Create Sessions</h3>
+        <p>Start new agent sessions or switch between active tasks directly from the repository interface.</p>
+      </div>
+      <div>
+        <h3 style="font-size:1rem;margin-bottom:8px">🔗 Jump to PRs</h3>
+        <p>One-click links to associated pull requests. See exactly what changes each agent session produced.</p>
+      </div>
+      <div>
+        <h3 style="font-size:1rem;margin-bottom:8px">📁 Archive Sessions</h3>
+        <p>Organize completed sessions by archiving them. Keep your workspace clean while preserving history.</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:20px;margin-bottom:0">
+      <strong>💡 Configuration:</strong> For policy and environment settings, navigate to <strong style="color:#e6edf3">Settings → Copilot → Coding agent</strong> within your repository. The Actions tab shows workflow run history, job logs, artifacts, and the staged pipeline execution stages.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LOCAL DEVELOPMENT WORKFLOW ═══════════════ -->
+<div class="section" id="local-dev">
+  <h2 class="section-title">🔁 Local Development Workflow</h2>
+  <p class="section-sub">A typical end-to-end development cycle with <code class="cmd">gh aw</code>.</p>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
+      <span class="terminal-title">Development Cycle</span>
+    </div>
+    <pre><span class="comment"># 1. Initialize the repository (one-time setup)</span>
+<span class="prompt">$</span> <span class="cmd">gh aw init</span>
+
+<span class="comment"># 2. Create a new workflow</span>
+<span class="prompt">$</span> <span class="cmd">gh aw new</span> <span class="val">my-workflow</span> <span class="flag">--engine copilot</span>
+
+<span class="comment"># 3. Edit the .md file in your editor of choice</span>
+
+<span class="comment"># 4. Validate without compiling</span>
+<span class="prompt">$</span> <span class="cmd">gh aw validate</span> <span class="val">my-workflow</span>
+
+<span class="comment"># 5. Compile to .lock.yml</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="val">my-workflow</span>
+
+<span class="comment"># 6. Watch mode for rapid iteration</span>
+<span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="flag">--watch</span>
+
+<span class="comment"># 7. Commit both files</span>
+<span class="prompt">$</span> git add .github/workflows/my-workflow.md .github/workflows/my-workflow.lock.yml
+<span class="prompt">$</span> git commit -m <span class="val">"Add my-workflow agentic workflow"</span>
+<span class="prompt">$</span> git push
+
+<span class="comment"># 8. Trigger a run</span>
+<span class="prompt">$</span> <span class="cmd">gh aw run</span> <span class="val">my-workflow</span>
+
+<span class="comment"># 9. Monitor health over time</span>
+<span class="prompt">$</span> <span class="cmd">gh aw health</span> <span class="val">my-workflow</span> <span class="flag">--days 7</span>
+
+<span class="comment"># 10. Analyze a specific run</span>
+<span class="prompt">$</span> <span class="cmd">gh aw audit</span> <span class="val">&lt;run-id&gt;</span> <span class="flag">--parse</span></pre>
+  </div>
+
+  <div class="tip">
+    <strong>⚡ Shortcut:</strong> <code class="cmd">gh aw run --push</code> combines steps 5–8 into a single command: recompile → stage → commit → push → dispatch.
+  </div>
+</div>
+
+<!-- ═══════════════ DEBUGGING & TROUBLESHOOTING ═══════════════ -->
+<div class="section" id="debugging">
+  <h2 class="section-title">🐛 Debugging &amp; Troubleshooting</h2>
+  <p class="section-sub">Tips, the DEBUG environment variable, and common fixes.</p>
+
+  <!-- DEBUG env var -->
+  <div style="margin-bottom:24px">
+    <h3 style="margin-bottom:12px">Debug Environment Variable</h3>
+    <p style="color:#8b949e;margin-bottom:12px">Enable detailed debugging output with namespace filtering:</p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
+        <span class="terminal-title">Debug Output</span>
+      </div>
+      <pre><span class="prompt">$</span> <span class="flag">DEBUG=*</span> <span class="cmd">gh aw compile</span>                <span class="comment"># All debug logs</span>
+<span class="prompt">$</span> <span class="flag">DEBUG=cli:*</span> <span class="cmd">gh aw compile</span>            <span class="comment"># CLI logs only</span>
+<span class="prompt">$</span> <span class="flag">DEBUG=*,-tests</span> <span class="cmd">gh aw compile</span>         <span class="comment"># All except test logs</span></pre>
+    </div>
+  </div>
+
+  <!-- Fuzzy matching -->
+  <div style="margin-bottom:24px">
+    <h3 style="margin-bottom:12px">Fuzzy Workflow Name Matching</h3>
+    <p style="color:#8b949e;margin-bottom:12px">The CLI auto-suggests similar workflow names on typos using Levenshtein distance:</p>
+    <div class="terminal">
+      <pre><span class="prompt">$</span> <span class="cmd">gh aw compile</span> <span class="val">audti-workflows</span>
+<span style="color:#f85149">✗ workflow file not found</span>
+<span style="color:#d29922">Did you mean: audit-workflows?</span></pre>
+    </div>
+  </div>
+
+  <!-- GHES -->
+  <div style="margin-bottom:24px">
+    <h3 style="margin-bottom:12px">GitHub Enterprise Server</h3>
+    <div class="terminal">
+      <pre><span class="prompt">$</span> export <span class="flag">GH_HOST</span>=<span class="val">"github.enterprise.com"</span>
+<span class="prompt">$</span> gh auth login <span class="flag">--hostname</span> <span class="val">github.enterprise.com</span>
+<span class="prompt">$</span> <span class="cmd">gh aw logs</span> <span class="val">workflow</span> <span class="flag">--repo github.enterprise.com/owner/repo</span></pre>
+    </div>
+  </div>
+
+  <!-- Troubleshooting table -->
+  <h3 style="margin-bottom:16px">Common Issues</h3>
+  <div style="overflow-x:auto">
+    <table class="opt-table" style="min-width:600px">
+      <thead>
+        <tr>
+          <th style="width:40%">Issue</th>
+          <th>Solution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#f85149;font-family:monospace">command not found: gh</td>
+          <td>Install the GitHub CLI from <a href="https://cli.github.com/" target="_blank">cli.github.com</a></td>
+        </tr>
+        <tr>
+          <td style="color:#f85149;font-family:monospace">extension not found: aw</td>
+          <td>Run <code class="cmd">gh extension install github/gh-aw</code></td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Compilation fails with YAML errors</td>
+          <td>Check indentation, colons, and array syntax in frontmatter. Error reports include file paths, line numbers, and contextual code snippets.</td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Workflow not found</td>
+          <td>Check the fuzzy suggestion or run <code class="cmd">gh aw status</code> to list available workflows</td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Permission denied</td>
+          <td>Check file permissions or repository access. Ensure <code>gh auth status</code> shows correct authentication.</td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Missing secrets at runtime</td>
+          <td>Run <code class="cmd">gh aw secrets bootstrap</code> to auto-detect and configure missing secrets</td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Trial creation fails</td>
+          <td>Check GitHub rate limits and authentication. Verify with <code>gh auth status</code>.</td>
+        </tr>
+        <tr>
+          <td style="color:#f85149">Lock file outdated</td>
+          <td>Run <code class="cmd">gh aw compile</code> to regenerate, or use <code class="cmd">gh aw run --push</code> which auto-recompiles.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ COMMAND CHEAT SHEET ═══════════════ -->
+<div class="section" id="cheatsheet">
+  <h2 class="section-title">📋 Command Cheat Sheet</h2>
+  <p class="section-sub">Every command at a glance.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+    <div class="card" style="padding:20px">
+      <h3 style="margin-bottom:12px;color:#58a6ff">⚡ Core</h3>
+      <table class="opt-table">
+        <tr><td>gh aw init</td><td>Initialize repository</td></tr>
+        <tr><td>gh aw compile</td><td>Compile <code>.md</code> → <code>.lock.yml</code></td></tr>
+        <tr><td>gh aw validate</td><td>Validate with all linters</td></tr>
+        <tr><td>gh aw run</td><td>Trigger execution</td></tr>
+        <tr><td>gh aw list</td><td>List workflows (no API)</td></tr>
+        <tr><td>gh aw status</td><td>Detailed status + runs</td></tr>
+        <tr><td>gh aw version</td><td>Show CLI version</td></tr>
+      </table>
+    </div>
+
+    <div class="card" style="padding:20px">
+      <h3 style="margin-bottom:12px;color:#3fb950">🔄 Lifecycle</h3>
+      <table class="opt-table">
+        <tr><td>gh aw add</td><td>Add from repos</td></tr>
+        <tr><td>gh aw add-wizard</td><td>Interactive setup</td></tr>
+        <tr><td>gh aw new</td><td>Create template</td></tr>
+        <tr><td>gh aw fix</td><td>Auto-fix deprecated</td></tr>
+        <tr><td>gh aw update</td><td>Update from upstream</td></tr>
+        <tr><td>gh aw upgrade</td><td>Upgrade repo config</td></tr>
+        <tr><td>gh aw remove</td><td>Remove workflow</td></tr>
+        <tr><td>gh aw enable/disable</td><td>Toggle workflows</td></tr>
+      </table>
+    </div>
+
+    <div class="card" style="padding:20px">
+      <h3 style="margin-bottom:12px;color:#bc8cff">🔍 Monitoring</h3>
+      <table class="opt-table">
+        <tr><td>gh aw logs</td><td>Download & analyze logs</td></tr>
+        <tr><td>gh aw audit</td><td>Deep run analysis</td></tr>
+        <tr><td>gh aw health</td><td>Metrics & trends</td></tr>
+        <tr><td>gh aw trial</td><td>Test in temp repos</td></tr>
+      </table>
+    </div>
+
+    <div class="card" style="padding:20px">
+      <h3 style="margin-bottom:12px;color:#d29922">🔌 MCP & Secrets</h3>
+      <table class="opt-table">
+        <tr><td>gh aw mcp</td><td>Manage MCP servers</td></tr>
+        <tr><td>gh aw mcp-server</td><td>Run as MCP server</td></tr>
+        <tr><td>gh aw secrets</td><td>Manage secrets</td></tr>
+        <tr><td>gh aw domains</td><td>List network domains</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>GitHub Agentic Workflows Hub · CLI &amp; Tooling Reference</p>
+  <p style="margin-top:4px">Built from official <a href="https://github.github.com/gh-aw/setup/cli/" target="_blank">gh-aw documentation</a> · <a href="https://github.com/github/gh-aw" target="_blank">github/gh-aw</a></p>
+</div>
+
+</div><!-- /page-wrap -->
+
+</body>
+</html>

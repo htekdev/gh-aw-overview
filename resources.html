@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources & Links — GitHub Agentic Workflows</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #0d1117; color: #e6edf3; line-height: 1.6;
+    }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(13,17,23,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid #30363d; padding: 12px 24px;
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    .nav-brand { color: #e6edf3; text-decoration: none; font-weight: 600; font-size: 18px; }
+    .nav-links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+    .nav-links a { color: #8b949e; text-decoration: none; }
+    .nav-links a:hover { color: #e6edf3; }
+    .nav-links a.active { color: #3fb950; }
+
+    /* Layout */
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+    main { padding-top: 72px; }
+
+    /* Hero */
+    .hero {
+      text-align: center; padding: 64px 24px 48px;
+      background: linear-gradient(135deg, rgba(88,166,255,0.08) 0%, rgba(63,185,80,0.08) 50%, rgba(188,140,255,0.06) 100%);
+      border-bottom: 1px solid #30363d;
+    }
+    .hero-icon { font-size: 56px; margin-bottom: 16px; }
+    .hero h1 {
+      font-size: 42px; font-weight: 800; margin-bottom: 12px;
+      background: linear-gradient(135deg, #58a6ff 0%, #3fb950 50%, #bc8cff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p { color: #8b949e; font-size: 18px; max-width: 700px; margin: 0 auto 24px; }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 20px;
+    }
+    .hero-stat {
+      text-align: center; padding: 12px 24px; background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d; border-radius: 12px;
+    }
+    .hero-stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; }
+    .hero-stat .lbl { font-size: 13px; color: #8b949e; }
+
+    /* Section */
+    .section { padding: 56px 0; }
+    .section + .section { border-top: 1px solid #21262d; }
+    .section-hdr {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    }
+    .section-hdr .icon { font-size: 28px; }
+    .section-hdr h2 { font-size: 26px; font-weight: 700; }
+    .section-hdr .count {
+      font-size: 13px; color: #8b949e; background: #21262d;
+      padding: 2px 10px; border-radius: 10px; margin-left: 4px;
+    }
+    .section-desc { color: #8b949e; font-size: 15px; margin-bottom: 24px; max-width: 800px; }
+
+    /* Cards Grid */
+    .card-grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    }
+    .card-grid-2col {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    }
+    .card {
+      background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+      padding: 20px; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .card:hover {
+      border-color: #58a6ff; transform: translateY(-2px);
+      box-shadow: 0 4px 24px rgba(88,166,255,0.08);
+    }
+    .card-link {
+      color: inherit; text-decoration: none; display: flex; flex-direction: column; height: 100%;
+    }
+    .card-link:hover { text-decoration: none; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .card h3 { font-size: 16px; font-weight: 600; color: #e6edf3; line-height: 1.4; }
+    .card .desc { font-size: 14px; color: #8b949e; flex: 1; margin-bottom: 12px; line-height: 1.5; }
+    .card .meta { font-size: 12px; color: #6e7681; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: auto; }
+    .card .url-hint { font-size: 12px; color: #484f58; word-break: break-all; margin-top: 8px; }
+
+    /* Badges */
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 6px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .badge-essential { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+    .badge-recommended { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+    .badge-supplementary { background: rgba(63,185,80,0.15); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+    .badge-blog { background: rgba(188,140,255,0.15); color: #bc8cff; border: 1px solid rgba(188,140,255,0.3); }
+    .badge-repo { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+
+    /* Checklist */
+    .checklist {
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+    .check-item {
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; user-select: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .check-item:hover { border-color: #484f58; }
+    .check-item input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 22px; height: 22px; border-radius: 6px; border: 2px solid #30363d;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all 0.2s; font-size: 14px; color: transparent;
+    }
+    .check-item input:checked ~ .check-box {
+      background: #238636; border-color: #238636; color: #fff;
+    }
+    .check-item input:checked ~ .check-body .check-title {
+      text-decoration: line-through; color: #8b949e;
+    }
+    .check-body { flex: 1; }
+    .check-title { font-size: 15px; font-weight: 600; color: #e6edf3; }
+    .check-desc { font-size: 13px; color: #8b949e; margin-top: 2px; }
+    .check-step {
+      font-size: 11px; font-weight: 700; color: #58a6ff; margin-bottom: 2px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* Quick Ref Grid */
+    .qr-grid {
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .qr-item {
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.2s, transform 0.2s; text-decoration: none; color: inherit;
+    }
+    .qr-item:hover { border-color: #58a6ff; transform: translateY(-1px); text-decoration: none; }
+    .qr-icon { font-size: 22px; flex-shrink: 0; }
+    .qr-text .qr-title { font-size: 14px; font-weight: 600; color: #e6edf3; }
+    .qr-text .qr-url { font-size: 12px; color: #484f58; word-break: break-all; }
+
+    /* Blog Series */
+    .blog-series { counter-reset: blog-part; }
+    .blog-entry {
+      display: flex; align-items: center; gap: 16px; padding: 14px 18px;
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      margin-bottom: 8px; transition: border-color 0.2s; text-decoration: none; color: inherit;
+    }
+    .blog-entry:hover { border-color: #bc8cff; text-decoration: none; }
+    .blog-num {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; background: rgba(188,140,255,0.12);
+      color: #bc8cff; border: 1px solid rgba(188,140,255,0.25);
+    }
+    .blog-info { flex: 1; }
+    .blog-info .blog-title { font-size: 15px; font-weight: 600; color: #e6edf3; }
+    .blog-info .blog-part { font-size: 12px; color: #8b949e; }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 40px 24px; border-top: 1px solid #21262d;
+      color: #484f58; font-size: 13px;
+    }
+    footer a { color: #58a6ff; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 28px; }
+      .hero-stats { gap: 16px; }
+      .card-grid, .card-grid-2col { grid-template-columns: 1fr; }
+      .checklist { grid-template-columns: 1fr; }
+      .qr-grid { grid-template-columns: 1fr; }
+      .nav-links { gap: 10px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">⚡ GH Agentic Workflows</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="core-concepts.html">Core Concepts</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="configuration.html">Configuration</a>
+      <a href="security.html">Security</a>
+      <a href="ecosystem.html">Ecosystem</a>
+      <a href="use-cases.html">Use Cases</a>
+      <a href="cli-tooling.html">CLI &amp; Tooling</a>
+      <a href="videos.html">Videos</a>
+      <a href="resources.html" class="active">Resources</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-icon">📖</div>
+    <h1>Resources &amp; Links</h1>
+    <p>The complete collection of official documentation, blog posts, repositories, community articles, and learning paths for GitHub Agentic Workflows.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">8+</div>
+        <div class="lbl">Official Docs</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">4</div>
+        <div class="lbl">Blog Posts</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">5</div>
+        <div class="lbl">Repositories</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">19</div>
+        <div class="lbl">Blog Series Parts</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">5</div>
+        <div class="lbl">Community Articles</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">45+</div>
+        <div class="lbl">Total Resources</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== GETTING STARTED CHECKLIST ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">✅</span>
+      <h2>Getting Started Checklist</h2>
+    </div>
+    <p class="section-desc">Follow these steps to get up and running with GitHub Agentic Workflows. Check off each item as you complete it.</p>
+    <div class="checklist">
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 1</div>
+          <div class="check-title">Install the GitHub CLI</div>
+          <div class="check-desc">Download and install <code>gh</code> from <a href="https://cli.github.com" target="_blank" rel="noopener">cli.github.com</a></div>
+        </div>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 2</div>
+          <div class="check-title">Install the gh-aw Extension</div>
+          <div class="check-desc">Run <code>gh extension install github/gh-aw</code></div>
+        </div>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 3</div>
+          <div class="check-title">Initialize Your Repository</div>
+          <div class="check-desc">Run <code>gh aw init --engine copilot</code> in your repo</div>
+        </div>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 4</div>
+          <div class="check-title">Create Your First Workflow</div>
+          <div class="check-desc">Add a Markdown workflow to <code>.github/workflows/</code></div>
+        </div>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 5</div>
+          <div class="check-title">Compile the Workflow</div>
+          <div class="check-desc">Run <code>gh aw compile</code> to generate the Actions YAML</div>
+        </div>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox">
+        <span class="check-box">✓</span>
+        <div class="check-body">
+          <div class="check-step">Step 6</div>
+          <div class="check-title">Enable in Your Repository</div>
+          <div class="check-desc">Push to GitHub and enable the workflow in the Actions tab</div>
+        </div>
+      </label>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== OFFICIAL DOCUMENTATION ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">📚</span>
+      <h2>Official Documentation</h2>
+      <span class="count">8 pages</span>
+    </div>
+    <p class="section-desc">The primary documentation site at <a href="https://github.github.io/gh-aw/" target="_blank" rel="noopener">github.github.io/gh-aw</a> — your authoritative reference for everything gh-aw.</p>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>📘 Documentation Home</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">Main documentation site. Complete reference for concepts, setup, security, and workflow authoring.</div>
+          <div class="url-hint">github.github.io/gh-aw/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/setup/quick-start/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>🚀 Quick Start Guide</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">Step-by-step guide: install gh-aw, add a starter workflow, compile, and run. The fastest path from zero to a working workflow.</div>
+          <div class="url-hint">gh-aw/setup/quick-start/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/setup/creating-workflows/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>🛠️ Creating Agentic Workflows</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">How to write, compile, and deploy your first workflow. Covers <code>gh aw init</code>, <code>gh aw compile</code>, and <code>gh aw run</code>.</div>
+          <div class="url-hint">gh-aw/setup/creating-workflows/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/introduction/overview/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>💡 About Workflows (Overview)</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Conceptual overview: coding agents + tools in GitHub Actions. Explains frontmatter, safe-outputs, and the compilation model.</div>
+          <div class="url-hint">gh-aw/introduction/overview/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/reference/markdown/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>📝 Markdown Reference</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Detailed guide on writing effective workflow instructions. Covers templating, substitutions, content organization, and common pitfalls.</div>
+          <div class="url-hint">gh-aw/reference/markdown/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/security/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>🔒 Security Architecture</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">Comprehensive security model: sandboxed execution, network isolation, SHA-pinned dependencies, tool allow-listing, compile-time validation.</div>
+          <div class="url-hint">gh-aw/security/</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://gh.io/gh-aw" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>🔗 Official Shortlink</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">Official shortlink redirecting to the documentation site. Easy to remember and share: <strong>gh.io/gh-aw</strong></div>
+          <div class="url-hint">gh.io/gh-aw</div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.com/github/gh-aw/blob/main/llms.txt" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>🤖 llms.txt (Agent Reference)</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">Machine-readable reference for AI agents working with gh-aw. Feed this to your coding agent for optimal gh-aw authoring.</div>
+          <div class="url-hint">github.com/github/gh-aw/blob/main/llms.txt</div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== GITHUB BLOG POSTS ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">📰</span>
+      <h2>GitHub Blog Posts</h2>
+      <span class="count">4 posts</span>
+    </div>
+    <p class="section-desc">Official announcements, changelog entries, and deep dives from the GitHub Blog.</p>
+
+    <div class="card-grid-2col">
+
+      <div class="card">
+        <a href="https://github.blog/ai-and-ml/github-copilot/automate-repository-tasks-with-github-agentic-workflows/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>Automate Repository Tasks with GitHub Agentic Workflows</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">The main announcement post (8-minute read). Introduces Continuous AI, the security model (read-only by default, safe-outputs), multi-engine support (Copilot CLI, Claude Code, OpenAI Codex), and billing.</div>
+          <div class="meta">
+            <span>✍️ Don Syme, Peli de Halleux</span>
+            <span>📅 Feb 13, 2026</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.blog/changelog/2026-02-13-github-agentic-workflows-are-now-in-technical-preview/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>GitHub Agentic Workflows — Now in Technical Preview</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Concise changelog entry covering key benefits: natural language workflows, security-first design, easy setup, agentic authoring. Links to Peli's Agent Factory (50+ specialized workflows).</div>
+          <div class="meta">
+            <span>✍️ GitHub Staff</span>
+            <span>📅 Feb 13, 2026</span>
+            <span class="badge badge-blog">Changelog</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.blog/ai-and-ml/generative-ai/continuous-ai-in-practice-what-developers-can-automate-today-with-agentic-ci/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>Continuous AI in Practice: What Developers Can Automate Today</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">Explores the Continuous AI pattern: natural-language rules + agentic reasoning, executed continuously inside repositories. Covers triage, documentation, code quality, and status reports.</div>
+          <div class="meta">
+            <span>✍️ GitHub Staff</span>
+            <span>📅 Feb 5, 2026</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.blog/changelog/2026-03-05-copilot-code-review-now-runs-on-an-agentic-architecture" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>Copilot Code Review Now Runs on an Agentic Architecture</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Code review now uses agentic tool-calling for broader context gathering. Higher-quality findings, lower noise, more actionable guidance. Runs on GitHub Actions infrastructure.</div>
+          <div class="meta">
+            <span>✍️ GitHub Staff</span>
+            <span>📅 Mar 5, 2026</span>
+            <span class="badge badge-blog">Changelog</span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== GITHUB REPOSITORIES ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">🗂️</span>
+      <h2>GitHub Repositories</h2>
+      <span class="count">5 repos</span>
+    </div>
+    <p class="section-desc">Open-source repositories powering GitHub Agentic Workflows — from the CLI extension to the firewall and sample packs.</p>
+
+    <div class="card-grid">
+
+      <div class="card" style="border-color: rgba(88,166,255,0.3);">
+        <a href="https://github.com/github/gh-aw" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>github/gh-aw</h3>
+            <span class="badge badge-essential">Essential</span>
+          </div>
+          <div class="desc">The main repository. GitHub CLI extension for writing agentic workflows in natural language Markdown. MIT License.</div>
+          <div class="meta">
+            <span class="badge badge-repo">⭐ 4,000+</span>
+            <span>Go (70.8%), JS (27.6%)</span>
+            <span>📦 v0.64.0</span>
+            <span>313 releases</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.com/githubnext/agentics" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>githubnext/agentics</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Sample pack of GitHub Agentic Workflows. Ready-to-use templates: daily-repo-status, issue-triage, and more. Great starting point.</div>
+          <div class="meta">
+            <span>📄 Markdown</span>
+            <span>Templates &amp; Samples</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.com/github/gh-aw-firewall" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>github/gh-aw-firewall</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Agent Workflow Firewall (AWF). Network egress control for AI agents with domain-based access control. Critical for security.</div>
+          <div class="meta">
+            <span>🔒 Security</span>
+            <span>Network Isolation</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.com/github" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>gh-aw-actions</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">Shared library of custom GitHub Actions used by compiled agentic workflows. The building blocks behind the generated YAML.</div>
+          <div class="meta">
+            <span>⚙️ GitHub Actions</span>
+            <span>Under github org</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.com/github" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>MCP Gateway</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">Routes Model Context Protocol (MCP) server calls through a unified HTTP gateway for agentic workflows. Companion project.</div>
+          <div class="meta">
+            <span>🔌 MCP Protocol</span>
+            <span>Companion project</span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== COMMUNITY ARTICLES ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">✍️</span>
+      <h2>Community Articles</h2>
+      <span class="count">5 articles</span>
+    </div>
+    <p class="section-desc">Hands-on guides, deep dives, and practical perspectives from the developer community.</p>
+
+    <div class="card-grid-2col">
+
+      <div class="card">
+        <a href="https://dev.to/htekdev/github-agentic-workflows-a-hands-on-guide-to-ai-powered-cicd-255e" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>GitHub Agentic Workflows: A Hands-On Guide to AI-Powered CI/CD</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Built entire demo using Copilot CLI. Covers four workflow patterns: issue triage, PR review, docs sync, CI failure investigation. Honest assessment of rough edges. "Set up four workflows in 30 minutes that would've taken days with traditional Actions."</div>
+          <div class="meta">
+            <span>✍️ htekdev</span>
+            <span>📅 Feb 17, 2026</span>
+            <span>🔗 dev.to</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://josh-ops.com/posts/github-agentic-workflows/" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>Getting Started with GitHub Agentic Workflows: A Hands-On Guide</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Built a demo repository with 11 agentic workflows. Practical guide covering gotchas, troubleshooting, and tips to shorten the learning curve. Covers prerequisites, installation, compilation, and deployment.</div>
+          <div class="meta">
+            <span>✍️ Josh Johanning</span>
+            <span>📅 Mar 3, 2026</span>
+            <span>🔗 josh-ops.com</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://www.tenki.cloud/blog/github-agentic-workflows" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>GitHub Agentic Workflows Explained</h3>
+            <span class="badge badge-recommended">Recommended</span>
+          </div>
+          <div class="desc">Deep technical analysis of the 3-layer security model (substrate isolation, compilation-time constraints, safe outputs). Covers agent flexibility across Copilot, Claude, and Codex.</div>
+          <div class="meta">
+            <span>✍️ Marina Rivosecchi</span>
+            <span>📅 Mar 23, 2026</span>
+            <span>🔗 tenki.cloud</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://www.linkedin.com/posts/ilyasf_github-githubgh-aw-github-agentic-workflows-activity-7431586150760316928-bp6q" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>LinkedIn: GitHub Introduces Agentic Workflows</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">"A shift from event-triggered automation to agent-driven automation: workflows that can reason about state and adapt their execution."</div>
+          <div class="meta">
+            <span>✍️ Ilyas F</span>
+            <span>📅 Feb 22, 2026</span>
+            <span>🔗 LinkedIn</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://www.ssw.com.au/rules/agentic-workflows" target="_blank" rel="noopener" class="card-link">
+          <div class="card-top">
+            <h3>SSW Rule: Agentic Workflows</h3>
+            <span class="badge badge-supplementary">Supplementary</span>
+          </div>
+          <div class="desc">Enterprise software consultancy's standard rule for when and how to adopt agentic workflows in projects. Practical enterprise perspective.</div>
+          <div class="meta">
+            <span>✍️ Eddie Kranz (SSW)</span>
+            <span>📅 Feb 2026</span>
+            <span>🔗 ssw.com.au</span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== QUICK REFERENCE ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">⚡</span>
+      <h2>Quick Reference</h2>
+    </div>
+    <p class="section-desc">Key links at a glance — bookmark these for daily use.</p>
+
+    <div class="qr-grid">
+
+      <a href="https://github.github.io/gh-aw/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">📘</span>
+        <div class="qr-text">
+          <div class="qr-title">Official Documentation</div>
+          <div class="qr-url">github.github.io/gh-aw</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/github/gh-aw" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🗂️</span>
+        <div class="qr-text">
+          <div class="qr-title">GitHub Repository</div>
+          <div class="qr-url">github.com/github/gh-aw</div>
+        </div>
+      </a>
+
+      <a href="https://github.blog/changelog/2026-02-13-github-agentic-workflows-are-now-in-technical-preview/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">📋</span>
+        <div class="qr-text">
+          <div class="qr-title">Changelog</div>
+          <div class="qr-url">github.blog/changelog</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/setup/quick-start/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🚀</span>
+        <div class="qr-text">
+          <div class="qr-title">Quick Start Guide</div>
+          <div class="qr-url">gh-aw/setup/quick-start</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/reference/markdown/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">📝</span>
+        <div class="qr-text">
+          <div class="qr-title">Markdown Reference</div>
+          <div class="qr-url">gh-aw/reference/markdown</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/security/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🔒</span>
+        <div class="qr-text">
+          <div class="qr-title">Security Architecture</div>
+          <div class="qr-url">gh-aw/security</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/introduction/overview/" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">💡</span>
+        <div class="qr-text">
+          <div class="qr-title">Frontmatter &amp; Schema</div>
+          <div class="qr-url">gh-aw/introduction/overview</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/github/gh-aw/blob/main/llms.txt" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🤖</span>
+        <div class="qr-text">
+          <div class="qr-title">llms.txt (Agent Reference)</div>
+          <div class="qr-url">gh-aw/blob/main/llms.txt</div>
+        </div>
+      </a>
+
+      <a href="https://gh.io/gh-aw" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🔗</span>
+        <div class="qr-text">
+          <div class="qr-title">Shortlink</div>
+          <div class="qr-url">gh.io/gh-aw</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/github/gh-aw-firewall" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">🛡️</span>
+        <div class="qr-text">
+          <div class="qr-title">Agent Workflow Firewall</div>
+          <div class="qr-url">github.com/github/gh-aw-firewall</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/githubnext/agentics" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">📦</span>
+        <div class="qr-text">
+          <div class="qr-title">Sample Workflow Pack</div>
+          <div class="qr-url">githubnext/agentics</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/github/gh-aw/discussions" target="_blank" rel="noopener" class="qr-item">
+        <span class="qr-icon">💬</span>
+        <div class="qr-text">
+          <div class="qr-title">Community Discussions</div>
+          <div class="qr-url">gh-aw/discussions</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PELI'S AGENT FACTORY BLOG SERIES ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">🏭</span>
+      <h2>Peli's Agent Factory Blog Series</h2>
+      <span class="count">19 parts</span>
+    </div>
+    <p class="section-desc">The definitive blog series by <strong>Don Syme</strong> and <strong>Peli de Halleux</strong> (GitHub Next / Microsoft Research). Over 100 workflows built and operated in the gh-aw repository itself. <em>"AI agents are most powerful when they're specialized, well-coordinated, and designed for their specific task."</em></p>
+
+    <div class="blog-series">
+
+      <a href="https://github.github.io/gh-aw/blog/2026-01-12-welcome-to-pelis-agent-factory/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">0</div>
+        <div class="blog-info">
+          <div class="blog-title">Welcome to Peli's Agent Factory</div>
+          <div class="blog-part">Introduction — Setting the stage for specialized agent workflows</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/2026-01-13-meet-the-workflows-documentation/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">1</div>
+        <div class="blog-info">
+          <div class="blog-title">Continuous Documentation Workflows</div>
+          <div class="blog-part">Part 1 — Automated docs generation, sync, and maintenance</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">2</div>
+        <div class="blog-info">
+          <div class="blog-title">Continuous Improvement Workflows</div>
+          <div class="blog-part">Part 2 — Incremental code and process improvements</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">3</div>
+        <div class="blog-info">
+          <div class="blog-title">Continuous Style Workflows</div>
+          <div class="blog-part">Part 3 — Enforcing consistent coding style with agents</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">4</div>
+        <div class="blog-info">
+          <div class="blog-title">Continuous Refactoring Workflows</div>
+          <div class="blog-part">Part 4 — Agent-driven refactoring and code modernization</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">5</div>
+        <div class="blog-info">
+          <div class="blog-title">Continuous Simplicity Workflows</div>
+          <div class="blog-part">Part 5 — Reducing complexity and keeping code simple</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">6</div>
+        <div class="blog-info">
+          <div class="blog-title">Simple Triage Workflow</div>
+          <div class="blog-part">Part 6 — Automated issue classification and labeling</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">7</div>
+        <div class="blog-info">
+          <div class="blog-title">Issue &amp; PR Management Workflows</div>
+          <div class="blog-part">Part 7 — End-to-end issue and pull request lifecycle management</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">8</div>
+        <div class="blog-info">
+          <div class="blog-title">Fault Investigation Workflows</div>
+          <div class="blog-part">Part 8 — Automated CI failure analysis and root cause investigation</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">9</div>
+        <div class="blog-info">
+          <div class="blog-title">Testing Workflows</div>
+          <div class="blog-part">Part 9 — Automated test generation and coverage improvement</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">10</div>
+        <div class="blog-info">
+          <div class="blog-title">Security Workflows</div>
+          <div class="blog-part">Part 10 — Security scanning, vulnerability detection, and remediation</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">11</div>
+        <div class="blog-info">
+          <div class="blog-title">Analytics Workflows</div>
+          <div class="blog-part">Part 11 — Repository analytics and reporting agents</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">12</div>
+        <div class="blog-info">
+          <div class="blog-title">Multi-Phase Improvers (Part 1)</div>
+          <div class="blog-part">Part 12 — Complex multi-step improvement workflows</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">13</div>
+        <div class="blog-info">
+          <div class="blog-title">Multi-Phase Improvers (Part 2)</div>
+          <div class="blog-part">Part 13 — Advanced patterns for chained improvements</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">14</div>
+        <div class="blog-info">
+          <div class="blog-title">Organization &amp; Cross-Repo Workflows (Part 1)</div>
+          <div class="blog-part">Part 14 — Managing workflows across multiple repositories</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">15</div>
+        <div class="blog-info">
+          <div class="blog-title">Organization &amp; Cross-Repo Workflows (Part 2)</div>
+          <div class="blog-part">Part 15 — Enterprise-scale workflow coordination</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">16</div>
+        <div class="blog-info">
+          <div class="blog-title">Advanced Analytics &amp; ML (Part 1)</div>
+          <div class="blog-part">Part 16 — Machine learning-powered repository insights</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">17</div>
+        <div class="blog-info">
+          <div class="blog-title">Advanced Analytics &amp; ML (Part 2)</div>
+          <div class="blog-part">Part 17 — Predictive analytics and trend detection</div>
+        </div>
+      </a>
+
+      <a href="https://github.github.io/gh-aw/blog/" target="_blank" rel="noopener" class="blog-entry">
+        <div class="blog-num">18</div>
+        <div class="blog-info">
+          <div class="blog-title">Project Coordination Workflows</div>
+          <div class="blog-part">Part 18 (Final) — Orchestrating agents across an entire project</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== KEY PEOPLE ==================== -->
+<section class="section">
+  <div class="container">
+    <div class="section-hdr">
+      <span class="icon">👥</span>
+      <h2>Key People</h2>
+    </div>
+    <p class="section-desc">The creators and contributors behind GitHub Agentic Workflows.</p>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/blog/authors/peli-de-halleux/" target="_blank" rel="noopener" class="card-link">
+          <h3>Peli de Halleux (pelikhan)</h3>
+          <div class="desc">Creator of gh-aw. GitHub Next / Microsoft Research. Built over 100 specialized agentic workflows documented in the Agent Factory blog series.</div>
+          <div class="meta"><span>🏢 GitHub Next</span><span>🔬 Microsoft Research</span></div>
+        </a>
+      </div>
+
+      <div class="card">
+        <a href="https://github.github.io/gh-aw/blog/authors/don-syme/" target="_blank" rel="noopener" class="card-link">
+          <h3>Don Syme (dsyme)</h3>
+          <div class="desc">Key contributor and creator of F#. Driving force behind the Continuous AI vision. Featured in Scott Hanselman interview on agentic workflows philosophy.</div>
+          <div class="meta"><span>🏢 Microsoft</span><span>💎 Creator of F#</span></div>
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-link">
+          <h3>Eddie Aftandilian (eaftan)</h3>
+          <div class="desc">Engineering Lead for GitHub Agentic Workflows. Overseeing the technical implementation and developer experience.</div>
+          <div class="meta"><span>🏢 GitHub</span><span>⚙️ Engineering Lead</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-link">
+          <h3>Idan Gazit</h3>
+          <div class="desc">Head of GitHub Next. Quoted extensively in blog posts: "Custom agents for offline tasks, that's what Continuous AI is."</div>
+          <div class="meta"><span>🏢 GitHub Next</span><span>🎯 Head of Research</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>GitHub Agentic Workflows — A collaboration among <a href="https://githubnext.com" target="_blank" rel="noopener">GitHub Next</a>, <a href="https://www.microsoft.com/research/" target="_blank" rel="noopener">Microsoft Research</a>, and Azure Core Upstream.</p>
+    <p style="margin-top:8px;">Open Source under the <a href="https://github.com/github/gh-aw/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Join the <a href="https://github.com/github/gh-aw/discussions" target="_blank" rel="noopener">Community Discussions</a> · <a href="https://discord.gg/githubnext" target="_blank" rel="noopener">GitHub Next Discord</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

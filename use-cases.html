@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Use Cases & Examples — GH Agentic Workflows</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero { padding: 140px 24px 60px; text-align: center; background: linear-gradient(135deg, rgba(88,166,255,0.08) 0%, rgba(63,185,80,0.06) 40%, rgba(188,140,255,0.08) 100%); border-bottom: 1px solid #30363d; }
+    .hero-emoji { font-size: 64px; margin-bottom: 16px; display: block; }
+    .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #58a6ff, #3fb950, #bc8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 18px; color: #8b949e; max-width: 700px; margin: 0 auto 24px; }
+    .hero-stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 24px; }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; }
+    .hero-stat .lbl { font-size: 13px; color: #8b949e; }
+
+    /* Section */
+    section { padding: 64px 0; }
+    section + section { border-top: 1px solid #21262d; }
+    .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .section-sub { color: #8b949e; margin-bottom: 32px; font-size: 15px; }
+
+    /* Overview Table */
+    .overview-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .overview-table thead th { text-align: left; padding: 12px 16px; background: #161b22; color: #8b949e; font-weight: 600; border-bottom: 2px solid #30363d; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .overview-table tbody td { padding: 12px 16px; border-bottom: 1px solid #21262d; vertical-align: middle; }
+    .overview-table tbody tr:hover { background: rgba(88,166,255,0.04); }
+    .overview-table .cat-num { color: #8b949e; font-weight: 600; width: 40px; }
+    .overview-table .cat-name { font-weight: 600; color: #e6edf3; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-low { background: rgba(63,185,80,0.15); color: #3fb950; }
+    .badge-medium { background: rgba(210,153,34,0.15); color: #d29922; }
+    .badge-high { background: rgba(248,81,73,0.15); color: #f85149; }
+    .trigger-tag { display: inline-block; background: rgba(88,166,255,0.1); color: #58a6ff; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-family: 'SFMono-Regular', Consolas, monospace; margin: 2px; }
+
+    /* Use Case Cards */
+    .uc-section { padding: 56px 0; }
+    .uc-section + .uc-section { border-top: 1px solid #21262d; }
+    .uc-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .uc-icon { font-size: 36px; flex-shrink: 0; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+    .uc-header h3 { font-size: 24px; font-weight: 700; }
+    .uc-header p { color: #8b949e; font-size: 14px; margin-top: 4px; }
+    .uc-accent-blue .uc-icon { background: rgba(88,166,255,0.12); }
+    .uc-accent-blue h3 { color: #58a6ff; }
+    .uc-accent-green .uc-icon { background: rgba(63,185,80,0.12); }
+    .uc-accent-green h3 { color: #3fb950; }
+    .uc-accent-purple .uc-icon { background: rgba(188,140,255,0.12); }
+    .uc-accent-purple h3 { color: #bc8cff; }
+    .uc-accent-orange .uc-icon { background: rgba(210,153,34,0.12); }
+    .uc-accent-orange h3 { color: #d29922; }
+    .uc-accent-red .uc-icon { background: rgba(248,81,73,0.12); }
+    .uc-accent-red h3 { color: #f85149; }
+    .uc-accent-teal .uc-icon { background: rgba(63,185,80,0.12); }
+    .uc-accent-teal h3 { color: #56d364; }
+
+    /* Code Blocks */
+    .code-block { position: relative; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; margin: 20px 0; overflow: hidden; }
+    .code-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: #161b22; border-bottom: 1px solid #30363d; font-size: 13px; color: #8b949e; }
+    .code-header .filename { font-family: 'SFMono-Regular', Consolas, monospace; }
+    .copy-btn { background: rgba(88,166,255,0.1); color: #58a6ff; border: 1px solid #30363d; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .copy-btn:hover { background: rgba(88,166,255,0.2); }
+    .code-block pre { padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; color: #e6edf3; margin: 0; }
+    .code-block pre .comment { color: #8b949e; }
+    .code-block pre .key { color: #ff7b72; }
+    .code-block pre .string { color: #a5d6ff; }
+    .code-block pre .heading { color: #d2a8ff; font-weight: 600; }
+    .code-block pre .value { color: #79c0ff; }
+
+    /* Why it works */
+    .why-box { background: #161b22; border: 1px solid #30363d; border-left: 3px solid #3fb950; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .why-box h4 { color: #3fb950; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .why-box p, .why-box li { color: #8b949e; font-size: 14px; }
+    .why-box ul { padding-left: 20px; margin-top: 8px; }
+    .why-box li { margin-bottom: 4px; }
+
+    /* Case study */
+    .case-study { background: linear-gradient(135deg, rgba(188,140,255,0.06), rgba(88,166,255,0.06)); border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .case-study h4 { color: #bc8cff; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .case-study p { color: #8b949e; font-size: 14px; }
+    .case-study blockquote { border-left: 3px solid #bc8cff; padding-left: 16px; margin: 12px 0; font-style: italic; color: #e6edf3; }
+    .case-study .source { font-size: 12px; color: #8b949e; margin-top: 8px; }
+
+    /* Results table */
+    .results-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    .results-table th { text-align: left; padding: 8px 12px; background: #161b22; color: #8b949e; font-weight: 600; border-bottom: 1px solid #30363d; }
+    .results-table td { padding: 8px 12px; border-bottom: 1px solid #21262d; }
+    .results-table tr:hover { background: rgba(88,166,255,0.03); }
+    .merge-rate { color: #3fb950; font-weight: 600; }
+
+    /* Pattern cards */
+    .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+    .pattern-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; transition: border-color 0.2s; }
+    .pattern-card:hover { border-color: #58a6ff; }
+    .pattern-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .pattern-card p { color: #8b949e; font-size: 14px; margin-bottom: 12px; }
+    .pattern-card .examples { font-size: 13px; color: #58a6ff; }
+
+    /* Factory section */
+    .factory-hero { background: linear-gradient(135deg, rgba(210,153,34,0.08), rgba(188,140,255,0.08)); border: 1px solid #30363d; border-radius: 16px; padding: 40px; margin-bottom: 32px; text-align: center; }
+    .factory-hero h3 { font-size: 28px; margin-bottom: 8px; }
+    .factory-hero blockquote { border: none; font-style: italic; color: #d29922; font-size: 18px; margin: 16px 0; }
+    .factory-hero .attr { color: #8b949e; font-size: 14px; }
+    .factory-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 24px 0; }
+    .factory-stat { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; text-align: center; }
+    .factory-stat .num { font-size: 24px; font-weight: 700; color: #d29922; }
+    .factory-stat .lbl { font-size: 12px; color: #8b949e; margin-top: 4px; }
+    .lessons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .lesson-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+    .lesson-card .num { color: #d29922; font-weight: 700; font-size: 20px; margin-bottom: 8px; }
+    .lesson-card h5 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .lesson-card p { color: #8b949e; font-size: 13px; }
+
+    /* Safe outputs ref */
+    .so-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    .so-table th { text-align: left; padding: 10px 14px; background: #161b22; color: #8b949e; font-weight: 600; border-bottom: 1px solid #30363d; }
+    .so-table td { padding: 10px 14px; border-bottom: 1px solid #21262d; }
+    .so-table code { background: rgba(88,166,255,0.1); color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+    /* Agentics collection */
+    .agentics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .agc-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s; }
+    .agc-card:hover { border-color: #58a6ff; }
+    .agc-card .emoji { font-size: 24px; flex-shrink: 0; }
+    .agc-card .name { font-weight: 600; font-size: 14px; }
+    .agc-card .desc { color: #8b949e; font-size: 12px; }
+
+    /* Decision guide */
+    .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .decision-card { border-radius: 12px; padding: 24px; }
+    .decision-card.good { background: rgba(63,185,80,0.06); border: 1px solid rgba(63,185,80,0.2); }
+    .decision-card.trad { background: rgba(210,153,34,0.06); border: 1px solid rgba(210,153,34,0.2); }
+    .decision-card h4 { font-size: 16px; margin-bottom: 12px; }
+    .decision-card.good h4 { color: #3fb950; }
+    .decision-card.trad h4 { color: #d29922; }
+    .decision-card li { color: #8b949e; font-size: 14px; margin-bottom: 6px; }
+    .decision-card ul { padding-left: 20px; }
+
+    /* Install block */
+    .install-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; color: #79c0ff; overflow-x: auto; }
+    .install-block .prompt { color: #3fb950; }
+    .install-block .comment-line { color: #8b949e; }
+
+    /* Responsive table wrapper */
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #30363d; }
+    .table-wrap table { min-width: 700px; }
+
+    /* Footer */
+    footer { border-top: 1px solid #30363d; padding: 32px 24px; text-align: center; color: #8b949e; font-size: 13px; }
+
+    @media (max-width: 768px) {
+      .pattern-grid, .lessons-grid, .agentics-grid { grid-template-columns: 1fr; }
+      .decision-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 16px; }
+      .uc-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #30363d;padding:12px 24px;">
+  <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <a href="index.html" style="color:#e6edf3;text-decoration:none;font-weight:600;font-size:18px;">⚡ GH Agentic Workflows</a>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:14px;">
+      <a href="index.html" style="color:#8b949e;text-decoration:none;">Home</a>
+      <a href="core-concepts.html" style="color:#8b949e;text-decoration:none;">Core Concepts</a>
+      <a href="architecture.html" style="color:#8b949e;text-decoration:none;">Architecture</a>
+      <a href="configuration.html" style="color:#8b949e;text-decoration:none;">Configuration</a>
+      <a href="security.html" style="color:#8b949e;text-decoration:none;">Security</a>
+      <a href="ecosystem.html" style="color:#8b949e;text-decoration:none;">Ecosystem</a>
+      <a href="use-cases.html" style="color:#3fb950;text-decoration:none;">Use Cases</a>
+      <a href="cli-tooling.html" style="color:#8b949e;text-decoration:none;">CLI &amp; Tooling</a>
+      <a href="videos.html" style="color:#8b949e;text-decoration:none;">Videos</a>
+      <a href="resources.html" style="color:#8b949e;text-decoration:none;">Resources</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <span class="hero-emoji">🎯</span>
+    <h1>Use Cases &amp; Examples</h1>
+    <p>Real-world automation patterns for every stage of the development lifecycle. Copy-paste workflows, proven results, and battle-tested patterns from GitHub's own Agent Factory.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">12</div><div class="lbl">Use Case Categories</div></div>
+      <div class="hero-stat"><div class="num">100+</div><div class="lbl">Factory Workflows</div></div>
+      <div class="hero-stat"><div class="num">96%</div><div class="lbl">Top Merge Rate</div></div>
+      <div class="hero-stat"><div class="num">7</div><div class="lbl">Design Patterns</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Quick Overview Table -->
+<section>
+  <h2 class="section-title">📋 All 12 Use Case Categories</h2>
+  <p class="section-sub">From simple triage to multi-repo orchestration — find the right automation for your needs.</p>
+  <div class="table-wrap">
+    <table class="overview-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Category</th>
+          <th>Trigger Pattern</th>
+          <th>Example Outputs</th>
+          <th>Complexity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="cat-num">1</td><td class="cat-name">Issue Triage &amp; Labeling</td><td><span class="trigger-tag">on: issue</span></td><td>Labels, comments</td><td><span class="badge badge-low">Low</span></td></tr>
+        <tr><td class="cat-num">2</td><td class="cat-name">Documentation Maintenance</td><td><span class="trigger-tag">on: schedule</span> <span class="trigger-tag">on: push</span></td><td>Pull requests, issues</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">3</td><td class="cat-name">CI Failure Analysis</td><td><span class="trigger-tag">on: workflow_run</span></td><td>Issues, PRs with fixes</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">4</td><td class="cat-name">Test Coverage Improvement</td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">5</td><td class="cat-name">Repository Reporting</td><td><span class="trigger-tag">on: schedule</span></td><td>Issues, discussions</td><td><span class="badge badge-low">Low</span></td></tr>
+        <tr><td class="cat-num">6</td><td class="cat-name">Security &amp; Compliance</td><td><span class="trigger-tag">on: schedule</span> <span class="trigger-tag">on: push</span></td><td>Issues, discussions</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">7</td><td class="cat-name">Code Quality &amp; Refactoring</td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td class="cat-num">8</td><td class="cat-name">Release &amp; Changelog</td><td><span class="trigger-tag">on: release</span> <span class="trigger-tag">on: push</span></td><td>Pull requests</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">9</td><td class="cat-name">Dependency Management</td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests, issues</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">10</td><td class="cat-name">Accessibility Review</td><td><span class="trigger-tag">on: pull_request</span> <span class="trigger-tag">on: schedule</span></td><td>Comments, issues</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">11</td><td class="cat-name">Code Review Assistance</td><td><span class="trigger-tag">on: pull_request</span> <span class="trigger-tag">on: issue_comment</span></td><td>Comments</td><td><span class="badge badge-medium">Medium</span></td></tr>
+        <tr><td class="cat-num">12</td><td class="cat-name">Onboarding &amp; ChatOps</td><td><span class="trigger-tag">on: issue_comment</span></td><td>Comments, issues</td><td><span class="badge badge-low">Low–Med</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========================================== -->
+<!-- USE CASE 1: Issue Triage -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-blue">
+  <div class="uc-header">
+    <div class="uc-icon">🏷️</div>
+    <div>
+      <h3>1. Issue Triage &amp; Labeling</h3>
+      <p>The "hello world" of agentic workflows — practical, immediately useful, and simple to implement. When a new issue is opened, the agent reads it, researches the codebase, applies labels, and posts a helpful comment.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/issue-triage-agent.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">timeout-minutes:</span> <span class="value">5</span>
+<span class="key">on:</span>
+  <span class="key">issue:</span>
+    <span class="key">types:</span> <span class="string">[opened, reopened]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">issues:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[issues, labels]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">add-labels:</span>
+    <span class="key">allowed:</span> <span class="string">[bug, feature, enhancement, documentation, question, help-wanted, good-first-issue]</span>
+  <span class="key">add-comment:</span> <span class="string">{}</span>
+---
+
+<span class="heading"># Issue Triage Agent</span>
+
+List open issues in ${{ github.repository }} that have no labels. For each
+unlabeled issue, analyze the title and body, then add one of the allowed
+labels: `bug`, `feature`, `enhancement`, `documentation`, `question`,
+`help-wanted`, or `good-first-issue`.
+
+Skip issues that:
+- Already have any of these labels
+- Have been assigned to any user (especially non-bot users)
+
+Do research on the issue in the context of the codebase and, after
+adding the label to an issue, mention the issue author in a comment, explain
+why the label was added and give a brief summary of how the issue may be
+addressed.</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Why It Works</h4>
+    <ul>
+      <li>The agent has <strong>read-only</strong> repository access with write operations restricted to two safe outputs: adding approved labels and posting comments.</li>
+      <li>Natural language instructions guide behavior without prescribing every code path.</li>
+      <li>The <code>allowed</code> list on <code>add-labels</code> prevents the agent from inventing arbitrary labels.</li>
+      <li>Customization is key — triage categories differ per repository, and the label list is easy to change.</li>
+    </ul>
+  </div>
+
+  <div class="case-study">
+    <h4>📌 Case Study: Home Assistant</h4>
+    <p>Home Assistant — one of the top projects on GitHub by contributor count — uses agentic workflows to analyze <strong>thousands</strong> of open issues and surface what matters most to maintainers.</p>
+    <blockquote>"No human can track what's trending or which problems affect the most users."</blockquote>
+    <p>— Franck Nijhof, Lead of Home Assistant</p>
+    <div class="source">Source: <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog — Automate repository tasks with GitHub Agentic Workflows</a> (Feb 13, 2026)</div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 2: Continuous Documentation -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-green">
+  <div class="uc-header">
+    <div class="uc-icon">📚</div>
+    <div>
+      <h3>2. Continuous Documentation Maintenance</h3>
+      <p>Code evolves rapidly; docs do not. Agentic workflows maintain, validate, and improve documentation continuously — catching drift, outdated examples, and terminology inconsistencies.</p>
+    </div>
+  </div>
+
+  <table class="results-table">
+    <thead><tr><th>Workflow</th><th>Results</th><th>Merge Rate</th></tr></thead>
+    <tbody>
+      <tr><td>Daily Documentation Updater</td><td>57 merged PRs out of 59 proposed</td><td class="merge-rate">96%</td></tr>
+      <tr><td>Glossary Maintainer</td><td>10 merged PRs out of 10 proposed</td><td class="merge-rate">100%</td></tr>
+      <tr><td>Documentation Unbloat</td><td>88 merged PRs out of 103 proposed</td><td class="merge-rate">85%</td></tr>
+      <tr><td>Documentation Noob Tester</td><td>9 merged PRs (via causal chain)</td><td class="merge-rate">43%</td></tr>
+      <tr><td>Multi-device Docs Tester</td><td>2 merged PRs out of 2 proposed</td><td class="merge-rate">100%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/daily-doc-updater.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">schedule:</span> <span class="value">daily</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default, pull_requests]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[docs] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/docs-.*"</span>
+---
+
+<span class="heading"># Daily Documentation Updater</span>
+
+Review the repository documentation for accuracy and completeness.
+
+<span class="heading">## Tasks</span>
+- Compare documentation against the current codebase for drift
+- Identify outdated code examples, deprecated API references, and broken links
+- Update README sections that reference changed functionality
+- Ensure all public functions and modules have accurate documentation
+
+<span class="heading">## Guidelines</span>
+- Keep existing tone and style consistent
+- Only propose changes where documentation is factually wrong or missing
+- Group related changes into a single pull request
+- Write clear PR descriptions explaining what changed and why</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Key Insight</h4>
+    <p>GitHub's team found that a <strong>heterogeneous approach</strong> works best: some agents generate content, others maintain it, and still others validate it. The Glossary Maintainer caught terminology drift where three different terms were used for the same concept. The Documentation Noob Tester approaches docs from a newcomer's perspective, finding confusing steps experienced developers overlook.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 3: CI Failure Analysis -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-red">
+  <div class="uc-header">
+    <div class="uc-icon">🔧</div>
+    <div>
+      <h3>3. CI Failure Analysis</h3>
+      <p>The CI Doctor transforms how teams respond to CI failures. Instead of drowning in failure notifications, maintainers receive investigated failures with diagnostic insights, root cause analysis, and proposed fixes.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/ci-failure-doctor.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">workflow_run:</span>
+    <span class="key">workflows:</span> <span class="string">["CI"]</span>
+    <span class="key">types:</span> <span class="string">[completed]</span>
+    <span class="key">conclusions:</span> <span class="string">[failure]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">actions:</span> <span class="value">read</span>
+  <span class="key">issues:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default, actions]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-issue:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[ci-doctor] "</span>
+    <span class="key">labels:</span> <span class="string">[ci-failure, needs-investigation]</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[ci-fix] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/ci-fix-.*"</span>
+---
+
+<span class="heading"># CI Failure Doctor</span>
+
+A CI workflow has failed. Investigate the failure and help the team resolve it.
+
+<span class="heading">## Investigation Steps</span>
+1. Retrieve and analyze the failed workflow run logs
+2. Identify the root cause of the failure
+3. Search for similar past issues and their resolutions
+4. Check if the failure is flaky (intermittent) or deterministic
+
+<span class="heading">## Output</span>
+- If the fix is straightforward, create a pull request with the fix
+- If investigation is needed, create an issue with:
+  - Summary of the failure
+  - Root cause analysis
+  - Suggested remediation steps
+  - Links to relevant logs and code</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Real-World Results</h4>
+    <p>The CI Doctor in Peli's Agent Factory achieved a <strong>69% merge rate</strong> (9 merged PRs out of 13 proposed), with fixes including:</p>
+    <ul>
+      <li>Adding Go module download pre-flight checks</li>
+      <li>Adding retry logic to prevent proxy 403 failures</li>
+      <li>Fixing flaky test timing issues</li>
+    </ul>
+    <p style="margin-top:8px;">GitHub teams internally report this pattern has inspired depth-investigation agents for site incidents.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 4: Test Coverage Improvement -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-green">
+  <div class="uc-header">
+    <div class="uc-icon">🧪</div>
+    <div>
+      <h3>4. Continuous Test Coverage Improvement</h3>
+      <p>Testing agents continuously identify coverage gaps, propose new test cases, and validate existing tests. Small, frequent improvements compound over time.</p>
+    </div>
+  </div>
+
+  <table class="results-table">
+    <thead><tr><th>Workflow</th><th>Results</th><th>Merge Rate</th></tr></thead>
+    <tbody>
+      <tr><td>Daily Testify Expert</td><td>19 issues created, 13 led to merged PRs</td><td class="merge-rate">100% causal</td></tr>
+      <tr><td>Daily Test Improver</td><td>Identifies gaps, implements new tests</td><td class="merge-rate">Incremental</td></tr>
+      <tr><td>CLI Consistency Checker</td><td>80 merged PRs out of 102 proposed</td><td class="merge-rate">78%</td></tr>
+      <tr><td>CI Coach</td><td>9 merged PRs out of 9 proposed</td><td class="merge-rate">100%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/daily-test-improver.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">schedule:</span> <span class="value">daily</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[tests] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/test-.*"</span>
+  <span class="key">create-issue:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[test-gap] "</span>
+    <span class="key">labels:</span> <span class="string">[testing, coverage]</span>
+---
+
+<span class="heading"># Daily Test Improver</span>
+
+Analyze the test suite for coverage gaps and quality improvements.
+
+<span class="heading">## Analysis Tasks</span>
+- Identify source files with low or no test coverage
+- Find functions and branches that lack edge case testing
+- Review existing tests for assertion quality and completeness
+- Look for test patterns that could be modernized
+
+<span class="heading">## Output</span>
+- Create a pull request adding one focused, high-value test
+- Include clear descriptions of what the test covers and why it matters
+- Ensure new tests follow existing project conventions
+- Run the test suite to verify tests pass before proposing</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Why It Works</h4>
+    <p>By creating <strong>one focused test per day</strong>, the agent avoids overwhelming reviewers while steadily improving coverage. The "one PR per concern" pattern ensures each contribution is easy to review and merge.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 5: Repository Reporting -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-purple">
+  <div class="uc-header">
+    <div class="uc-icon">📊</div>
+    <div>
+      <h3>5. Repository Reporting &amp; Metrics</h3>
+      <p>Among the simplest workflows to set up. Create regular summaries of repository health, activity, and trends — providing immediate value to maintainers.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/weekly-issue-summary.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">schedule:</span>
+    - <span class="key">cron:</span> <span class="string">"0 9 * * MON"</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">issues:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+  <span class="key">discussions:</span> <span class="value">read</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-issue:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[weekly-summary] "</span>
+    <span class="key">labels:</span> <span class="string">[report, weekly]</span>
+    <span class="key">close-older-issues:</span> <span class="value">true</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+---
+
+<span class="heading"># Weekly Issue Summary</span>
+
+Generate a comprehensive weekly summary of issue activity.
+
+<span class="heading">## Report Sections</span>
+1. **New Issues** — List all issues opened this week with brief descriptions
+2. **Closed Issues** — Issues resolved this week and how they were fixed
+3. **Stale Issues** — Issues with no activity in the past 14 days
+4. **Trending Topics** — Common themes or patterns across recent issues
+5. **Recommendations** — Suggested priorities for the coming week
+
+<span class="heading">## Format</span>
+- Use tables for structured data
+- Include trend indicators (↑ ↓ →) where relevant
+- Link directly to each referenced issue
+- Keep the total report under 500 words</pre>
+  </div>
+
+  <table class="results-table" style="margin-top:20px;">
+    <thead><tr><th>Factory Workflow</th><th>Output</th><th>Volume</th></tr></thead>
+    <tbody>
+      <tr><td>Metrics Collector</td><td>Daily metrics tracking agent ecosystem performance</td><td>41 discussions</td></tr>
+      <tr><td>Portfolio Analyst</td><td>Cost reduction opportunities &amp; token optimization</td><td>7 analysis discussions</td></tr>
+      <tr><td>Audit Workflows</td><td>Meta-agent analyzing logs, costs, errors, success patterns</td><td>93 audit reports, 9 issues</td></tr>
+    </tbody>
+  </table>
+
+  <div class="case-study" style="margin-top:20px;">
+    <h4>📌 Case Study: CNCF</h4>
+    <p>The <strong>Cloud Native Computing Foundation (CNCF)</strong> has adopted reporting workflows for improved team reporting across the organization, demonstrating the pattern works at enterprise scale.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 6: Security & Vulnerability Triage -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-red">
+  <div class="uc-header">
+    <div class="uc-icon">🛡️</div>
+    <div>
+      <h3>6. Security &amp; Vulnerability Triage</h3>
+      <p>Security workflows act as automated guardians — scanning for vulnerabilities, exposed credentials, malicious code patterns, and compliance violations.</p>
+    </div>
+  </div>
+
+  <table class="results-table">
+    <thead><tr><th>Factory Workflow</th><th>Output</th><th>Results</th></tr></thead>
+    <tbody>
+      <tr><td>Security Compliance</td><td>Vulnerability campaigns with deadline tracking</td><td>SLA-driven remediation</td></tr>
+      <tr><td>Firewall</td><td>Network security validation</td><td>59 daily reports, 5 smoke tests</td></tr>
+      <tr><td>Daily Secrets Analysis</td><td>Credential exposure scanning</td><td>Continuous monitoring</td></tr>
+      <tr><td>Daily Malicious Code Scan</td><td>Suspicious pattern detection</td><td>Supply chain defense</td></tr>
+      <tr><td>Static Analysis Report</td><td>Security audits (zizmor, poutine, actionlint)</td><td>57 discussions, 12 reports</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/pr-security-reviewer.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">pull_request:</span>
+    <span class="key">types:</span> <span class="string">[opened, synchronize]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default, pull_requests]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">add-comment:</span>
+    <span class="key">max:</span> <span class="value">1</span>
+---
+
+<span class="heading"># PR Security Reviewer</span>
+
+Review the pull request diff for security concerns.
+
+<span class="heading">## What to Check</span>
+1. **Secrets &amp; Credentials** — hardcoded API keys, tokens, passwords
+2. **Injection Vulnerabilities** — SQL injection, XSS, command injection
+3. **Dependency Changes** — new deps with known vulnerabilities
+4. **Permission Escalation** — changes to auth/access control logic
+5. **GitHub Actions Security** — unsafe workflow patterns
+
+<span class="heading">## Output Format</span>
+Post a single comment with:
+- 🔴 **Critical** findings that must be addressed before merge
+- 🟡 **Warning** findings that should be reviewed
+- 🟢 **Info** observations about security-related changes
+- If no issues found, post a brief "Security review passed" comment</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Why It Works</h4>
+    <p>By running on every PR, the security reviewer catches issues <strong>before they merge</strong>. The severity-tiered output (🔴🟡🟢) ensures the team focuses on what matters. The <code>max: 1</code> constraint on comments prevents notification spam.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 7: Code Quality & Refactoring -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-purple">
+  <div class="uc-header">
+    <div class="uc-icon">✨</div>
+    <div>
+      <h3>7. Code Quality &amp; Continuous Refactoring</h3>
+      <p>Refactoring agents continuously analyze code structure and propose improvements — splitting oversized files, extracting duplicated logic, and identifying dead code.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/code-simplifier.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">schedule:</span> <span class="value">daily</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[simplify] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/simplify-.*"</span>
+---
+
+<span class="heading"># Continuous Code Simplifier</span>
+
+Identify opportunities to simplify and improve code quality.
+
+<span class="heading">## Analysis Tasks</span>
+- Find files over 300 lines that could be split into focused modules
+- Identify duplicated code blocks for shared utilities extraction
+- Look for overly complex functions (high cyclomatic complexity)
+- Find dead code (unused imports, unreachable branches, commented-out code)
+
+<span class="heading">## Output</span>
+- Create one focused pull request per simplification
+- Each PR should address a single concern
+- Include before/after metrics (lines of code, complexity score)
+- Ensure all existing tests continue to pass
+- Explain the refactoring rationale clearly in the PR description</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/performance-auditor.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">pull_request:</span>
+    <span class="key">types:</span> <span class="string">[opened, synchronize]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">add-comment:</span> <span class="string">{}</span>
+---
+
+<span class="heading"># Big O Performance Auditor</span>
+
+Review the pull request for algorithmic performance concerns.
+
+<span class="heading">## Analysis</span>
+- Estimate time and space complexity of changed functions
+- Identify potential bottlenecks (nested loops, repeated collection scans)
+- Flag operations that scale poorly with input size
+
+<span class="heading">## Output Format</span>
+Post a structured comment with:
+- Complexity estimate for each flagged function
+- The specific bottleneck identified
+- A refactored implementation suggestion
+- Estimated performance impact</pre>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 8: Release Notes & Changelog -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-orange">
+  <div class="uc-header">
+    <div class="uc-icon">🚀</div>
+    <div>
+      <h3>8. Release Notes &amp; Changelog Generation</h3>
+      <p>Automate version bumps and human-readable changelog entries. The Changeset workflow in Peli's Agent Factory achieved a <strong>78% merge rate</strong> (22 merged out of 28 proposed PRs).</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/release-changelog.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">release:</span>
+    <span class="key">types:</span> <span class="string">[published]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default, pull_requests]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[changelog] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/changelog-.*"</span>
+---
+
+<span class="heading"># Release Changelog Generator</span>
+
+A new release has been published. Generate a comprehensive changelog.
+
+<span class="heading">## Tasks</span>
+1. Analyze all commits since the previous release tag
+2. Categorize changes into:
+   - 🚀 **Features** — new functionality
+   - 🐛 **Bug Fixes** — resolved issues
+   - 📖 **Documentation** — doc improvements
+   - ⚡ **Performance** — speed or efficiency improvements
+   - 🔧 **Maintenance** — refactoring, dependency updates, CI changes
+   - 💥 **Breaking Changes** — backward-incompatible modifications
+3. Generate a human-readable changelog entry
+4. Update the CHANGELOG.md file
+
+<span class="heading">## Guidelines</span>
+- Link each entry to the relevant PR or commit
+- Credit contributors by @mention
+- Highlight breaking changes prominently at the top
+- Follow the Keep a Changelog format (keepachangelog.com)</pre>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 9: Dependency Management -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-blue">
+  <div class="uc-header">
+    <div class="uc-icon">📦</div>
+    <div>
+      <h3>9. Dependency Management</h3>
+      <p>Agentic workflows analyze dependency updates with contextual awareness that simple automated tools lack — assessing risk, checking changelogs, and grouping related updates intelligently.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/dependency-auditor.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">schedule:</span>
+    - <span class="key">cron:</span> <span class="string">"0 10 * * MON"</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">create-pull-request:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[deps] "</span>
+    <span class="key">branch-pattern:</span> <span class="string">"^automated/deps-.*"</span>
+  <span class="key">create-issue:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[dep-alert] "</span>
+    <span class="key">labels:</span> <span class="string">[dependencies, needs-review]</span>
+---
+
+<span class="heading"># Weekly Dependency Audit</span>
+
+Analyze project dependencies for updates, vulnerabilities, and health.
+
+<span class="heading">## Analysis Tasks</span>
+1. Check for outdated dependencies and their latest versions
+2. Assess risk and breaking change potential for each update
+3. Identify deprecated packages that need migration
+4. Review dependency health signals (maintenance activity, download trends)
+
+<span class="heading">## Output</span>
+- For safe, minor updates: create a PR grouping related updates together
+- For major version bumps: create an issue with a migration guide
+- For security vulnerabilities: create a high-priority issue with remediation
+- Include a risk assessment for each proposed change
+
+<span class="heading">## Guidelines</span>
+- Group related dependency updates into coherent PRs
+- Never update multiple major versions simultaneously
+- Include test results confirming compatibility
+- Link to changelogs and migration guides</pre>
+  </div>
+
+  <div class="why-box">
+    <h4>💡 Why It Works</h4>
+    <p>Unlike traditional Dependabot PRs that flood your inbox with one-per-dependency updates, this agent <strong>groups related updates</strong>, assesses risk, and provides context. Major version bumps become issues with migration guides rather than surprise PRs.</p>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- USE CASE 10: Code Review Assistance -->
+<!-- ========================================== -->
+<div class="uc-section uc-accent-teal">
+  <div class="uc-header">
+    <div class="uc-icon">😤</div>
+    <div>
+      <h3>10. Code Review Assistance</h3>
+      <p>Pull request review agents provide contextual feedback on code changes without replacing human judgment. The Grumpy Reviewer from githubnext/agentics is the standout example.</p>
+    </div>
+  </div>
+
+  <table class="results-table">
+    <thead><tr><th>Factory Workflow</th><th>Output</th><th>Volume</th></tr></thead>
+    <tbody>
+      <tr><td>Schema Consistency Checker</td><td>Detects schema/code/doc drift</td><td>55 analysis discussions</td></tr>
+      <tr><td>Breaking Change Checker</td><td>Backward-incompatibility alerts</td><td>Alert issues</td></tr>
+      <tr><td>Big O Performance Auditor</td><td>Complexity estimates on PRs</td><td>PR comments</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/grumpy-reviewer.md — from githubnext/agentics</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">issue_comment:</span>
+    <span class="key">types:</span> <span class="string">[created]</span>
+  <span class="key">pull_request_review_comment:</span>
+    <span class="key">types:</span> <span class="string">[created]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+  <span class="key">issues:</span> <span class="value">read</span>
+
+<span class="key">tools:</span>
+  <span class="key">github:</span>
+    <span class="key">toolsets:</span> <span class="string">[default, pull_requests]</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">add-comment:</span>
+    <span class="key">max:</span> <span class="value">1</span>
+---
+
+<span class="heading"># Grumpy Code Reviewer</span>
+
+You are a grumpy but thorough senior developer performing an on-demand
+code review. You've seen every anti-pattern, survived every production
+incident, and have strong opinions backed by decades of experience.
+
+<span class="heading">## When Triggered</span>
+Respond when a maintainer comments "/review" on a pull request.
+
+<span class="heading">## Review Focus</span>
+1. **Correctness** — Will this code actually work? Edge cases? Error handling?
+2. **Performance** — Any obvious bottlenecks or scaling issues?
+3. **Security** — Input validation? Injection risks? Auth issues?
+4. **Maintainability** — Will future-you understand this in 6 months?
+5. **Testing** — Are the tests actually testing anything meaningful?
+
+<span class="heading">## Tone</span>
+- Be direct and opinionated, but never mean
+- Use dry humor sparingly
+- Always explain WHY something is a problem, not just THAT it is
+- Acknowledge good code when you see it (grudgingly)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 .github/workflows/breaking-change-checker.md</span>
+      <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+    </div>
+    <pre>---
+<span class="key">on:</span>
+  <span class="key">pull_request:</span>
+    <span class="key">types:</span> <span class="string">[opened, synchronize]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span> <span class="value">read</span>
+  <span class="key">pull-requests:</span> <span class="value">read</span>
+
+<span class="key">safe-outputs:</span>
+  <span class="key">add-comment:</span>
+    <span class="key">max:</span> <span class="value">1</span>
+  <span class="key">create-issue:</span>
+    <span class="key">title-prefix:</span> <span class="string">"[breaking-change] "</span>
+    <span class="key">labels:</span> <span class="string">[breaking-change, needs-review]</span>
+---
+
+<span class="heading"># Breaking Change Checker</span>
+
+Analyze the pull request for backward-incompatible changes.
+
+<span class="heading">## What Constitutes a Breaking Change</span>
+- Removed or renamed public functions, classes, or methods
+- Changed function signatures (added required parameters, changed return types)
+- Modified data structures or API response shapes
+- Changed default values for configuration options
+- Removed or renamed CLI commands or flags
+- Database schema changes that aren't additive
+
+<span class="heading">## Output</span>
+- If breaking changes found: post a comment + create a tracking issue
+- If no breaking changes, post a brief confirmation comment</pre>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Design Patterns -->
+<!-- ========================================== -->
+<section>
+  <h2 class="section-title">🧩 Design Patterns</h2>
+  <p class="section-sub">Operational patterns that structure how agentic workflows are organized and triggered.</p>
+
+  <div class="pattern-grid">
+    <div class="pattern-card" style="border-top: 3px solid #58a6ff;">
+      <h4 style="color:#58a6ff;">⏰ DailyOps</h4>
+      <p>Scheduled daily maintenance and reporting workflows that run on <code>on: schedule: daily</code>. Best for continuous improvement tasks that compound over time.</p>
+      <div class="examples">Examples: Documentation updater, test improver, code simplifier, security scanner, metrics collector</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #3fb950;">
+      <h4 style="color:#3fb950;">🎫 IssueOps</h4>
+      <p>Workflows triggered by issue events using <code>on: issues</code> or <code>on: issue_comment</code>. React to issue creation, labeling, or comment-based commands.</p>
+      <div class="examples">Examples: Triage agent, onboarding guide, plan command (/plan), priority assignment</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #bc8cff;">
+      <h4 style="color:#bc8cff;">💬 ChatOps</h4>
+      <p>Interactive workflows via comment-based slash commands. Users trigger automation with commands like <code>/review</code>, <code>/plan</code>, or <code>/archie</code>.</p>
+      <div class="examples">Examples: Grumpy reviewer (/review), Archie diagrams (/archie), plan command (/plan)</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #d29922;">
+      <h4 style="color:#d29922;">📈 DataOps</h4>
+      <p>Data processing and analysis workflows that collect metrics, analyze trends, and produce actionable insights from repository activity.</p>
+      <div class="examples">Examples: Metrics collector, portfolio analyst, audit workflows, cost analysis</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #f85149;">
+      <h4 style="color:#f85149;">📋 ProjectOps</h4>
+      <p>Project management automation for status tracking, milestone reporting, and cross-issue coordination.</p>
+      <div class="examples">Examples: Status tracking, milestone reports, backlog prioritization, sprint summaries</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #56d364;">
+      <h4 style="color:#56d364;">🌐 MultiRepoOps</h4>
+      <p>Cross-repository coordination workflows that enforce organization-wide standards, sync configurations, and manage multi-repo changes.</p>
+      <div class="examples">Examples: Org standards enforcement, config sync, cross-repo refactoring, dependency alignment</div>
+    </div>
+    <div class="pattern-card" style="border-top: 3px solid #79c0ff;">
+      <h4 style="color:#79c0ff;">🔗 Orchestration</h4>
+      <p>Workflow-of-workflows coordination where meta-agents monitor, analyze, and optimize other agentic workflows.</p>
+      <div class="examples">Examples: Q workflow optimizer, audit workflows, portfolio analyst, agent health monitoring</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================== -->
+<!-- Safe Outputs Quick Reference -->
+<!-- ========================================== -->
+<section>
+  <h2 class="section-title">🔒 Safe-Outputs Quick Reference</h2>
+  <p class="section-sub">The core security mechanism — every write operation must be declared in frontmatter.</p>
+
+  <div class="table-wrap">
+    <table class="so-table">
+      <thead><tr><th>Safe Output</th><th>Purpose</th><th>Example Configuration</th></tr></thead>
+      <tbody>
+        <tr><td><code>add-labels</code></td><td>Add labels to issues/PRs</td><td><code>allowed: [bug, feature, docs]</code></td></tr>
+        <tr><td><code>add-comment</code></td><td>Post comments</td><td><code>max: 1</code></td></tr>
+        <tr><td><code>create-issue</code></td><td>Create GitHub issues</td><td><code>title-prefix: "[bot] "</code>, <code>labels: [automated]</code>, <code>close-older-issues: true</code></td></tr>
+        <tr><td><code>create-pull-request</code></td><td>Create PRs</td><td><code>title-prefix: "[ai] "</code>, <code>branch-pattern: "^automated/.*"</code></td></tr>
+        <tr><td><code>close-issue</code></td><td>Close issues</td><td><code>target: "triggering"</code>, <code>required-labels: [stale]</code></td></tr>
+        <tr><td><code>update-issue</code></td><td>Update issue title/body</td><td><code>status: true</code>, <code>title: true</code></td></tr>
+        <tr><td><code>create-pull-request-review-comment</code></td><td>PR review comments</td><td><code>max: 3</code></td></tr>
+        <tr><td><code>upload-asset</code></td><td>Upload files to a branch</td><td><code>branch: "assets/my-workflow"</code></td></tr>
+        <tr><td><code>dispatch-workflow</code></td><td>Trigger other workflows</td><td><code>max: 1</code></td></tr>
+        <tr><td><code>noop</code></td><td>Explicitly do nothing</td><td>Auto-enabled with most outputs</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========================================== -->
+<!-- Peli's Agent Factory -->
+<!-- ========================================== -->
+<section>
+  <h2 class="section-title">🏭 Peli's Agent Factory</h2>
+  <p class="section-sub">GitHub Next's internal collection — the most extensive real-world deployment of agentic workflows.</p>
+
+  <div class="factory-hero">
+    <h3>🍫 The Candy Shop Chocolate Factory</h3>
+    <blockquote>"It's basically a candy shop chocolate factory of agentic workflows."</blockquote>
+    <div class="attr">— Don Syme, GitHub Next</div>
+  </div>
+
+  <div class="factory-stats">
+    <div class="factory-stat"><div class="num">100+</div><div class="lbl">Agentic Workflows</div></div>
+    <div class="factory-stat"><div class="num">19</div><div class="lbl">"Meet the Workflows" Blog Posts</div></div>
+    <div class="factory-stat"><div class="num">Hundreds</div><div class="lbl">Merged PRs</div></div>
+    <div class="factory-stat"><div class="num">github/gh-aw</div><div class="lbl">Repository</div></div>
+  </div>
+
+  <h3 style="font-size:18px; margin: 32px 0 16px; color: #d29922;">🎓 Key Lessons Learned</h3>
+  <div class="lessons-grid">
+    <div class="lesson-card">
+      <div class="num">01</div>
+      <h5>Repo-Level Automation Is Powerful</h5>
+      <p>Agents embedded in the development workflow have outsized impact compared to external tools.</p>
+    </div>
+    <div class="lesson-card">
+      <div class="num">02</div>
+      <h5>Cost-Quality Tradeoffs Are Real</h5>
+      <p>Longer analyses aren't always better. Optimize for signal, not token count.</p>
+    </div>
+    <div class="lesson-card">
+      <div class="num">03</div>
+      <h5>Specialization Beats Generalization</h5>
+      <p>Many focused agents outperform one general-purpose agent. Each does one thing well.</p>
+    </div>
+    <div class="lesson-card">
+      <div class="num">04</div>
+      <h5>Observability Is Essential</h5>
+      <p>Meta-agents monitoring other agents proved invaluable for debugging and optimization.</p>
+    </div>
+    <div class="lesson-card">
+      <div class="num">05</div>
+      <h5>Incremental Progress Compounds</h5>
+      <p>Small, frequent improvements beat heroic refactoring efforts. One test per day adds up.</p>
+    </div>
+    <div class="lesson-card">
+      <div class="num">06</div>
+      <h5>Security Must Be Built In</h5>
+      <p>Guardrails aren't optional. Safe-outputs, read-only defaults, and sandboxing are fundamental.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:18px; margin: 32px 0 16px; color: #d29922;">📦 The Agentics Collection (githubnext/agentics)</h3>
+  <p style="color:#8b949e; font-size:14px; margin-bottom:16px;">Community-contributed, MIT-licensed reusable workflows. Install with <code>gh aw add-wizard</code>.</p>
+
+  <div class="agentics-grid">
+    <div class="agc-card"><div class="emoji">🏷️</div><div><div class="name">Issue Triage</div><div class="desc">Triage labelling of issues and pull requests</div></div></div>
+    <div class="agc-card"><div class="emoji">🤖</div><div><div class="name">Repo Assist</div><div class="desc">Multi-task backlog burner, bug fixer, general assistant</div></div></div>
+    <div class="agc-card"><div class="emoji">🛡️</div><div><div class="name">AI Moderator</div><div class="desc">Detect and moderate spam, link spam, and AI-generated content</div></div></div>
+    <div class="agc-card"><div class="emoji">😤</div><div><div class="name">Grumpy Reviewer</div><div class="desc">On-demand opinionated code review by a grumpy senior dev</div></div></div>
+    <div class="agc-card"><div class="emoji">🔍</div><div><div class="name">PR Nitpick Reviewer</div><div class="desc">Fine-grained review focusing on style and subtle issues</div></div></div>
+    <div class="agc-card"><div class="emoji">🔄</div><div><div class="name">Autoloop</div><div class="desc">Iterative optimization agent with metrics evaluation</div></div></div>
+    <div class="agc-card"><div class="emoji">📚</div><div><div class="name">Weekly Research</div><div class="desc">Collect research updates and industry trends</div></div></div>
+    <div class="agc-card"><div class="emoji">📊</div><div><div class="name">Weekly Issue Summary</div><div class="desc">Weekly issue activity report with trend charts</div></div></div>
+    <div class="agc-card"><div class="emoji">👥</div><div><div class="name">Daily Repo Status</div><div class="desc">Assess repo activity and create status reports</div></div></div>
+    <div class="agc-card"><div class="emoji">📊</div><div><div class="name">Archie</div><div class="desc">Generate Mermaid diagrams with /archie command</div></div></div>
+    <div class="agc-card"><div class="emoji">📋</div><div><div class="name">Plan Command</div><div class="desc">Break down issues into sub-tasks with /plan</div></div></div>
+    <div class="agc-card"><div class="emoji">🔧</div><div><div class="name">Q — Workflow Optimizer</div><div class="desc">Expert system that analyzes and optimizes workflows</div></div></div>
+  </div>
+
+  <div class="install-block" style="margin-top:24px;">
+    <div class="comment-line"># Install the gh-aw CLI extension</div>
+    <div><span class="prompt">$</span> gh extension install github/gh-aw</div>
+    <br>
+    <div class="comment-line"># Add a workflow from the agentics collection</div>
+    <div><span class="prompt">$</span> gh aw add-wizard https://github.com/githubnext/agentics/blob/main/.github/workflows/issue-triage.md</div>
+    <br>
+    <div class="comment-line"># Compile and commit</div>
+    <div><span class="prompt">$</span> gh aw compile</div>
+    <div><span class="prompt">$</span> git add .github/workflows/</div>
+    <div><span class="prompt">$</span> git commit -m "Add issue triage agentic workflow"</div>
+  </div>
+</section>
+
+<!-- ========================================== -->
+<!-- Choosing the Right Use Case -->
+<!-- ========================================== -->
+<section>
+  <h2 class="section-title">🧭 Choosing the Right Approach</h2>
+  <p class="section-sub">Not everything should be an agentic workflow. Here's how to decide.</p>
+
+  <div class="decision-grid">
+    <div class="decision-card good">
+      <h4>✅ Great Fit for Agentic Workflows</h4>
+      <ul>
+        <li>Context-heavy, repetitive tasks that vary in detail</li>
+        <li>Tasks requiring summarization, judgment, and communication</li>
+        <li>Processes requiring guardrailed automation with human review</li>
+        <li>Work that would be painful or impractical to script imperatively</li>
+        <li>Anything needing natural language understanding of code + issues</li>
+      </ul>
+    </div>
+    <div class="decision-card trad">
+      <h4>⚙️ Better Suited for Traditional CI/CD</h4>
+      <ul>
+        <li>Ultra-deterministic build, test, and deploy steps</li>
+        <li>Millisecond-latency critical paths</li>
+        <li>Situations requiring strictly identical output every run</li>
+        <li>Container builds, artifact packaging, and deployment pipelines</li>
+        <li>Binary pass/fail gates with no interpretation needed</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="why-box" style="margin-top:24px; border-left-color: #58a6ff;">
+    <h4 style="color:#58a6ff;">💡 The Practical Rule</h4>
+    <p style="color:#e6edf3; font-size:15px;">Keep deterministic pipelines deterministic. Use agentic workflows where interpretation and adaptation add value. The two complement each other — they don't compete.</p>
+  </div>
+</section>
+
+<!-- ========================================== -->
+<!-- Getting Started Progression -->
+<!-- ========================================== -->
+<section>
+  <h2 class="section-title">🚦 Getting Started Progression</h2>
+  <p class="section-sub">A recommended path from first workflow to full automation suite.</p>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px;">
+    <div class="pattern-card" style="border-left:3px solid #3fb950;">
+      <h4 style="color:#3fb950;">1️⃣ Start Simple</h4>
+      <p>Begin with a low-risk daily status report or issue triage agent with strict guardrails. Comments and labels only — no PR creation yet.</p>
+    </div>
+    <div class="pattern-card" style="border-left:3px solid #58a6ff;">
+      <h4 style="color:#58a6ff;">2️⃣ Add Safe-Outputs</h4>
+      <p>Introduce predictable PR and issue behavior with title prefixes, branch patterns, and label constraints.</p>
+    </div>
+    <div class="pattern-card" style="border-left:3px solid #bc8cff;">
+      <h4 style="color:#bc8cff;">3️⃣ Expand to Maintenance</h4>
+      <p>Add documentation updates, test improvements, and CI failure investigation workflows.</p>
+    </div>
+    <div class="pattern-card" style="border-left:3px solid #d29922;">
+      <h4 style="color:#d29922;">4️⃣ Extract Reusable Agents</h4>
+      <p>Share common patterns via imports with version pinning across multiple repositories.</p>
+    </div>
+    <div class="pattern-card" style="border-left:3px solid #f85149;">
+      <h4 style="color:#f85149;">5️⃣ Introduce MCP Servers</h4>
+      <p>Add specialist context (Terraform, database tools, etc.) only where domain tools provide clear value.</p>
+    </div>
+    <div class="pattern-card" style="border-left:3px solid #79c0ff;">
+      <h4 style="color:#79c0ff;">6️⃣ Monitor &amp; Optimize</h4>
+      <p>Add metrics collection and portfolio analysis as the number of workflows grows. Use meta-agents to watch your agents.</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /.container -->
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>⚡ GH Agentic Workflows Hub — Use Cases &amp; Examples</p>
+    <p style="margin-top:8px;">Data sourced from <a href="https://github.github.com/gh-aw/">official docs</a>, <a href="https://github.github.com/gh-aw/blog/2026-01-12-welcome-to-pelis-agent-factory/">Peli's Agent Factory</a>, <a href="https://github.com/githubnext/agentics">githubnext/agentics</a>, and <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a>.</p>
+  </div>
+</footer>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>

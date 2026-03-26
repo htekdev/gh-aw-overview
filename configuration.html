@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration Reference — GitHub Agentic Workflows</title>
+  <meta name="description" content="Complete frontmatter schema, syntax reference, triggers, permissions, engines, tools, safe outputs, and network configuration for GitHub Agentic Workflows.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--blue:#58a6ff;--green:#3fb950;--purple:#bc8cff;--orange:#d29922;--red:#f85149;--cyan:#39d2c0;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;--mono:SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace}
+    html{scroll-behavior:smooth;scroll-padding-top:72px}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+    a{color:var(--blue);text-decoration:none}a:hover{color:#79c0ff}
+    code{font-family:var(--mono);background:rgba(110,118,129,.15);padding:2px 6px;border-radius:4px;font-size:.9em}
+    .container{max-width:1400px;margin:0 auto;padding:0 24px}
+    /* Hero */
+    .hero{padding:120px 24px 48px;text-align:center;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:60px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(88,166,255,.08) 0%,transparent 70%);pointer-events:none}
+    .hero-icon{font-size:64px;margin-bottom:16px;display:inline-block;filter:drop-shadow(0 0 20px rgba(88,166,255,.3))}
+    .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{color:var(--muted);font-size:18px;max-width:700px;margin:0 auto}
+    /* Quick nav */
+    .qnav{max-width:1400px;margin:0 auto;padding:0 24px 32px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .qnav a{background:var(--card);border:1px solid var(--border);padding:8px 16px;border-radius:20px;font-size:13px;color:var(--muted);transition:all .2s}
+    .qnav a:hover{border-color:var(--blue);color:var(--text)}
+    /* Sections */
+    .section{padding:48px 0;border-top:1px solid var(--border)}
+    .section:first-of-type{border-top:none}
+    .sh{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .sh h2{font-size:1.6rem;font-weight:700}
+    .sh .badge{font-size:.75rem;background:rgba(88,166,255,.1);color:var(--blue);padding:2px 10px;border-radius:12px}
+    /* Tables */
+    .tbl-wrap{overflow-x:auto;margin:16px 0;border-radius:8px;border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    th{background:rgba(88,166,255,.06);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--blue);font-weight:600;white-space:nowrap}
+    td{padding:10px 14px;border-bottom:1px solid rgba(48,54,61,.5);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    tr:hover{background:rgba(88,166,255,.03)}
+    td code{font-size:.8rem;white-space:nowrap}
+    /* Code blocks */
+    .code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0;font-family:var(--mono);font-size:.85rem;line-height:1.7}
+    .code-block .kw{color:var(--blue)}
+    .code-block .str{color:var(--green)}
+    .code-block .cm{color:var(--muted);font-style:italic}
+    .code-block .num{color:var(--orange)}
+    /* Cards */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin:16px 0}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .25s}
+    .card:hover{border-color:var(--blue);transform:translateY(-2px)}
+    .card h3{font-size:1rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .card p{color:var(--muted);font-size:.875rem}
+    .card .tag{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600;margin-right:4px}
+    .tag-required{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+    .tag-default{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+    .tag-type{background:rgba(163,113,247,.15);color:var(--purple);border:1px solid rgba(163,113,247,.3)}
+    /* Callout */
+    .callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:16px 20px;margin:16px 0;font-size:.9rem}
+    .callout.warn{border-left-color:var(--orange)}
+    .callout.tip{border-left-color:var(--green)}
+    /* Subsection */
+    .sub-h{font-size:1.2rem;font-weight:600;margin:32px 0 12px;padding-top:16px;border-top:1px solid rgba(48,54,61,.4);display:flex;align-items:center;gap:8px}
+    .sub-h:first-child{border-top:none;padding-top:0}
+    /* Footer */
+    footer{text-align:center;padding:48px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:.875rem}
+    @media(max-width:768px){.card-grid{grid-template-columns:1fr}table{font-size:.8rem}th,td{padding:8px}}
+  </style>
+</head>
+<body>
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #30363d;padding:12px 24px;">
+    <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <a href="index.html" style="color:#e6edf3;text-decoration:none;font-weight:600;font-size:18px;">⚡ GH Agentic Workflows</a>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:14px;">
+        <a href="index.html" style="color:#8b949e;text-decoration:none;">Home</a>
+        <a href="core-concepts.html" style="color:#8b949e;text-decoration:none;">Core Concepts</a>
+        <a href="architecture.html" style="color:#8b949e;text-decoration:none;">Architecture</a>
+        <a href="configuration.html" style="color:#3fb950;text-decoration:none;">Configuration</a>
+        <a href="security.html" style="color:#8b949e;text-decoration:none;">Security</a>
+        <a href="ecosystem.html" style="color:#8b949e;text-decoration:none;">Ecosystem</a>
+        <a href="use-cases.html" style="color:#8b949e;text-decoration:none;">Use Cases</a>
+        <a href="cli-tooling.html" style="color:#8b949e;text-decoration:none;">CLI &amp; Tooling</a>
+        <a href="videos.html" style="color:#8b949e;text-decoration:none;">Videos</a>
+        <a href="resources.html" style="color:#8b949e;text-decoration:none;">Resources</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-icon">⚙️</div>
+    <h1>Configuration Reference</h1>
+    <p>Complete frontmatter schema, trigger events, permissions, engines, tools, safe outputs, and network configuration for GitHub Agentic Workflows.</p>
+  </div>
+
+  <div class="qnav">
+    <a href="#overview">Overview</a>
+    <a href="#schema">Schema</a>
+    <a href="#triggers">Triggers</a>
+    <a href="#permissions">Permissions</a>
+    <a href="#engines">Engines</a>
+    <a href="#tools">Tools</a>
+    <a href="#safe-outputs">Safe Outputs</a>
+    <a href="#network">Network</a>
+    <a href="#mcp">MCP Servers</a>
+    <a href="#advanced">Advanced</a>
+  </div>
+
+  <div class="container">
+
+    <!-- OVERVIEW -->
+    <div class="section" id="overview">
+      <div class="sh"><h2>How Configuration Works</h2></div>
+      <p style="max-width:800px;margin-bottom:16px">Every agentic workflow is a <code>.md</code> file in <code>.github/workflows/</code> with two parts:</p>
+      <div class="card-grid" style="grid-template-columns:1fr 1fr">
+        <div class="card" style="border-top:3px solid var(--blue)">
+          <h3>📋 YAML Frontmatter</h3>
+          <p>Structured configuration between <code>---</code> markers. Declares triggers, permissions, tools, engine, and safe outputs. Validated against a JSON schema at compile time.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--green)">
+          <h3>📝 Markdown Body</h3>
+          <p>Natural-language instructions for the AI agent. Loaded at runtime — editable without recompilation. The agent interprets these instructions contextually.</p>
+        </div>
+      </div>
+      <div class="code-block"><span class="cm"># File: .github/workflows/triage-issues.md</span>
+<span class="kw">---</span>
+<span class="kw">on:</span>
+  <span class="kw">issues:</span>
+    <span class="kw">types:</span> [<span class="str">opened</span>]
+<span class="kw">permissions:</span> <span class="str">read-all</span>
+<span class="kw">safe-outputs:</span>
+  <span class="kw">add-labels:</span>
+    <span class="kw">allowed:</span> [<span class="str">bug</span>, <span class="str">feature</span>, <span class="str">docs</span>]
+  <span class="kw">add-comment:</span> {}
+<span class="kw">---</span>
+
+<span class="cm"># Issue Triage Agent</span>
+Analyze new issues and apply the appropriate label.
+Explain your reasoning in a comment.</div>
+      <div class="callout tip">💡 Run <code>gh aw compile</code> to transform the <code>.md</code> file into a <code>.lock.yml</code> — a security-hardened GitHub Actions workflow. The lock file is what Actions executes.</div>
+    </div>
+
+    <!-- SCHEMA -->
+    <div class="section" id="schema">
+      <div class="sh"><h2>Complete Frontmatter Schema</h2><span class="badge">35+ fields</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td><code>string</code></td><td>No</td><td>Filename</td><td>Display name in GitHub Actions UI</td></tr>
+            <tr><td><code>description</code></td><td><code>string</code></td><td>No</td><td>—</td><td>Human-readable workflow description</td></tr>
+            <tr style="background:rgba(248,81,73,.04)"><td><code>on</code></td><td><code>string|object</code></td><td><strong style="color:var(--red)">Yes</strong></td><td>—</td><td>Trigger events and access controls</td></tr>
+            <tr><td><code>permissions</code></td><td><code>string|object</code></td><td>No</td><td><code>read-all</code></td><td>GitHub token permission scopes</td></tr>
+            <tr><td><code>engine</code></td><td><code>string|object</code></td><td>No</td><td><code>copilot</code></td><td>AI engine and model selection</td></tr>
+            <tr><td><code>tools</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Available tools for the agent</td></tr>
+            <tr><td><code>mcp-servers</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Custom Model Context Protocol servers</td></tr>
+            <tr><td><code>mcp-scripts</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Inline MCP tools via JS/shell scripts</td></tr>
+            <tr><td><code>safe-outputs</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Permitted write operations</td></tr>
+            <tr><td><code>network</code></td><td><code>string|object</code></td><td>No</td><td><code>defaults</code></td><td>Network access control (AWF)</td></tr>
+            <tr><td><code>sandbox</code></td><td><code>string|object</code></td><td>No</td><td><code>awf</code></td><td>Sandbox configuration (AWF + MCP gateway)</td></tr>
+            <tr><td><code>strict</code></td><td><code>boolean</code></td><td>No</td><td><code>true</code></td><td>Enhanced security validation</td></tr>
+            <tr><td><code>imports</code></td><td><code>string[]|object[]</code></td><td>No</td><td>—</td><td>Import shared config from other <code>.md</code> files</td></tr>
+            <tr><td><code>source</code></td><td><code>string</code></td><td>No</td><td>—</td><td>Origin tracking (<code>owner/repo/path@ref</code>)</td></tr>
+            <tr><td><code>secrets</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Secret values for workflow execution</td></tr>
+            <tr><td><code>environment</code></td><td><code>string|object</code></td><td>No</td><td>—</td><td>Deployment protection rules</td></tr>
+            <tr><td><code>container</code></td><td><code>string|object</code></td><td>No</td><td>—</td><td>Container image for job steps</td></tr>
+            <tr><td><code>services</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Service containers (databases, caches)</td></tr>
+            <tr><td><code>steps</code></td><td><code>array</code></td><td>No</td><td>—</td><td>Custom steps before agentic execution</td></tr>
+            <tr><td><code>post-steps</code></td><td><code>array</code></td><td>No</td><td>—</td><td>Custom steps after agentic execution</td></tr>
+            <tr><td><code>jobs</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Custom jobs alongside agentic execution</td></tr>
+            <tr><td><code>env</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Workflow-level environment variables</td></tr>
+            <tr><td><code>cache</code></td><td><code>object|array</code></td><td>No</td><td>—</td><td>GitHub Actions cache configuration</td></tr>
+            <tr><td><code>concurrency</code></td><td><code>string|object</code></td><td>No</td><td>—</td><td>Workflow concurrency control</td></tr>
+            <tr><td><code>runs-on</code></td><td><code>string|array</code></td><td>No</td><td><code>ubuntu-latest</code></td><td>Runner label for main job</td></tr>
+            <tr><td><code>timeout-minutes</code></td><td><code>integer</code></td><td>No</td><td><code>20</code></td><td>Maximum execution time</td></tr>
+            <tr><td><code>if</code></td><td><code>string</code></td><td>No</td><td>—</td><td>Conditional execution expression</td></tr>
+            <tr><td><code>run-name</code></td><td><code>string</code></td><td>No</td><td>Workflow name</td><td>Custom run display name</td></tr>
+            <tr><td><code>private</code></td><td><code>boolean</code></td><td>No</td><td><code>false</code></td><td>Prevent external installation</td></tr>
+            <tr><td><code>labels</code></td><td><code>string[]</code></td><td>No</td><td>—</td><td>Workflow categorization tags</td></tr>
+            <tr><td><code>metadata</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Custom key-value pairs</td></tr>
+            <tr><td><code>resources</code></td><td><code>string[]</code></td><td>No</td><td>—</td><td>Companion files for <code>gh aw add</code></td></tr>
+            <tr><td><code>runtimes</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Override default runtime versions</td></tr>
+            <tr><td><code>features</code></td><td><code>object</code></td><td>No</td><td>—</td><td>Experimental feature flags</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRIGGERS -->
+    <div class="section" id="triggers">
+      <div class="sh"><h2>Trigger Events (<code>on:</code>)</h2><span class="badge">30+ triggers</span></div>
+      <p style="margin-bottom:16px">The <code>on:</code> field uses standard GitHub Actions trigger syntax, extended with gh-aw-specific controls.</p>
+
+      <h3 class="sub-h">Standard Triggers</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Trigger</th><th>Key</th><th>Common Types</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td>Issues</td><td><code>issues</code></td><td><code>opened</code>, <code>edited</code>, <code>labeled</code></td><td>React to issue lifecycle</td></tr>
+            <tr><td>Pull Request</td><td><code>pull_request</code></td><td><code>opened</code>, <code>synchronize</code></td><td>React to PR events</td></tr>
+            <tr><td>Issue Comment</td><td><code>issue_comment</code></td><td><code>created</code></td><td>ChatOps, respond to comments</td></tr>
+            <tr><td>Push</td><td><code>push</code></td><td>—</td><td>React to code pushes</td></tr>
+            <tr><td>Schedule</td><td><code>schedule</code></td><td>—</td><td>Recurring automation</td></tr>
+            <tr><td>Workflow Dispatch</td><td><code>workflow_dispatch</code></td><td>—</td><td>Manual trigger with inputs</td></tr>
+            <tr><td>Workflow Run</td><td><code>workflow_run</code></td><td>—</td><td>Chain after another workflow</td></tr>
+            <tr><td>Discussion</td><td><code>discussion</code></td><td><code>created</code>, <code>edited</code></td><td>React to discussions</td></tr>
+            <tr><td>Release</td><td><code>release</code></td><td><code>published</code></td><td>Auto-generate changelogs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">🕐 Fuzzy Schedule Syntax</h3>
+      <p style="margin-bottom:8px;color:var(--muted)">Human-friendly schedules. The compiler assigns deterministic scattered times based on file path.</p>
+      <div class="code-block"><span class="kw">on:</span>
+  <span class="kw">schedule:</span> <span class="str">daily</span>                              <span class="cm"># Scattered daily</span>
+  <span class="kw">schedule:</span> <span class="str">daily around 14:00</span>                 <span class="cm"># ±1 hour of 14:00</span>
+  <span class="kw">schedule:</span> <span class="str">daily between 9:00 and 17:00</span>       <span class="cm"># Business hours</span>
+  <span class="kw">schedule:</span> <span class="str">weekly on friday around 5pm</span>        <span class="cm"># Weekly on Fridays</span>
+  <span class="kw">schedule:</span> <span class="str">hourly</span>                             <span class="cm"># Every hour</span>
+  <span class="kw">schedule:</span> <span class="str">every 10 minutes</span>                   <span class="cm"># Minimum 5 minutes</span></div>
+
+      <h3 class="sub-h">⚡ Slash & Label Commands</h3>
+      <div class="code-block"><span class="cm"># Slash command — users type /review in comments</span>
+<span class="kw">on:</span>
+  <span class="kw">slash_command:</span> <span class="str">"review"</span>
+
+<span class="cm"># Label command — fires when label is added</span>
+<span class="kw">on:</span>
+  <span class="kw">label_command:</span> <span class="str">"deploy"</span></div>
+
+      <h3 class="sub-h">🔧 gh-aw Trigger Extensions</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>reaction</code></td><td><code>string</code></td><td>Emoji reaction on trigger (<code>eyes</code>, <code>rocket</code>, <code>none</code>)</td></tr>
+            <tr><td><code>status-comment</code></td><td><code>boolean</code></td><td>Post started/completed comments</td></tr>
+            <tr><td><code>stop-after</code></td><td><code>string</code></td><td>Auto-disable deadline (<code>+90d</code>, <code>2024-12-31</code>)</td></tr>
+            <tr><td><code>manual-approval</code></td><td><code>string</code></td><td>Environment name for human approval gate</td></tr>
+            <tr><td><code>roles</code></td><td><code>string[]</code></td><td>Required repo roles (<code>admin</code>, <code>maintainer</code>, <code>write</code>)</td></tr>
+            <tr><td><code>skip-bots</code></td><td><code>string[]</code></td><td>Skip for listed bot actors</td></tr>
+            <tr><td><code>lock-for-agent</code></td><td><code>boolean</code></td><td>Lock issue during execution</td></tr>
+            <tr><td><code>skip-if-match</code></td><td><code>string|object</code></td><td>Skip if GitHub search query matches</td></tr>
+            <tr><td><code>skip-if-check-failing</code></td><td><code>boolean|object</code></td><td>Skip if CI checks are failing</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PERMISSIONS -->
+    <div class="section" id="permissions">
+      <div class="sh"><h2>Permissions</h2></div>
+      <div class="callout warn">⚠️ <strong>Read-only by default.</strong> In strict mode (enabled by default), write permissions are <strong>refused</strong> — you must use <code>safe-outputs</code> for all write operations.</div>
+      <div class="code-block"><span class="cm"># Shorthand</span>
+<span class="kw">permissions:</span> <span class="str">read-all</span>
+
+<span class="cm"># Granular</span>
+<span class="kw">permissions:</span>
+  <span class="kw">contents:</span> <span class="str">read</span>
+  <span class="kw">issues:</span> <span class="str">read</span>
+  <span class="kw">pull-requests:</span> <span class="str">read</span>
+  <span class="kw">models:</span> <span class="str">read</span>        <span class="cm"># Required for Copilot AI model access</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Scope</th><th>Values</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>contents</code></td><td><code>read|write|none</code></td><td>Repository file access</td></tr>
+            <tr><td><code>issues</code></td><td><code>read|write|none</code></td><td>Issue API access</td></tr>
+            <tr><td><code>pull-requests</code></td><td><code>read|write|none</code></td><td>PR API access</td></tr>
+            <tr><td><code>actions</code></td><td><code>read|write|none</code></td><td>Workflow and run access</td></tr>
+            <tr><td><code>checks</code></td><td><code>read|write|none</code></td><td>Check runs and suites</td></tr>
+            <tr><td><code>discussions</code></td><td><code>read|write|none</code></td><td>Discussion API</td></tr>
+            <tr><td><code>models</code></td><td><code>read|none</code></td><td>GitHub Copilot AI model access</td></tr>
+            <tr><td><code>security-events</code></td><td><code>read|write|none</code></td><td>Code scanning, Dependabot</td></tr>
+            <tr><td><code>packages</code></td><td><code>read|write|none</code></td><td>Package registry</td></tr>
+            <tr><td><code>statuses</code></td><td><code>read|write|none</code></td><td>Commit status API</td></tr>
+            <tr><td><code>id-token</code></td><td><code>write|none</code></td><td>OIDC JWT tokens</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ENGINES -->
+    <div class="section" id="engines">
+      <div class="sh"><h2>Engine Configuration</h2><span class="badge">4 engines</span></div>
+      <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+        <div class="card" style="border-top:3px solid var(--blue)">
+          <h3>🤖 Copilot <span class="tag tag-default">default</span></h3>
+          <p>GitHub's own coding agent. Uses Copilot premium requests.</p>
+          <div class="code-block" style="margin-top:12px"><span class="kw">engine:</span> <span class="str">copilot</span></div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--orange)">
+          <h3>🧠 Claude</h3>
+          <p>Anthropic's coding agent. Requires <code>ANTHROPIC_API_KEY</code>.</p>
+          <div class="code-block" style="margin-top:12px"><span class="kw">engine:</span> <span class="str">claude</span></div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--green)">
+          <h3>💻 Codex</h3>
+          <p>OpenAI's coding agent. Requires <code>OPENAI_API_KEY</code>.</p>
+          <div class="code-block" style="margin-top:12px"><span class="kw">engine:</span> <span class="str">codex</span></div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--cyan)">
+          <h3>✨ Gemini</h3>
+          <p>Google's coding agent. Requires <code>GEMINI_API_KEY</code>.</p>
+          <div class="code-block" style="margin-top:12px"><span class="kw">engine:</span> <span class="str">gemini</span></div>
+        </div>
+      </div>
+      <h3 class="sub-h">Extended Engine Configuration</h3>
+      <div class="code-block"><span class="kw">engine:</span>
+  <span class="kw">id:</span> <span class="str">copilot</span>
+  <span class="kw">version:</span> <span class="str">"0.0.422"</span>            <span class="cm"># Pin specific CLI version</span>
+  <span class="kw">model:</span> <span class="str">gpt-5</span>                  <span class="cm"># Override default model</span>
+  <span class="kw">agent:</span> <span class="str">technical-doc-writer</span>   <span class="cm"># Custom agent (.github/agents/&lt;name&gt;.agent.md)</span>
+  <span class="kw">max-continuations:</span> <span class="num">3</span>          <span class="cm"># Autopilot mode (Copilot only)</span>
+  <span class="kw">max-turns:</span> <span class="num">50</span>                 <span class="cm"># Max chat iterations (Claude only)</span>
+  <span class="kw">env:</span>
+    <span class="kw">DEBUG_MODE:</span> <span class="str">"true"</span></div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="section" id="tools">
+      <div class="sh"><h2>Tools Configuration</h2><span class="badge">12 built-in tools</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Key</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub</td><td><code>github:</code></td><td>GitHub API operations via MCP server</td></tr>
+            <tr><td>Bash</td><td><code>bash:</code></td><td>Shell command execution (sandboxed)</td></tr>
+            <tr><td>Edit</td><td><code>edit:</code></td><td>File editing in workspace</td></tr>
+            <tr><td>Web Fetch</td><td><code>web-fetch:</code></td><td>Fetch web content</td></tr>
+            <tr><td>Web Search</td><td><code>web-search:</code></td><td>Search the web</td></tr>
+            <tr><td>Playwright</td><td><code>playwright:</code></td><td>Browser automation and testing</td></tr>
+            <tr><td>Cache Memory</td><td><code>cache-memory:</code></td><td>Persistent memory across runs</td></tr>
+            <tr><td>Repo Memory</td><td><code>repo-memory:</code></td><td>Git-based context storage</td></tr>
+            <tr><td>Agentic Workflows</td><td><code>agentic-workflows:</code></td><td>Workflow introspection</td></tr>
+            <tr><td>Serena</td><td><code>serena:</code></td><td>AI-powered code intelligence (LSP)</td></tr>
+            <tr><td>QMD</td><td><code>qmd:</code></td><td>Documentation vector search</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">GitHub Tool — Toolsets</h3>
+      <div class="code-block"><span class="kw">tools:</span>
+  <span class="kw">github:</span>
+    <span class="kw">toolsets:</span> [<span class="str">repos</span>, <span class="str">issues</span>, <span class="str">pull_requests</span>, <span class="str">labels</span>, <span class="str">code_search</span>]
+    <span class="kw">read-only:</span> <span class="str">true</span>
+    <span class="kw">lockdown:</span> <span class="str">true</span></div>
+
+      <h3 class="sub-h">Bash — Command Allowlisting</h3>
+      <div class="code-block"><span class="kw">tools:</span>
+  <span class="kw">bash:</span>                              <span class="cm"># Default safe commands only</span>
+  <span class="kw">bash:</span> <span class="str">true</span>                         <span class="cm"># All commands</span>
+  <span class="kw">bash:</span> [<span class="str">"echo"</span>, <span class="str">"git:*"</span>, <span class="str">"npm"</span>]   <span class="cm"># Specific commands</span></div>
+
+      <h3 class="sub-h">Complete Example</h3>
+      <div class="code-block"><span class="kw">tools:</span>
+  <span class="kw">edit:</span>
+  <span class="kw">bash:</span> [<span class="str">"gh"</span>, <span class="str">"git:*"</span>, <span class="str">"npm"</span>, <span class="str">"node"</span>]
+  <span class="kw">github:</span>
+    <span class="kw">toolsets:</span> [<span class="str">issues</span>, <span class="str">pull_requests</span>, <span class="str">labels</span>]
+  <span class="kw">web-fetch:</span>
+  <span class="kw">web-search:</span>
+  <span class="kw">cache-memory:</span>
+    <span class="kw">key:</span> <span class="str">"project-context"</span>
+  <span class="kw">playwright:</span>
+  <span class="kw">serena:</span> [<span class="str">"typescript"</span>, <span class="str">"python"</span>]
+  <span class="kw">timeout:</span> <span class="num">120</span></div>
+    </div>
+
+    <!-- SAFE OUTPUTS -->
+    <div class="section" id="safe-outputs">
+      <div class="sh"><h2>Safe Outputs</h2><span class="badge">30+ types</span></div>
+      <p style="margin-bottom:16px">Safe outputs are the security boundary between read-only AI execution and write operations. The agent produces structured output; separate permission-controlled jobs execute the writes.</p>
+
+      <h3 class="sub-h">Issues & Discussions</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Key</th><th>Max</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Create Issue</td><td><code>create-issue</code></td><td>1</td><td>Create GitHub issues with labels, assignees</td></tr>
+            <tr><td>Update Issue</td><td><code>update-issue</code></td><td>1</td><td>Update issue status, title, body</td></tr>
+            <tr><td>Close Issue</td><td><code>close-issue</code></td><td>1</td><td>Close issues with comment</td></tr>
+            <tr><td>Create Discussion</td><td><code>create-discussion</code></td><td>1</td><td>Create GitHub discussions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">Pull Requests</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Key</th><th>Max</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Create PR</td><td><code>create-pull-request</code></td><td>1</td><td>Create PRs with code changes</td></tr>
+            <tr><td>Push to PR</td><td><code>push-to-pull-request-branch</code></td><td>1</td><td>Push changes to existing PR branch</td></tr>
+            <tr><td>Review Comments</td><td><code>create-pull-request-review-comment</code></td><td>10</td><td>Line-specific review comments</td></tr>
+            <tr><td>Submit Review</td><td><code>submit-pull-request-review</code></td><td>1</td><td>APPROVE/REQUEST_CHANGES/COMMENT</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">Labels, Assignments & Comments</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Key</th><th>Max</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Add Comment</td><td><code>add-comment</code></td><td>1</td><td>Post comments on issues/PRs/discussions</td></tr>
+            <tr><td>Add Labels</td><td><code>add-labels</code></td><td>3</td><td>Add labels (with allowlist)</td></tr>
+            <tr><td>Remove Labels</td><td><code>remove-labels</code></td><td>3</td><td>Remove labels</td></tr>
+            <tr><td>Add Reviewer</td><td><code>add-reviewer</code></td><td>3</td><td>Add reviewers to PRs</td></tr>
+            <tr><td>Assign to Agent</td><td><code>assign-to-agent</code></td><td>1</td><td>Assign Copilot to issues/PRs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">Workflows & Security</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Key</th><th>Max</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Dispatch Workflow</td><td><code>dispatch-workflow</code></td><td>1</td><td>Trigger other agentic workflows</td></tr>
+            <tr><td>Call Workflow</td><td><code>call-workflow</code></td><td>1</td><td>Call reusable workflows (fan-out)</td></tr>
+            <tr><td>Code Scanning</td><td><code>create-code-scanning-alert</code></td><td>∞</td><td>Generate SARIF security advisories</td></tr>
+            <tr><td>Upload Asset</td><td><code>upload-asset</code></td><td>10</td><td>Publish files to orphaned git branch</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">Examples</h3>
+      <div class="code-block"><span class="kw">safe-outputs:</span>
+  <span class="kw">create-issue:</span>
+    <span class="kw">title-prefix:</span> <span class="str">"[ai] "</span>
+    <span class="kw">labels:</span> [<span class="str">automation</span>, <span class="str">agentic</span>]
+    <span class="kw">assignees:</span> [<span class="str">copilot</span>]
+    <span class="kw">max:</span> <span class="num">5</span>
+    <span class="kw">expires:</span> <span class="str">7d</span>
+
+  <span class="kw">create-pull-request:</span>
+    <span class="kw">title-prefix:</span> <span class="str">"[ai] "</span>
+    <span class="kw">draft:</span> <span class="str">true</span>
+    <span class="kw">reviewers:</span> [<span class="str">copilot</span>]
+    <span class="kw">auto-merge:</span> <span class="str">true</span>
+    <span class="kw">protected-files:</span> <span class="str">"blocked"</span>
+
+  <span class="kw">add-labels:</span>
+    <span class="kw">allowed:</span> [<span class="str">bug</span>, <span class="str">enhancement</span>, <span class="str">docs</span>]
+    <span class="kw">max:</span> <span class="num">5</span>
+
+  <span class="kw">add-comment:</span>
+    <span class="kw">max:</span> <span class="num">3</span>
+    <span class="kw">hide-older-comments:</span> <span class="str">true</span></div>
+    </div>
+
+    <!-- MCP SERVERS -->
+    <div class="section" id="mcp">
+      <div class="sh"><h2>Custom MCP Servers</h2></div>
+      <p style="margin-bottom:16px">Three connection modes for external tools:</p>
+      <div class="card-grid">
+        <div class="card" style="border-top:3px solid var(--green)">
+          <h3>📡 Process (stdio)</h3>
+          <div class="code-block"><span class="kw">mcp-servers:</span>
+  <span class="kw">slack:</span>
+    <span class="kw">command:</span> <span class="str">"npx"</span>
+    <span class="kw">args:</span> [<span class="str">"-y"</span>, <span class="str">"@slack/mcp-server"</span>]
+    <span class="kw">env:</span>
+      <span class="kw">SLACK_BOT_TOKEN:</span> <span class="str">"$&lbrace;&lbrace; secrets.SLACK_TOKEN &rbrace;&rbrace;"</span></div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--purple)">
+          <h3>🐳 Container (Docker)</h3>
+          <div class="code-block"><span class="kw">mcp-servers:</span>
+  <span class="kw">custom-db:</span>
+    <span class="kw">container:</span> <span class="str">"ghcr.io/org/db-mcp:latest"</span>
+    <span class="kw">env:</span>
+      <span class="kw">DATABASE_URL:</span> <span class="str">"$&lbrace;&lbrace; secrets.DB_URL &rbrace;&rbrace;"</span></div>
+        </div>
+        <div class="card" style="border-top:3px solid var(--blue)">
+          <h3>🌐 HTTP Endpoint</h3>
+          <div class="code-block"><span class="kw">mcp-servers:</span>
+  <span class="kw">remote-api:</span>
+    <span class="kw">url:</span> <span class="str">"https://api.example.com/mcp"</span>
+    <span class="kw">headers:</span>
+      <span class="kw">Authorization:</span> <span class="str">"Bearer $&lbrace;&lbrace; secrets.TOKEN &rbrace;&rbrace;"</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NETWORK -->
+    <div class="section" id="network">
+      <div class="sh"><h2>Network Configuration</h2></div>
+      <p style="margin-bottom:16px">Controlled by the Agent Workflow Firewall (AWF). Only whitelisted domains are accessible.</p>
+      <div class="code-block"><span class="kw">network:</span> <span class="str">defaults</span>                   <span class="cm"># Basic infrastructure only</span>
+
+<span class="kw">network:</span>
+  <span class="kw">allowed:</span>
+    - <span class="str">defaults</span>                      <span class="cm"># Basic infra</span>
+    - <span class="str">python</span>                        <span class="cm"># PyPI ecosystem</span>
+    - <span class="str">node</span>                          <span class="cm"># NPM ecosystem</span>
+    - <span class="str">github</span>                        <span class="cm"># GitHub domains</span>
+    - <span class="str">"api.example.com"</span>             <span class="cm"># Custom domain</span>
+  <span class="kw">blocked:</span>
+    - <span class="str">"cdn.tracker.com"</span>             <span class="cm"># Block specific (takes precedence)</span></div>
+
+      <h3 class="sub-h">Ecosystem Identifiers</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Covers</th></tr></thead>
+          <tbody>
+            <tr><td><code>defaults</code></td><td>Certificates, JSON schema, Ubuntu mirrors</td></tr>
+            <tr><td><code>github</code></td><td>GitHub and adjacent domains</td></tr>
+            <tr><td><code>python</code></td><td>PyPI, pip</td></tr>
+            <tr><td><code>node</code></td><td>npm, yarn, pnpm</td></tr>
+            <tr><td><code>go</code></td><td>proxy.golang.org</td></tr>
+            <tr><td><code>rust</code></td><td>crates.io</td></tr>
+            <tr><td><code>java</code></td><td>Maven Central, Gradle</td></tr>
+            <tr><td><code>dotnet</code></td><td>NuGet</td></tr>
+            <tr><td><code>containers</code></td><td>Docker Hub, GHCR, Quay</td></tr>
+            <tr><td><code>terraform</code></td><td>HashiCorp domains</td></tr>
+            <tr><td><code>playwright</code></td><td>Browser downloads</td></tr>
+            <tr><td><code>linux-distros</code></td><td>Debian, Alpine repos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADVANCED -->
+    <div class="section" id="advanced">
+      <div class="sh"><h2>Advanced Configuration</h2></div>
+
+      <h3 class="sub-h">Imports — Shared Configuration</h3>
+      <div class="code-block"><span class="kw">imports:</span>
+  - <span class="str">"./shared/base-config.md"</span>                          <span class="cm"># Local file</span>
+  - <span class="str">"githubnext/agentics/shared/security.md@main"</span>      <span class="cm"># Remote</span></div>
+
+      <h3 class="sub-h">Concurrency</h3>
+      <div class="code-block"><span class="kw">concurrency:</span>
+  <span class="kw">group:</span> <span class="str">"gh-aw-$&lbrace;&lbrace; github.workflow &rbrace;&rbrace;"</span>
+  <span class="kw">cancel-in-progress:</span> <span class="str">true</span></div>
+
+      <h3 class="sub-h">Custom Steps</h3>
+      <div class="code-block"><span class="kw">steps:</span>                             <span class="cm"># Run BEFORE agent</span>
+  - <span class="kw">uses:</span> <span class="str">actions/setup-node@v4</span>
+    <span class="kw">with:</span>
+      <span class="kw">node-version:</span> <span class="str">"20"</span>
+
+<span class="kw">post-steps:</span>                        <span class="cm"># Run AFTER agent</span>
+  - <span class="kw">run:</span> <span class="str">echo "Agent completed"</span></div>
+
+      <h3 class="sub-h">Complete Workflow Example</h3>
+      <div class="code-block"><span class="kw">---</span>
+<span class="kw">name:</span> <span class="str">"CI Failure Investigator"</span>
+<span class="kw">description:</span> <span class="str">"Investigates CI failures and proposes fixes"</span>
+
+<span class="kw">on:</span>
+  <span class="kw">workflow_run:</span>
+    <span class="kw">workflows:</span> [<span class="str">"CI"</span>]
+    <span class="kw">types:</span> [<span class="str">completed</span>]
+  <span class="kw">roles:</span> [<span class="str">admin</span>, <span class="str">maintainer</span>]
+  <span class="kw">stop-after:</span> <span class="str">"+90d"</span>
+
+<span class="kw">permissions:</span>
+  <span class="kw">contents:</span> <span class="str">read</span>
+  <span class="kw">actions:</span> <span class="str">read</span>
+  <span class="kw">issues:</span> <span class="str">read</span>
+
+<span class="kw">engine:</span>
+  <span class="kw">id:</span> <span class="str">copilot</span>
+  <span class="kw">max-continuations:</span> <span class="num">3</span>
+
+<span class="kw">tools:</span>
+  <span class="kw">edit:</span>
+  <span class="kw">bash:</span> [<span class="str">"gh"</span>, <span class="str">"git:*"</span>, <span class="str">"npm"</span>]
+  <span class="kw">github:</span>
+    <span class="kw">toolsets:</span> [<span class="str">repos</span>, <span class="str">issues</span>, <span class="str">pull_requests</span>]
+
+<span class="kw">safe-outputs:</span>
+  <span class="kw">create-pull-request:</span>
+    <span class="kw">title-prefix:</span> <span class="str">"[ci-fix] "</span>
+    <span class="kw">labels:</span> [<span class="str">ci-fix</span>, <span class="str">automation</span>]
+    <span class="kw">draft:</span> <span class="str">true</span>
+  <span class="kw">add-comment:</span>
+    <span class="kw">max:</span> <span class="num">2</span>
+
+<span class="kw">network:</span>
+  <span class="kw">allowed:</span>
+    - <span class="str">defaults</span>
+    - <span class="str">node</span>
+    - <span class="str">github</span>
+
+<span class="kw">timeout-minutes:</span> <span class="num">15</span>
+<span class="kw">---</span>
+
+<span class="cm"># CI Failure Investigator</span>
+
+When a CI workflow fails, investigate the failure:
+
+1. Read the failed workflow logs
+2. Identify the root cause
+3. Search the codebase for the relevant code
+4. Propose a fix as a pull request
+5. Comment on the triggering issue with your analysis</div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Built with ⚡ by <a href="https://github.com/htekdev">htekdev</a> · <a href="https://github.com/github/gh-aw">gh-aw on GitHub</a></p>
+  </footer>
+</body>
+</html>
