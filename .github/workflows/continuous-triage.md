@@ -19,6 +19,18 @@ tools:
   github:
     toolsets: [issues, labels, repos]
 
+mcp-servers:
+  exa:
+    command: "npx"
+    args: ["-y", "exa-mcp-server"]
+    env:
+      EXA_API_KEY: "${{ secrets.EXA_API_KEY }}"
+  perplexity:
+    command: "npx"
+    args: ["-y", "perplexity-mcp"]
+    env:
+      PERPLEXITY_API_KEY: "${{ secrets.PERPLEXITY_API_KEY }}"
+
 safe-outputs:
   add-labels:
     allowed: [bug, enhancement, question, content-request, broken-link, typo, good-first-issue, documentation]
@@ -30,6 +42,9 @@ network:
   allowed:
     - defaults
     - github
+    - node
+    - "api.exa.ai"
+    - "api.perplexity.ai"
 ---
 
 # Continuous Triage Agent
@@ -42,6 +57,7 @@ When a new issue is opened, analyze it and:
 
 1. **Read the issue** title and body carefully
 2. **Research the repository** — this is a static HTML documentation site with pages about GH-AW core concepts, architecture, configuration, security, ecosystem, use cases, CLI tooling, videos, and resources
+3. **Search the web** using Exa and Perplexity to find relevant context — official docs, GitHub issues, blog posts, or discussions related to the issue topic
 3. **Categorize** the issue by applying the most appropriate label(s):
    - `bug` — Something is broken (broken page, rendering issue, wrong information)
    - `enhancement` — Suggestion to improve existing content or add new features

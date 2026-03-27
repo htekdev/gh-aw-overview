@@ -18,6 +18,24 @@ tools:
   github:
     toolsets: [repos, issues]
   bash: ["cat", "grep", "head", "find"]
+  web-fetch:
+
+mcp-servers:
+  exa:
+    command: "npx"
+    args: ["-y", "exa-mcp-server"]
+    env:
+      EXA_API_KEY: "${{ secrets.EXA_API_KEY }}"
+  perplexity:
+    command: "npx"
+    args: ["-y", "perplexity-mcp"]
+    env:
+      PERPLEXITY_API_KEY: "${{ secrets.PERPLEXITY_API_KEY }}"
+  youtube:
+    command: "npx"
+    args: ["-y", "@anthropic/youtube-mcp"]
+    env:
+      YOUTUBE_API_KEY: "${{ secrets.YOUTUBE_API_KEY }}"
 
 safe-outputs:
   add-comment:
@@ -28,6 +46,12 @@ network:
   allowed:
     - defaults
     - github
+    - node
+    - "api.exa.ai"
+    - "api.perplexity.ai"
+    - "www.googleapis.com"
+    - "*.youtube.com"
+    - "*.ytimg.com"
 ---
 
 # ChatOps Assistant — GH-AW Expert
@@ -69,7 +93,8 @@ This repository is a comprehensive documentation hub for GitHub Agentic Workflow
 
 - Be thorough but organized — use headers, lists, and code blocks
 - Always ground your answer in the site's content (read the relevant files)
-- If the topic isn't covered on the site, say so and provide what you know
+- If the topic isn't covered on the site, use Exa and Perplexity to search for the latest official information
+- Use YouTube to find relevant tutorial videos when applicable
 - Include a link to the relevant page: `https://htekdev.github.io/gh-aw-overview/<page>.html`
 - Keep the tone helpful and educational
 - Format code examples as proper YAML/markdown blocks

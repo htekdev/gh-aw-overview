@@ -19,6 +19,18 @@ tools:
   edit:
   web-fetch:
 
+mcp-servers:
+  exa:
+    command: "npx"
+    args: ["-y", "exa-mcp-server"]
+    env:
+      EXA_API_KEY: "${{ secrets.EXA_API_KEY }}"
+  perplexity:
+    command: "npx"
+    args: ["-y", "perplexity-mcp"]
+    env:
+      PERPLEXITY_API_KEY: "${{ secrets.PERPLEXITY_API_KEY }}"
+
 safe-outputs:
   create-pull-request:
     title-prefix: "[docs] "
@@ -35,6 +47,12 @@ network:
     - defaults
     - github
     - node
+    - "api.exa.ai"
+    - "api.perplexity.ai"
+    - "github.github.com"
+    - "github.github.io"
+    - "github.blog"
+    - "githubnext.com"
 ---
 
 # Continuous Documentation Agent
@@ -64,7 +82,11 @@ Perform a weekly documentation health check:
    - Are version numbers current? (gh-aw is actively developed)
    - Are code examples syntactically correct?
    - Do the described features match current gh-aw capabilities?
-3. **Check for completeness**:
+3. **Cross-reference with live sources** using Exa and Perplexity:
+   - Search for the latest gh-aw announcements and changelog entries
+   - Compare the site's version numbers and feature descriptions against official docs
+   - Check if any new features have been released that aren't documented
+4. **Check for completeness**:
    - Are there any major GH-AW topics not covered?
    - Are any sections thin or missing detail?
 4. **Check for consistency**:

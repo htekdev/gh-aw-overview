@@ -17,6 +17,18 @@ tools:
   bash: ["cat", "grep", "find", "head", "tail", "sort", "uniq", "wc", "curl"]
   web-fetch:
 
+mcp-servers:
+  exa:
+    command: "npx"
+    args: ["-y", "exa-mcp-server"]
+    env:
+      EXA_API_KEY: "${{ secrets.EXA_API_KEY }}"
+  youtube:
+    command: "npx"
+    args: ["-y", "@anthropic/youtube-mcp"]
+    env:
+      YOUTUBE_API_KEY: "${{ secrets.YOUTUBE_API_KEY }}"
+
 safe-outputs:
   create-issue:
     title-prefix: "[broken-links] "
@@ -29,6 +41,17 @@ network:
     - defaults
     - github
     - node
+    - "api.exa.ai"
+    - "www.googleapis.com"
+    - "*.youtube.com"
+    - "*.ytimg.com"
+    - "github.github.com"
+    - "github.github.io"
+    - "github.blog"
+    - "githubnext.com"
+    - "thenewstack.io"
+    - "dev.to"
+    - "betterstack.com"
 ---
 
 # Continuous Link Validation Agent
@@ -51,7 +74,7 @@ Scan all HTML files in the repository for broken or problematic links:
 
 3. **Check for common issues**:
    - Links to `github.github.com/gh-aw/` — verify they still resolve
-   - YouTube video links — check if videos are still available
+   - YouTube video links — use the YouTube MCP to verify videos still exist
    - Blog post links — check if articles are still published
    - GitHub repository links — check if repos still exist
 
