@@ -7,19 +7,14 @@ const { Content } = await page.render();
 ---
 
 <BaseLayout title={page.data.title} description={page.data.description} currentPage="use-cases">
-  <section class="page-hero">
-    <div class="container">
-      <span class="hero-emoji">{page.data.heroEmoji}</span>
+  <header class="page-hero">
+    <div class="hero-content">
+      <div class="hero-emoji">{page.data.heroEmoji}</div>
       <h1 class="hero-title">Use Cases & Examples</h1>
       <p class="hero-subtitle">{page.data.heroSubtitle}</p>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="num">12</div><div class="lbl">Use Case Categories</div></div>
-        <div class="hero-stat"><div class="num">100+</div><div class="lbl">Factory Workflows</div></div>
-        <div class="hero-stat"><div class="num">96%</div><div class="lbl">Top Merge Rate</div></div>
-        <div class="hero-stat"><div class="num">7</div><div class="lbl">Design Patterns</div></div>
-      </div>
     </div>
-  </section>
+  </header>
+
   <div class="container mdx-content">
     <Content />
   </div>

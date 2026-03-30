@@ -184,7 +184,7 @@ section + section {
   margin-bottom: 40px;
 }
 
-/* ── Hero ─────────────────────────────────────────────── */
+/* ── Hero (Homepage — full viewport) ──────────────────── */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -194,6 +194,17 @@ section + section {
   position: relative;
   overflow: hidden;
   padding: 100px 24px 60px;
+}
+
+/* ── Page Hero (Sub-pages — compact) ─────────────────── */
+.page-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  padding: 120px 24px 48px;
 }
 
 .hero::before {
@@ -210,6 +221,24 @@ section + section {
     rgba(63, 185, 80, 0.08) 25%,
     rgba(188, 140, 255, 0.06) 50%,
     transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(56, 166, 255, 0.10) 0%,
+    rgba(63, 185, 80, 0.06) 30%,
+    transparent 60%
   );
   pointer-events: none;
   z-index: 0;
@@ -261,6 +290,21 @@ section + section {
   color: var(--color-text-muted);
   margin-bottom: 16px;
   font-weight: 500;
+}
+
+/* ── Page Hero Overrides ──────────────────────────────── */
+.page-hero .hero-emoji {
+  font-size: 56px;
+  animation: none;
+  margin-bottom: 16px;
+}
+
+.page-hero .hero-title {
+  font-size: clamp(28px, 5vw, 48px);
+}
+
+.page-hero .hero-subtitle {
+  margin-bottom: 0;
 }
 
 .hero-desc {
