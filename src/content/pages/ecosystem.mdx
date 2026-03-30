@@ -1,0 +1,1065 @@
+---
+title: "Ecosystem — GitHub Agentic Workflows"
+description: "AI engines, built-in tools, MCP protocol, ecosystem bundles, and extensibility options for GitHub Agentic Workflows."
+navLabel: "Ecosystem"
+navOrder: 5
+heroEmoji: "🧩"
+heroSubtitle: "AI engines, tools, and integrations"
+accentColor: "purple"
+---
+
+<section id="overview">
+
+## Ecosystem Overview
+
+<p class="section-desc">GitHub Agentic Workflows is a composable stack of six core primitives. Each addresses a different control layer — from always-on behavioral standards to deterministic policy enforcement.</p>
+
+<div class="stack">
+  <div class="stack-layer bg-hooks" style="border-left: 4px solid var(--color-pink);">
+    <span class="stack-num c-hooks">6</span>
+    <span class="stack-name c-hooks">Hooks</span>
+    <span class="badge badge-pink">Policy Layer</span>
+    <span class="stack-desc">Deterministic gates that enforce rules on everything below</span>
+    <span class="stack-analogy">🔒 Security checkpoint</span>
+  </div>
+  <div class="stack-layer bg-mcp" style="border-left: 4px solid var(--color-cyan);">
+    <span class="stack-num c-mcp">5</span>
+    <span class="stack-name c-mcp">MCP Servers</span>
+    <span class="badge badge-cyan">Connectivity</span>
+    <span class="stack-desc">Live access to external systems, APIs, and data</span>
+    <span class="stack-analogy">🔌 API gateway</span>
+  </div>
+  <div class="stack-layer bg-skills" style="border-left: 4px solid var(--color-orange);">
+    <span class="stack-num c-skills">4</span>
+    <span class="stack-name c-skills">Agent Skills</span>
+    <span class="badge badge-orange">Workflow Layer</span>
+    <span class="stack-desc">Reusable runbooks with scripts, templates, and references</span>
+    <span class="stack-analogy">📋 Training manual</span>
+  </div>
+  <div class="stack-layer bg-agents" style="border-left: 4px solid var(--color-purple);">
+    <span class="stack-num c-agents">3</span>
+    <span class="stack-name c-agents">Custom Agents</span>
+    <span class="badge badge-purple">Persona Layer</span>
+    <span class="stack-desc">Specialist roles with tool boundaries and collaboration patterns</span>
+    <span class="stack-analogy">👤 Team member</span>
+  </div>
+  <div class="stack-layer bg-prompts" style="border-left: 4px solid var(--color-green);">
+    <span class="stack-num c-prompts">2</span>
+    <span class="stack-name c-prompts">Prompt Files</span>
+    <span class="badge badge-green">Task Layer</span>
+    <span class="stack-desc">Named slash commands for repeatable one-shot tasks</span>
+    <span class="stack-analogy">📄 Playbook page</span>
+  </div>
+  <div class="stack-layer bg-instructions" style="border-left: 4px solid var(--color-blue);">
+    <span class="stack-num c-instructions">1</span>
+    <span class="stack-name c-instructions">Custom Instructions</span>
+    <span class="badge badge-blue">Behavior Layer</span>
+    <span class="stack-desc">Always-on standards and conventions — the foundation everything inherits</span>
+    <span class="stack-analogy">📘 Employee handbook</span>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Composable by design:</strong> A custom agent can inherit instructions, invoke skills, call MCP-provided tools, and be governed by hooks — all simultaneously. The primitives layer together; they don't replace each other.
+</div>
+
+</section>
+
+<section id="coding-agent">
+
+## 🤖 Copilot Coding Agent
+
+<p class="section-desc">The autonomous runtime engine that executes agentic workflows in ephemeral GitHub Actions environments.</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>What It Does</h3>
+    <p>The Copilot coding agent is an autonomous AI developer that works independently in the background. It operates in ephemeral <strong>GitHub Actions</strong> environments where it can explore code, make changes, run tests, iterate on failures, and open pull requests.</p>
+    <ul style="margin-top: 12px;">
+      <li>Fix bugs identified in issues or code review</li>
+      <li>Implement incremental features from scoped descriptions</li>
+      <li>Improve test coverage by writing missing tests</li>
+      <li>Address technical debt (refactoring, dependency updates)</li>
+      <li>Update documentation to match code changes</li>
+      <li>Accelerate secret scanning remediation</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Key Insight</h3>
+    <div class="callout" style="margin-top: 0;">
+      <strong>CCA ≠ Agent Mode.</strong> The Copilot coding agent works <em>autonomously</em> in a GitHub Actions environment and creates PRs. Agent mode in the IDE works <em>interactively</em> in your local environment with human-in-the-loop control.
+    </div>
+    <h3 style="margin-top: 16px;">Session Management</h3>
+    <ul>
+      <li><strong>Steering</strong> — Provide mid-session guidance without stopping the run</li>
+      <li><strong>Resume locally</strong> — Open in VS Code or paste a CLI command to continue</li>
+      <li><strong>Archiving</strong> — Stopped sessions can be archived</li>
+      <li><strong>Tracking</strong> — Monitor from CLI, Mobile, VS Code, Raycast, JetBrains</li>
+    </ul>
+  </div>
+</div>
+
+### Entry Points
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Entry Point</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td><strong>GitHub Issues</strong></td><td>Assign an issue to Copilot via the assignees dropdown or <code>@copilot</code> mention</td></tr>
+      <tr><td><strong>Pull Requests</strong></td><td>Comment <code>@copilot</code> on an existing PR to request changes</td></tr>
+      <tr><td><strong>Agents Tab</strong></td><td>Repository-level dashboard to launch and manage sessions, select agents, pick models</td></tr>
+      <tr><td><strong>Agents Panel</strong></td><td>Click the ✦ button at the top of any GitHub page</td></tr>
+      <tr><td><strong>Copilot Chat</strong></td><td>Start a coding agent session from Copilot Chat on GitHub.com</td></tr>
+      <tr><td><strong>VS Code / JetBrains</strong></td><td>Initiate coding agent sessions from IDE Copilot Chat</td></tr>
+      <tr><td><strong>Copilot CLI</strong></td><td>Prefix any prompt with <code>&amp;</code> to delegate to the cloud coding agent</td></tr>
+      <tr><td><strong>GitHub CLI / API</strong></td><td>Use <code>gh issue edit</code> or the REST API to assign issues programmatically</td></tr>
+    </tbody>
+  </table>
+</div>
+
+### Workflow Lifecycle
+
+<div class="lifecycle">
+  <span class="lifecycle-step">📝 Issue / Prompt</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">🤖 Agent picks up task</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">🌿 Creates branch</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">🔍 Reads code</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">📋 Plans changes</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">⚙️ Implements</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">🧪 Runs tests</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step">🔄 Iterates</span>
+  <span class="lifecycle-arrow">→</span>
+  <span class="lifecycle-step" style="border-color: var(--color-green); background: rgba(63,185,80,0.1);">✅ Opens PR</span>
+</div>
+
+</section>
+
+<section id="instructions">
+
+## 📘 Custom Instructions
+
+<p class="section-desc">The foundational behavioral layer — always-on rules that shape every interaction across an entire repository, organization, or workspace.</p>
+
+### Six Instruction Types
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Type</th><th>File Location</th><th>Loading</th><th>Platforms</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong class="c-instructions">Repository-wide</strong></td>
+        <td><code>.github/copilot-instructions.md</code></td>
+        <td>Always-on (every request)</td>
+        <td>VS Code, JetBrains, Eclipse, Xcode, GitHub.com</td>
+        <td>Global coding standards</td>
+      </tr>
+      <tr>
+        <td><strong class="c-instructions">Path-specific</strong></td>
+        <td><code>.github/instructions/&#42;.instructions.md</code></td>
+        <td>File-matched via <code>applyTo</code> glob</td>
+        <td>VS Code, GitHub.com</td>
+        <td>Language/framework-specific rules</td>
+      </tr>
+      <tr>
+        <td><strong class="c-instructions">Agent instructions</strong></td>
+        <td><code>AGENTS.md</code> (any directory)</td>
+        <td>When coding agent operates</td>
+        <td>VS Code, GitHub.com, CLI</td>
+        <td>Autonomous agent procedures</td>
+      </tr>
+      <tr>
+        <td><strong class="c-instructions">Model-specific</strong></td>
+        <td><code>CLAUDE.md</code> / <code>GEMINI.md</code></td>
+        <td>When corresponding model is active</td>
+        <td>GitHub.com</td>
+        <td>Model-specific tuning</td>
+      </tr>
+      <tr>
+        <td><strong class="c-instructions">Personal</strong></td>
+        <td>VS Code User Settings</td>
+        <td>Always-on (across workspaces)</td>
+        <td>VS Code</td>
+        <td>Individual preferences</td>
+      </tr>
+      <tr>
+        <td><strong class="c-instructions">Organization</strong></td>
+        <td>GitHub Org settings</td>
+        <td>Always-on (org-wide)</td>
+        <td>All platforms</td>
+        <td>Organization-level standards</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card border-blue">
+    <h3>Path-Specific Instructions</h3>
+    <p>Use YAML frontmatter with an <code>applyTo</code> glob pattern to scope instructions to specific file types:</p>
+  </div>
+  <div class="card border-blue">
+    <h3>AGENTS.md</h3>
+    <p>Added to the coding agent in <strong>August 2025</strong>. Key characteristics:</p>
+    <ul>
+      <li>Placed <strong>anywhere</strong> in the repository</li>
+      <li>Nearest <code>AGENTS.md</code> in directory tree takes precedence</li>
+      <li>Subdirectory files scope to that directory and children</li>
+      <li>Root <code>AGENTS.md</code> applies globally</li>
+      <li>Follows the open <a href="https://github.com/agentsmd/agents.md">agentsmd spec</a></li>
+      <li><code>CLAUDE.md</code> and <code>GEMINI.md</code> are read <em>in addition</em></li>
+    </ul>
+  </div>
+</div>
+
+Path-specific instructions example:
+
+```yaml
+---
+applyTo: "**/*.bicep"
+---
+When writing Bicep files, always use parameter
+decorators, follow naming conventions, and include
+resource descriptions for documentation.
+```
+
+<div class="card border-blue" style="margin-top: 4px;">
+  <h3>Precedence Model</h3>
+</div>
+
+```
+Layer 0: Personal Instructions (VS Code Settings)          ← Highest priority
+Layer 1: copilot-instructions.md (repo-wide)                ← Always-on
+Layer 2: *.instructions.md (matched by applyTo glob)        ← Conditionally loaded
+Layer 3: AGENTS.md (when coding agent is operating)         ← Agent-scoped
+Layer 4: Skill (if the task matches a skill description)    ← On-demand
+Layer 5: Custom Agent prompt (if a specific agent selected) ← Explicitly selected
+```
+
+All applicable instructions are provided simultaneously — contradictions between layers should be avoided.
+
+<div class="callout" style="margin-top: 16px;">
+  <strong>Best practice:</strong> Keep <code>copilot-instructions.md</code> concise (5–15 core rules, 200–500 tokens). Use path-specific instructions for language-specific conventions. Reserve <code>AGENTS.md</code> for autonomous agent operational procedures.
+</div>
+
+</section>
+
+<section id="prompts">
+
+## 📄 Prompt Files
+
+<p class="section-desc">Reusable, named tasks invoked on demand as slash commands — bridging always-on instructions and full custom agents.</p>
+
+<div class="grid-2">
+  <div class="card border-green">
+    <h3>Format &amp; Configuration</h3>
+    <ul>
+      <li>Markdown files in <code>.github/prompts/&#42;.prompt.md</code></li>
+      <li>Invoked with <code>/</code> in Copilot Chat (e.g., <code>/security-review</code>)</li>
+      <li>Support YAML frontmatter: <code>agent</code>, <code>tools</code>, <code>model</code>, <code>description</code>, <code>mode</code></li>
+      <li>Built-in variables: <code>$&#123;selection&#125;</code>, <code>$&#123;file&#125;</code>, <code>$&#123;input:variableName&#125;</code></li>
+      <li>Can reference a custom agent via the <code>agent</code> field</li>
+    </ul>
+  </div>
+  <div class="card border-green">
+    <h3>Example</h3>
+  </div>
+</div>
+
+```yaml
+---
+mode: agent
+tools: ['search/codebase', 'edit/editFiles',
+        'read/problems']
+description: Create a structured implementation
+             plan for a new feature
+---
+# Feature Planning
+
+You are a senior software architect.
+Create an implementation plan for the
+following feature: ${input:featureDescription}
+
+## Requirements
+- Break down into discrete tasks
+- Identify affected files using codebase search
+- Estimate complexity per task
+```
+
+<div class="callout callout-green">
+  <strong>When to use Prompt Files:</strong> Repeatable tasks you type the same prompt for, tasks benefiting from dynamic variables, and named slash commands the whole team can share via source control.
+</div>
+
+</section>
+
+<section id="agents">
+
+## 👤 Custom Agents
+
+<p class="section-desc">Specialized AI personas with defined roles, tool boundaries, and collaboration patterns. Defined as <code>.agent.md</code> files with YAML frontmatter.</p>
+
+<div class="grid-2">
+  <div class="card border-purple">
+    <h3>Configuration Fields</h3>
+    <div class="table-wrap" style="margin-top: 8px;">
+      <table>
+        <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>Display name (defaults to filename)</td></tr>
+          <tr><td><code>description</code></td><td>Role description (influences discovery)</td></tr>
+          <tr><td><code>tools</code></td><td>Allowed-tool whitelist</td></tr>
+          <tr><td><code>model</code></td><td>Model selection (supports fallback lists)</td></tr>
+          <tr><td><code>handoffs</code></td><td>Inter-agent transition configuration</td></tr>
+          <tr><td><code>agents</code></td><td>Invocable sub-agent whitelist</td></tr>
+          <tr><td><code>mcp-servers</code></td><td>MCP server configs embedded in frontmatter</td></tr>
+          <tr><td><code>metadata</code></td><td>Key-value annotation pairs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card border-purple">
+    <h3>Configuration Scope</h3>
+    <div class="table-wrap" style="margin-top: 8px;">
+      <table>
+        <thead><tr><th>Level</th><th>Location</th><th>Scope</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Repository</strong></td><td><code>.github/agents/&#42;.agent.md</code></td><td>Current project</td></tr>
+          <tr><td><strong>User</strong></td><td><code>&#126;/.copilot/agents/&#42;.agent.md</code></td><td>All projects</td></tr>
+          <tr><td><strong>Organization</strong></td><td><code>.github-private</code> repo</td><td>All org repos</td></tr>
+          <tr><td><strong>Enterprise</strong></td><td>Enterprise agent registry</td><td>All enterprise repos</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 style="margin-top: 16px;">Runs On</h3>
+    <p>GitHub.com (Agents tab, issues, PRs, panel) · VS Code (GA) · JetBrains, Eclipse, Xcode (preview) · Copilot CLI (<code>--agent=</code> flag)</p>
+  </div>
+</div>
+
+### Collaboration Patterns
+
+<div class="grid-2">
+  <div class="card" style="border-left: 4px solid var(--color-purple); border-top: 3px solid var(--color-purple);">
+    <h3>🤝 Handoffs <span class="badge badge-purple">User-Guided</span></h3>
+    <p>Relay-race style transitions where the user explicitly confirms each switch. Shared conversation history across the chain.</p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--color-orange); border-top: 3px solid var(--color-orange);">
+    <h3>🔄 Sub-agents <span class="badge badge-orange">Programmatic</span></h3>
+    <p>Manager-delegate style where the parent agent autonomously invokes child agents without user intervention.</p>
+  </div>
+</div>
+
+Handoffs example:
+
+```yaml
+---
+name: Planner
+description: Generate implementation plans
+tools: ['search', 'fetch']
+handoffs:
+  - label: Start Implementation
+    agent: Implementer
+    prompt: "Implement the plan above."
+    send: false  # User must click
+---
+```
+
+**Handoff flow:** Planner → *\[User clicks\]* → Implementer → *\[User clicks\]* → Reviewer
+
+- Human-in-the-loop control
+- Shared conversation history
+- Unlimited depth
+
+Sub-agents example:
+
+```yaml
+---
+name: Feature Builder
+description: Build features by researching
+             first, then implementing
+tools: ['agent']
+agents: ['Researcher', 'Implementer']
+---
+```
+
+**Sub-agent flow:** Feature Builder autonomously delegates → Researcher → Implementer
+
+- Agent-autonomous (no user clicks)
+- Isolated context (clean session)
+- Single level depth only
+
+<div class="table-wrap" style="margin-top: 20px;">
+  <table>
+    <thead><tr><th>Dimension</th><th>Handoffs</th><th>Sub-agents</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Trigger</strong></td><td>User clicks a button</td><td>Parent agent invokes programmatically</td></tr>
+      <tr><td><strong>Control</strong></td><td>User-driven (human-in-the-loop)</td><td>Agent-autonomous</td></tr>
+      <tr><td><strong>Context</strong></td><td>Shared conversation history</td><td>Isolated context (clean session)</td></tr>
+      <tr><td><strong>Visibility</strong></td><td>User sees the agent switch</td><td>Transparent — user sees only the result</td></tr>
+      <tr><td><strong>Depth</strong></td><td>Unlimited</td><td>Single level only</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Multi-stage pipelines needing human review</td><td>Automated divide-and-conquer tasks</td></tr>
+    </tbody>
+  </table>
+</div>
+
+### MCP Servers in Agent Profiles
+
+<div class="card border-purple">
+  <p>Custom agents can embed MCP server configurations directly in their frontmatter:</p>
+</div>
+
+```yaml
+---
+name: my-custom-agent-with-mcp
+description: Custom agent description
+tools: ['tool-a', 'tool-b', 'custom-mcp/tool-1']
+mcp-servers:
+  custom-mcp:
+    type: 'local'
+    command: 'some-command'
+    args: ['--arg1', '--arg2']
+    tools: ["*"]
+    env:
+      ENV_VAR_NAME: ${{ secrets.COPILOT_MCP_ENV_VAR_VALUE }}
+---
+```
+
+Secret syntax supports: `$COPILOT_MCP_*`, `${COPILOT_MCP_*}`, and `${{ secrets.COPILOT_MCP_* }}`.
+
+</section>
+
+<section id="skills">
+
+## 📋 Agent Skills
+
+<p class="section-desc">The workflow packaging layer — reusable runbooks that bundle instructions, scripts, templates, and reference materials into self-contained capability packages.</p>
+
+<div class="callout callout-orange">
+  <strong>Open Standard:</strong> Agent Skills follow the <a href="https://agentskills.io">agentskills.io</a> specification (originally developed by Anthropic). A skill defined once works in GitHub Copilot, Claude Code, and any other skills-compatible agent.
+</div>
+
+### Progressive Loading Model (Three-Tier)
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Tier</th><th>Content</th><th>Token Budget</th><th>When Loaded</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-green">Tier 1</span> Metadata</td>
+        <td><code>name</code> + <code>description</code> (YAML frontmatter)</td>
+        <td>~50–100 tokens/skill</td>
+        <td><strong>Always</strong> in context</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">Tier 2</span> Body</td>
+        <td>SKILL.md body content</td>
+        <td>Recommended &lt; 500 tokens</td>
+        <td>When Copilot determines relevance</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">Tier 3</span> References</td>
+        <td>Files under <code>references/</code>, <code>scripts/</code>, etc.</td>
+        <td>Recommended &lt; 1,000 tokens/file</td>
+        <td>When explicitly referenced</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+At startup, agents load **only the name and description** of each available skill — just enough to know when it might be relevant. Full content is loaded progressively.
+
+<div class="grid-2">
+  <div class="card border-orange">
+    <h3>Directory Structure</h3>
+  </div>
+  <div class="card border-orange">
+    <h3>SKILL.md Format</h3>
+  </div>
+</div>
+
+Directory structure:
+
+```
+.github/skills/incident-triage/
+├── SKILL.md              # Required: primary instructions
+├── LICENSE.txt            # Recommended: license terms
+├── scripts/               # Optional: executable scripts
+│   ├── collect-metrics.sh
+│   └── notify-oncall.ps1
+├── references/            # Optional: on-demand docs
+│   ├── runbook.md
+│   └── escalation-matrix.md
+├── assets/                # Optional: static resources
+│   └── triage-template.md
+└── templates/             # Optional: scaffolds
+    └── incident-report.md
+```
+
+SKILL.md format:
+
+```yaml
+---
+name: github-actions-failure-debugging
+description: >
+  Guide for debugging failing GitHub Actions
+  workflows. Use this when asked to debug
+  failing GitHub Actions workflows.
+---
+
+To debug failing GitHub Actions workflows:
+
+1. Use `list_workflow_runs` to look up
+   recent runs and their status
+2. Use `summarize_job_log_failures` for
+   an AI summary of failed jobs
+3. Use `get_job_logs` for full failure
+   logs if needed
+4. Reproduce locally, then fix and verify
+```
+
+<div class="callout callout-pink">
+  <strong>Critical:</strong> The <code>description</code> field is the <em>sole criterion</em> Copilot uses to determine whether to load a skill. Include both what-it-does and when-to-use-it.
+</div>
+
+### Storage Locations
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Type</th><th>Location</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Project skills</strong></td><td><code>.github/skills/&lt;name&gt;/</code></td><td>Current repository</td></tr>
+      <tr><td><strong>Claude-compatible</strong></td><td><code>.claude/skills/&lt;name&gt;/</code></td><td>Current repository (cross-agent)</td></tr>
+      <tr><td><strong>Personal skills</strong></td><td><code>&#126;/.copilot/skills/&lt;name&gt;/</code></td><td>All projects for this user</td></tr>
+      <tr><td><strong>Personal (Claude)</strong></td><td><code>&#126;/.claude/skills/&lt;name&gt;/</code></td><td>All projects for this user</td></tr>
+    </tbody>
+  </table>
+</div>
+
+### Real-World Skill Examples
+
+<div class="grid-3">
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">🔒 api-security-review</h3>
+    <p style="font-size: 13px;">Reviews APIM configs against OWASP Top 10</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">🏗️ architecture-design</h3>
+    <p style="font-size: 13px;">Designs Azure architectures with WAF alignment</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">💰 azure-pricing</h3>
+    <p style="font-size: 13px;">Real-time Azure retail pricing lookups via MCP</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">⚡ gh-aw-operations</h3>
+    <p style="font-size: 13px;">Creating, compiling, debugging GitHub Agentic Workflows</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">🔧 terraform-provider-upgrade</h3>
+    <p style="font-size: 13px;">Safe Terraform provider upgrades</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-orange);">
+    <h3 style="font-size: 16px;">📊 waf-assessment</h3>
+    <p style="font-size: 13px;">Well-Architected Framework assessment across all five pillars</p>
+  </div>
+</div>
+
+### Skills vs Instructions
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Concern</th><th>Instructions</th><th>Skills</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Loading</strong></td><td>Always-on or pattern-matched</td><td>On-demand (description-matched)</td></tr>
+      <tr><td><strong>Assets</strong></td><td>Text only</td><td>Scripts, templates, references</td></tr>
+      <tr><td><strong>Token cost</strong></td><td>Always in context</td><td>Progressive — loaded when relevant</td></tr>
+      <tr><td><strong>Portability</strong></td><td>Copilot-specific</td><td><strong>Open standard</strong> (multi-agent)</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Simple rules for every interaction</td><td>Detailed workflows for specific tasks</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</section>
+
+<section id="mcp">
+
+## 🔌 MCP Integration
+
+<p class="section-desc">Model Context Protocol — an open standard defining how applications share context with large language models, connecting AI agents to live external systems.</p>
+
+### Four Capability Categories
+
+<div class="grid-2" style="margin-bottom: 24px;">
+  <div class="card" style="border-top: 3px solid var(--color-cyan);">
+    <h3 style="color: var(--color-cyan);">🔧 Tools</h3>
+    <p>Actions the agent can invoke — create issues, query databases, deploy services, call APIs.</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-cyan);">
+    <h3 style="color: var(--color-cyan);">📦 Resources</h3>
+    <p>Data the agent can pull into context — files, API responses, database rows.</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-cyan);">
+    <h3 style="color: var(--color-cyan);">💬 Prompts</h3>
+    <p>Pre-configured prompt templates contributed by the MCP server.</p>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-cyan);">
+    <h3 style="color: var(--color-cyan);">🖥️ MCP Apps</h3>
+    <p>Interactive UI components — forms and visualizations rendered in chat.</p>
+  </div>
+</div>
+
+<div class="callout callout-cyan">
+  <strong>Important:</strong> The Copilot coding agent on GitHub.com currently only supports <strong>tools</strong> from MCP servers. Resources, prompts, and apps are available in IDE agent mode.
+</div>
+
+### GitHub MCP Server
+
+<div class="card border-cyan">
+  <p>GitHub provides a built-in MCP server giving agents native access to GitHub platform capabilities:</p>
+  <div class="grid-3" style="margin-top: 12px;">
+    <div><strong>Issues</strong> — List, create, update, search</div>
+    <div><strong>Pull Requests</strong> — Create, diff, files, status</div>
+    <div><strong>Workflow Runs</strong> — List runs, job logs, failure summaries</div>
+    <div><strong>Repositories</strong> — Search code, file contents, branches</div>
+    <div><strong>Code Search</strong> — Symbols, patterns across repos</div>
+    <div><strong>Code Scanning</strong> — Security analysis (GHAS)</div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top: 20px;">
+  <div class="card border-cyan">
+    <h3>Remote Config (Recommended)</h3>
+  </div>
+  <div class="card border-cyan">
+    <h3>Coding Agent Config (Cloud)</h3>
+  </div>
+</div>
+
+Remote MCP config:
+
+```json
+{
+  "servers": {
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/"
+    }
+  }
+}
+```
+
+Uses one-click OAuth — no PAT or additional software required.
+
+Coding agent MCP config:
+
+```json
+{
+  "mcpServers": {
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server"],
+      "env": {
+        "SENTRY_AUTH_TOKEN":
+          "$COPILOT_MCP_SENTRY_TOKEN"
+      }
+    }
+  }
+}
+```
+
+Secrets must be prefixed with `COPILOT_MCP_` and stored in the `copilot` environment.
+
+### Configuration Locations
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Surface</th><th>Configuration Location</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>VS Code (workspace)</strong></td><td><code>.vscode/mcp.json</code></td><td>Shared via source control</td></tr>
+      <tr><td><strong>VS Code (user)</strong></td><td>User-level <code>mcp.json</code></td><td>Personal MCP servers</td></tr>
+      <tr><td><strong>GitHub.com (repo)</strong></td><td>Repo settings → Copilot → Coding agent</td><td>JSON config for cloud agent</td></tr>
+      <tr><td><strong>Custom Agent frontmatter</strong></td><td><code>mcp-servers</code> property in <code>.agent.md</code></td><td>MCP embedded in agent def</td></tr>
+      <tr><td><strong>Organization policy</strong></td><td>GitHub org/enterprise settings</td><td>Centrally managed access</td></tr>
+      <tr><td><strong>JetBrains / Eclipse / Xcode</strong></td><td>IDE-specific <code>mcp.json</code></td><td>Agent mode in IDEs</td></tr>
+    </tbody>
+  </table>
+</div>
+
+### Toolsets
+
+<div class="card border-cyan">
+  <p>The GitHub MCP server supports <strong>toolsets</strong> — groups of related tools that can be enabled or disabled. Fewer tools means better performance and security.</p>
+  <div class="grid-2" style="margin-top: 12px;">
+    <div>
+      <code style="color: var(--color-cyan);">https://api.githubcopilot.com/mcp/readonly</code>
+      <p style="font-size: 13px; color: var(--color-text-muted);">Read-only tools</p>
+    </div>
+    <div>
+      <code style="color: var(--color-cyan);">https://api.githubcopilot.com/mcp/</code>
+      <p style="font-size: 13px; color: var(--color-text-muted);">Full access (use <code>X-MCP-Toolsets</code> header to filter)</p>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<section id="hooks">
+
+## 🔒 Hooks System
+
+<p class="section-desc">The policy enforcement layer — deterministic shell commands that run at strategic points in an agent's workflow. Unlike instructions (advisory), hooks are deterministic: a deny is a deny.</p>
+
+### Eight Hook Types
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Hook Type</th><th>When It Fires</th><th>Key Capability</th></tr></thead>
+    <tbody>
+      <tr><td><code class="c-hooks">sessionStart</code></td><td>New session begins or resumes</td><td>Initialize environments, validate project state, show banners</td></tr>
+      <tr><td><code class="c-hooks">sessionEnd</code></td><td>Session completes or terminates</td><td>Cleanup resources, generate reports, session summaries</td></tr>
+      <tr><td><code class="c-hooks">userPromptSubmitted</code></td><td>User submits a prompt</td><td>Log requests for auditing, scan for threat signals</td></tr>
+      <tr><td><code class="c-hooks" style="font-weight: 700;">preToolUse</code></td><td>Before any tool execution</td><td><strong>Approve or deny</strong> tool executions (most powerful hook)</td></tr>
+      <tr><td><code class="c-hooks">postToolUse</code></td><td>After tool completes</td><td>Log results, track metrics, send alerts</td></tr>
+      <tr><td><code class="c-hooks">agentStop</code></td><td>Main agent finishes responding</td><td>Post-processing, notifications</td></tr>
+      <tr><td><code class="c-hooks">subagentStop</code></td><td>Sub-agent completes</td><td>Validate sub-agent results</td></tr>
+      <tr><td><code class="c-hooks">errorOccurred</code></td><td>Error during agent execution</td><td>Error logging, notifications</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2" style="margin-top: 20px;">
+  <div class="card border-pink">
+    <h3>Configuration Format</h3>
+    <p>Hooks are JSON files in <code>.github/hooks/&#42;.json</code>:</p>
+  </div>
+  <div class="card border-pink">
+    <h3>Input / Output Format</h3>
+    <p>Hooks receive detailed JSON via <strong>stdin</strong>:</p>
+  </div>
+</div>
+
+Hook configuration example:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "./scripts/session-banner.sh",
+        "powershell": "./scripts/session-banner.ps1",
+        "cwd": ".github/hooks",
+        "timeoutSec": 10
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/security-check.sh",
+        "powershell": "./scripts/security-check.ps1",
+        "cwd": "scripts",
+        "env": {
+          "LOG_LEVEL": "INFO"
+        }
+      }
+    ]
+  }
+}
+```
+
+preToolUse input:
+
+```json
+{
+  "timestamp": 1704614600000,
+  "cwd": "/path/to/project",
+  "toolName": "bash",
+  "toolArgs": "{\"command\":\"rm -rf /\"}"
+}
+```
+
+preToolUse output (to deny):
+
+```json
+{
+  "decision": "deny",
+  "reason": "Destructive command blocked"
+}
+```
+
+postToolUse input includes results:
+
+```json
+{
+  "toolResult": {
+    "resultType": "success",
+    "result": "..."
+  }
+}
+```
+
+### Where Hooks Run
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Platform</th><th>Status</th><th>Config Location</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Copilot coding agent</strong> (GitHub.com)</td><td><span class="badge badge-green">GA</span></td><td><code>.github/hooks/&#42;.json</code> (default branch)</td></tr>
+      <tr><td><strong>GitHub Copilot CLI</strong></td><td><span class="badge badge-green">GA</span></td><td><code>.github/hooks/&#42;.json</code> (current working directory)</td></tr>
+      <tr><td><strong>VS Code</strong></td><td><span class="badge badge-blue">Preview</span></td><td><code>.github/hooks/&#42;.json</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+### Governance Example: Comprehensive Audit Trail
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart":          [{ "type": "command", "bash": "./audit/log-session-start.sh" }],
+    "userPromptSubmitted":   [{ "type": "command", "bash": "./audit/log-prompt.sh" }],
+    "preToolUse":            [{ "type": "command", "bash": "./audit/log-tool-use.sh" }],
+    "postToolUse":           [{ "type": "command", "bash": "./audit/log-tool-result.sh" }],
+    "sessionEnd":            [{ "type": "command", "bash": "./audit/log-session-end.sh" }]
+  }
+}
+```
+
+### Governance Audit Hook (Community)
+
+<div class="card border-pink">
+  <p>The <a href="https://github.com/github/awesome-copilot/blob/main/hooks/governance-audit/README.md">governance-audit hook</a> from awesome-copilot provides:</p>
+  <div class="grid-3" style="margin-top: 12px;">
+    <div><strong>Threat detection</strong> — Scans for data exfiltration, privilege escalation, prompt injection</div>
+    <div><strong>Governance levels</strong> — Open, Standard, Strict, Locked (allowlist-only)</div>
+    <div><strong>Audit trail</strong> — Append-only JSON log; full prompts are never logged</div>
+  </div>
+</div>
+
+Configure governance level in hooks.json env:
+
+```json
+{
+  "env": {
+    "GOVERNANCE_LEVEL": "strict",
+    "BLOCK_ON_THREAT": "true"
+  }
+}
+```
+
+<div class="callout callout-pink" style="margin-top: 16px;">
+  <strong>Performance:</strong> Hooks run <em>synchronously</em> and block agent execution — keep them under 5 seconds. Default timeout is 30s. Always validate/sanitize JSON input and never log sensitive data.
+</div>
+
+</section>
+
+<section id="composition">
+
+## 🔗 How They Compose
+
+<p class="section-desc">The six primitives are designed to layer together. They compose — they don't replace each other.</p>
+
+<div class="compose-diagram">
+  <div class="compose-row">
+    <div class="compose-node" style="background: rgba(247,120,186,0.15); border: 2px solid var(--color-pink); color: var(--color-pink); width: 100%; max-width: 760px;">
+      🔒 HOOKS — Policy enforcement wraps everything below
+    </div>
+  </div>
+  <div class="compose-row">
+    <div class="compose-node" style="background: rgba(57,210,192,0.12); border: 2px solid var(--color-cyan); color: var(--color-cyan); width: 100%; max-width: 680px;">
+      🔌 MCP SERVERS — External tools available to any layer
+    </div>
+  </div>
+  <div class="compose-row">
+    <div class="compose-node" style="background: rgba(210,153,34,0.12); border: 2px solid var(--color-orange); color: var(--color-orange); width: 46%;">
+      📋 SKILLS — On-demand workflows
+    </div>
+    <div class="compose-node" style="background: rgba(188,140,255,0.12); border: 2px solid var(--color-purple); color: var(--color-purple); width: 46%;">
+      👤 AGENTS — Specialist personas
+    </div>
+  </div>
+  <div class="compose-row">
+    <div class="compose-node" style="background: rgba(63,185,80,0.12); border: 2px solid var(--color-green); color: var(--color-green); width: 100%; max-width: 580px;">
+      📄 PROMPT FILES — Named slash commands
+    </div>
+  </div>
+  <div class="compose-row">
+    <div class="compose-node" style="background: rgba(88,166,255,0.12); border: 2px solid var(--color-blue); color: var(--color-blue); width: 100%; max-width: 760px;">
+      📘 INSTRUCTIONS — Always-on foundation everything inherits
+    </div>
+  </div>
+</div>
+
+### Composition Rules
+
+<div class="grid-2">
+  <div class="card border-purple">
+    <h3>Layering</h3>
+    <ul>
+      <li>A <strong>custom agent</strong> can reference <strong>instruction files</strong> via Markdown links</li>
+      <li>A <strong>prompt file</strong> can set <code>agent:</code> to run inside a specific <strong>custom agent</strong></li>
+      <li>A <strong>skill</strong> can bundle scripts that any <strong>agent</strong> or <strong>prompt file</strong> invokes</li>
+      <li>An <strong>MCP server</strong> provides tools any agent, prompt, or skill can call</li>
+      <li><strong>Hooks</strong> enforce policy regardless of which primitive triggered the action</li>
+    </ul>
+  </div>
+  <div class="card border-blue">
+    <h3>Decision Flow</h3>
+    <ol style="padding-left: 20px;">
+      <li>Need a rule on <strong>every</strong> request? → <span class="c-instructions"><strong>Instructions</strong></span></li>
+      <li>Need a <strong>named, repeatable</strong> task? → <span class="c-prompts"><strong>Prompt File</strong></span></li>
+      <li>Need a <strong>specialist persona</strong> with limited tools? → <span class="c-agents"><strong>Custom Agent</strong></span></li>
+      <li>Need a <strong>reusable runbook</strong> with scripts? → <span class="c-skills"><strong>Skill</strong></span></li>
+      <li>Need <strong>live external data</strong>? → <span class="c-mcp"><strong>+ MCP</strong></span></li>
+      <li>Must be <strong>enforced deterministically</strong>? → <span class="c-hooks"><strong>+ Hook</strong></span></li>
+    </ol>
+    <p style="margin-top: 12px; font-size: 13px; color: var(--color-text-muted);">Questions 1–4 are "pick one" decisions. Questions 5–6 are <strong>additive layers</strong> stacked on top.</p>
+  </div>
+</div>
+
+### Comprehensive Comparison
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th class="c-instructions">Instructions</th>
+        <th class="c-prompts">Prompt Files</th>
+        <th class="c-agents">Custom Agents</th>
+        <th class="c-skills">Skills</th>
+        <th class="c-mcp">MCP Servers</th>
+        <th class="c-hooks">Hooks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Location</strong></td>
+        <td><code>.github/copilot-instructions.md</code>, <code>AGENTS.md</code></td>
+        <td><code>.github/prompts/</code></td>
+        <td><code>.github/agents/</code></td>
+        <td><code>.github/skills/</code></td>
+        <td><code>.vscode/mcp.json</code>, repo settings</td>
+        <td><code>.github/hooks/</code></td>
+      </tr>
+      <tr>
+        <td><strong>Trigger</strong></td>
+        <td>Always-on or pattern-matched</td>
+        <td>Manual slash command</td>
+        <td>User selects or agent delegates</td>
+        <td>Auto-discovered by description</td>
+        <td>Tool call from any surface</td>
+        <td>Agent lifecycle events</td>
+      </tr>
+      <tr>
+        <td><strong>Loading</strong></td>
+        <td>Injected every request</td>
+        <td>On invocation</td>
+        <td>When selected</td>
+        <td>Progressive (3 tiers)</td>
+        <td>When tools are called</td>
+        <td>On lifecycle event</td>
+      </tr>
+      <tr>
+        <td><strong>Assets</strong></td>
+        <td>Text only</td>
+        <td>Text + variables</td>
+        <td>Text + tool config + MCP</td>
+        <td>Text + scripts + templates + refs</td>
+        <td>External service integration</td>
+        <td>Shell scripts</td>
+      </tr>
+      <tr>
+        <td><strong>Enforcement</strong></td>
+        <td>Advisory</td>
+        <td>Advisory</td>
+        <td>Advisory (tools bounded)</td>
+        <td>Advisory</td>
+        <td>Deterministic (success/fail)</td>
+        <td><strong>Deterministic</strong> (approve/deny)</td>
+      </tr>
+      <tr>
+        <td><strong>Portability</strong></td>
+        <td>Copilot-specific</td>
+        <td>Copilot-specific</td>
+        <td>Copilot-specific</td>
+        <td><strong>Open standard</strong></td>
+        <td><strong>Open standard</strong></td>
+        <td>Copilot CCA + CLI</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### A Mature gh-aw Repository
+
+<div class="card border-blue">
+</div>
+
+```
+.github/
+├── copilot-instructions.md              # Global standards
+├── instructions/
+│   ├── terraform.instructions.md        # applyTo: "**/*.tf"
+│   ├── typescript.instructions.md       # applyTo: "**/*.ts"
+│   └── pipeline.instructions.md         # applyTo: "**/*.yml"
+├── prompts/
+│   ├── security-review.prompt.md        # /security-review
+│   ├── release-notes.prompt.md          # /release-notes
+│   └── generate-module.prompt.md        # /generate-module
+├── agents/
+│   ├── planner.agent.md                 # Planning specialist
+│   ├── implementer.agent.md             # Code implementation
+│   ├── security-reviewer.agent.md       # Read-only security review
+│   └── cost-optimizer.agent.md          # Cloud cost analysis
+├── skills/
+│   ├── incident-triage/
+│   │   ├── SKILL.md
+│   │   ├── scripts/collect-metrics.sh
+│   │   └── templates/incident-report.md
+│   ├── postmortem/
+│   │   ├── SKILL.md
+│   │   └── references/rca-template.md
+│   └── ci-troubleshooting/
+│       ├── SKILL.md
+│       └── scripts/diagnose-pipeline.sh
+├── hooks/
+│   ├── security-gates.json              # preToolUse: block risky commands
+│   └── audit-logging.json               # postToolUse: log all tool calls
+AGENTS.md                                # Multi-agent operational procedures
+```
+
+</section>
+
+<section id="timeline">
+
+## 📅 Ecosystem Evolution
+
+<p class="section-desc">Key milestones in the gh-aw ecosystem.</p>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Date</th><th>Milestone</th></tr></thead>
+    <tbody>
+      <tr><td>Nov 2024</td><td>MCP open standard published</td></tr>
+      <tr><td>Jul 2025</td><td>Copilot coding agent enters public preview</td></tr>
+      <tr><td>Aug 2025</td><td>Copilot coding agent adds <code>AGENTS.md</code> support</td></tr>
+      <tr><td>Sep 2025</td><td>Copilot CLI enters public preview</td></tr>
+      <tr><td>Nov 2025</td><td>Custom agents announced for GitHub Copilot</td></tr>
+      <tr><td>Dec 2025</td><td>Agent Skills support launched (open standard from Anthropic)</td></tr>
+      <tr><td>Jan 2026</td><td>Agents Tab introduced for repository-level session management</td></tr>
+      <tr><td>Feb 2026</td><td>Copilot CLI reaches GA · Hooks system launched</td></tr>
+      <tr><td>Mar 2026</td><td>Custom agents in JetBrains, Eclipse, Xcode · GitHub MCP Registry preview · VS Code hooks preview</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</section>

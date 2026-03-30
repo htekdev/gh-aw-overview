@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('pages', 'ecosystem');
+const { Content } = await entry.render();
+const { title, description, heroEmoji, heroSubtitle } = entry.data;
+---
+
+<BaseLayout title={title} description={description} currentPage="ecosystem">
+  <div class="container">
+    <section class="page-hero">
+      <div class="hero-emoji">{heroEmoji}</div>
+      <h1 class="hero-title">The Ecosystem</h1>
+      <p class="hero-subtitle">{heroSubtitle}</p>
+    </section>
+
+    <div class="mdx-content">
+      <Content />
+    </div>
+  </div>
+</BaseLayout>

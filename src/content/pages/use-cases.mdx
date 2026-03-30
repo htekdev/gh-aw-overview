@@ -1,0 +1,906 @@
+---
+title: "Use Cases & Examples — GitHub Agentic Workflows"
+description: "Real-world patterns and examples — ChatOps, DailyOps, IssueOps, DataOps, ProjectOps, MultiRepoOps, and lessons from Peli's Agent Factory."
+navLabel: "Use Cases"
+navOrder: 6
+heroEmoji: "🎯"
+heroSubtitle: "Real-world patterns, examples, and proven results"
+accentColor: "orange"
+---
+
+## 📋 All 12 Use Case Categories
+
+From simple triage to multi-repo orchestration — find the right automation for your needs.
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Category</th>
+<th>Trigger Pattern</th>
+<th>Example Outputs</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><strong>Issue Triage & Labeling</strong></td><td><span class="trigger-tag">on: issue</span></td><td>Labels, comments</td><td><span class="badge badge-green">Low</span></td></tr>
+<tr><td>2</td><td><strong>Documentation Maintenance</strong></td><td><span class="trigger-tag">on: schedule</span> <span class="trigger-tag">on: push</span></td><td>Pull requests, issues</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>3</td><td><strong>CI Failure Analysis</strong></td><td><span class="trigger-tag">on: workflow_run</span></td><td>Issues, PRs with fixes</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>4</td><td><strong>Test Coverage Improvement</strong></td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>5</td><td><strong>Repository Reporting</strong></td><td><span class="trigger-tag">on: schedule</span></td><td>Issues, discussions</td><td><span class="badge badge-green">Low</span></td></tr>
+<tr><td>6</td><td><strong>Security & Compliance</strong></td><td><span class="trigger-tag">on: schedule</span> <span class="trigger-tag">on: push</span></td><td>Issues, discussions</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>7</td><td><strong>Code Quality & Refactoring</strong></td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests</td><td><span class="badge badge-red">High</span></td></tr>
+<tr><td>8</td><td><strong>Release & Changelog</strong></td><td><span class="trigger-tag">on: release</span> <span class="trigger-tag">on: push</span></td><td>Pull requests</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>9</td><td><strong>Dependency Management</strong></td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests, issues</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>10</td><td><strong>Accessibility Review</strong></td><td><span class="trigger-tag">on: pull_request</span> <span class="trigger-tag">on: schedule</span></td><td>Comments, issues</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>11</td><td><strong>Code Review Assistance</strong></td><td><span class="trigger-tag">on: pull_request</span> <span class="trigger-tag">on: issue_comment</span></td><td>Comments</td><td><span class="badge badge-orange">Medium</span></td></tr>
+<tr><td>12</td><td><strong>Onboarding & ChatOps</strong></td><td><span class="trigger-tag">on: issue_comment</span></td><td>Comments, issues</td><td><span class="badge badge-green">Low–Med</span></td></tr>
+</tbody>
+</table>
+</div>
+
+---
+
+### 🏷️ 1. Issue Triage & Labeling
+
+The "hello world" of agentic workflows — practical, immediately useful, and simple to implement. When a new issue is opened, the agent reads it, researches the codebase, applies labels, and posts a helpful comment.
+
+**📄 `.github/workflows/issue-triage-agent.md`**
+
+```yaml
+---
+timeout-minutes: 5
+on:
+  issue:
+    types: [opened, reopened]
+
+permissions:
+  issues: read
+
+tools:
+  github:
+    toolsets: [issues, labels]
+
+safe-outputs:
+  add-labels:
+    allowed: [bug, feature, enhancement, documentation, question, help-wanted, good-first-issue]
+  add-comment: {}
+---
+
+# Issue Triage Agent
+
+List open issues in ${{ github.repository }} that have no labels. For each
+unlabeled issue, analyze the title and body, then add one of the allowed
+labels: `bug`, `feature`, `enhancement`, `documentation`, `question`,
+`help-wanted`, or `good-first-issue`.
+
+Skip issues that:
+- Already have any of these labels
+- Have been assigned to any user (especially non-bot users)
+
+Do research on the issue in the context of the codebase and, after
+adding the label to an issue, mention the issue author in a comment, explain
+why the label was added and give a brief summary of how the issue may be
+addressed.
+```
+
+<div class="info-box green">
+<h4>💡 Why It Works</h4>
+<ul>
+<li>The agent has <strong>read-only</strong> repository access with write operations restricted to two safe outputs: adding approved labels and posting comments.</li>
+<li>Natural language instructions guide behavior without prescribing every code path.</li>
+<li>The <code>allowed</code> list on <code>add-labels</code> prevents the agent from inventing arbitrary labels.</li>
+<li>Customization is key — triage categories differ per repository, and the label list is easy to change.</li>
+</ul>
+</div>
+
+<div class="info-box purple">
+<h4>📌 Case Study: Home Assistant</h4>
+<p>Home Assistant — one of the top projects on GitHub by contributor count — uses agentic workflows to analyze <strong>thousands</strong> of open issues and surface what matters most to maintainers.</p>
+<blockquote>"No human can track what's trending or which problems affect the most users."</blockquote>
+<p>— Franck Nijhof, Lead of Home Assistant</p>
+<p class="source">Source: <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog — Automate repository tasks with GitHub Agentic Workflows</a> (Feb 13, 2026)</p>
+</div>
+
+---
+
+### 📚 2. Continuous Documentation Maintenance
+
+Code evolves rapidly; docs do not. Agentic workflows maintain, validate, and improve documentation continuously — catching drift, outdated examples, and terminology inconsistencies.
+
+| Workflow | Results | Merge Rate |
+|----------|---------|------------|
+| Daily Documentation Updater | 57 merged PRs out of 59 proposed | <span class="merge-rate">96%</span> |
+| Glossary Maintainer | 10 merged PRs out of 10 proposed | <span class="merge-rate">100%</span> |
+| Documentation Unbloat | 88 merged PRs out of 103 proposed | <span class="merge-rate">85%</span> |
+| Documentation Noob Tester | 9 merged PRs (via causal chain) | <span class="merge-rate">43%</span> |
+| Multi-device Docs Tester | 2 merged PRs out of 2 proposed | <span class="merge-rate">100%</span> |
+
+**📄 `.github/workflows/daily-doc-updater.md`**
+
+```yaml
+---
+on:
+  schedule: daily
+
+permissions:
+  contents: read
+  pull-requests: read
+
+tools:
+  github:
+    toolsets: [default, pull_requests]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[docs] "
+    branch-pattern: "^automated/docs-.*"
+---
+
+# Daily Documentation Updater
+
+Review the repository documentation for accuracy and completeness.
+
+## Tasks
+- Compare documentation against the current codebase for drift
+- Identify outdated code examples, deprecated API references, and broken links
+- Update README sections that reference changed functionality
+- Ensure all public functions and modules have accurate documentation
+
+## Guidelines
+- Keep existing tone and style consistent
+- Only propose changes where documentation is factually wrong or missing
+- Group related changes into a single pull request
+- Write clear PR descriptions explaining what changed and why
+```
+
+<div class="info-box green">
+<h4>💡 Key Insight</h4>
+<p>GitHub's team found that a <strong>heterogeneous approach</strong> works best: some agents generate content, others maintain it, and still others validate it. The Glossary Maintainer caught terminology drift where three different terms were used for the same concept. The Documentation Noob Tester approaches docs from a newcomer's perspective, finding confusing steps experienced developers overlook.</p>
+</div>
+
+---
+
+### 🔧 3. CI Failure Analysis
+
+The CI Doctor transforms how teams respond to CI failures. Instead of drowning in failure notifications, maintainers receive investigated failures with diagnostic insights, root cause analysis, and proposed fixes.
+
+**📄 `.github/workflows/ci-failure-doctor.md`**
+
+```yaml
+---
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    conclusions: [failure]
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+
+tools:
+  github:
+    toolsets: [default, actions]
+
+safe-outputs:
+  create-issue:
+    title-prefix: "[ci-doctor] "
+    labels: [ci-failure, needs-investigation]
+  create-pull-request:
+    title-prefix: "[ci-fix] "
+    branch-pattern: "^automated/ci-fix-.*"
+---
+
+# CI Failure Doctor
+
+A CI workflow has failed. Investigate the failure and help the team resolve it.
+
+## Investigation Steps
+1. Retrieve and analyze the failed workflow run logs
+2. Identify the root cause of the failure
+3. Search for similar past issues and their resolutions
+4. Check if the failure is flaky (intermittent) or deterministic
+
+## Output
+- If the fix is straightforward, create a pull request with the fix
+- If investigation is needed, create an issue with:
+  - Summary of the failure
+  - Root cause analysis
+  - Suggested remediation steps
+  - Links to relevant logs and code
+```
+
+<div class="info-box green">
+<h4>💡 Real-World Results</h4>
+<p>The CI Doctor in Peli's Agent Factory achieved a <strong>69% merge rate</strong> (9 merged PRs out of 13 proposed), with fixes including:</p>
+<ul>
+<li>Adding Go module download pre-flight checks</li>
+<li>Adding retry logic to prevent proxy 403 failures</li>
+<li>Fixing flaky test timing issues</li>
+</ul>
+<p>GitHub teams internally report this pattern has inspired depth-investigation agents for site incidents.</p>
+</div>
+
+---
+
+### 🧪 4. Continuous Test Coverage Improvement
+
+Testing agents continuously identify coverage gaps, propose new test cases, and validate existing tests. Small, frequent improvements compound over time.
+
+| Workflow | Results | Merge Rate |
+|----------|---------|------------|
+| Daily Testify Expert | 19 issues created, 13 led to merged PRs | <span class="merge-rate">100% causal</span> |
+| Daily Test Improver | Identifies gaps, implements new tests | <span class="merge-rate">Incremental</span> |
+| CLI Consistency Checker | 80 merged PRs out of 102 proposed | <span class="merge-rate">78%</span> |
+| CI Coach | 9 merged PRs out of 9 proposed | <span class="merge-rate">100%</span> |
+
+**📄 `.github/workflows/daily-test-improver.md`**
+
+```yaml
+---
+on:
+  schedule: daily
+
+permissions:
+  contents: read
+
+tools:
+  github:
+    toolsets: [default]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[tests] "
+    branch-pattern: "^automated/test-.*"
+  create-issue:
+    title-prefix: "[test-gap] "
+    labels: [testing, coverage]
+---
+
+# Daily Test Improver
+
+Analyze the test suite for coverage gaps and quality improvements.
+
+## Analysis Tasks
+- Identify source files with low or no test coverage
+- Find functions and branches that lack edge case testing
+- Review existing tests for assertion quality and completeness
+- Look for test patterns that could be modernized
+
+## Output
+- Create a pull request adding one focused, high-value test
+- Include clear descriptions of what the test covers and why it matters
+- Ensure new tests follow existing project conventions
+- Run the test suite to verify tests pass before proposing
+```
+
+<div class="info-box green">
+<h4>💡 Why It Works</h4>
+<p>By creating <strong>one focused test per day</strong>, the agent avoids overwhelming reviewers while steadily improving coverage. The "one PR per concern" pattern ensures each contribution is easy to review and merge.</p>
+</div>
+
+---
+
+### 📊 5. Repository Reporting & Metrics
+
+Among the simplest workflows to set up. Create regular summaries of repository health, activity, and trends — providing immediate value to maintainers.
+
+**📄 `.github/workflows/weekly-issue-summary.md`**
+
+```yaml
+---
+on:
+  schedule:
+    - cron: "0 9 * * MON"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  discussions: read
+
+safe-outputs:
+  create-issue:
+    title-prefix: "[weekly-summary] "
+    labels: [report, weekly]
+    close-older-issues: true
+
+tools:
+  github:
+---
+
+# Weekly Issue Summary
+
+Generate a comprehensive weekly summary of issue activity.
+
+## Report Sections
+1. **New Issues** — List all issues opened this week with brief descriptions
+2. **Closed Issues** — Issues resolved this week and how they were fixed
+3. **Stale Issues** — Issues with no activity in the past 14 days
+4. **Trending Topics** — Common themes or patterns across recent issues
+5. **Recommendations** — Suggested priorities for the coming week
+
+## Format
+- Use tables for structured data
+- Include trend indicators (↑ ↓ →) where relevant
+- Link directly to each referenced issue
+- Keep the total report under 500 words
+```
+
+| Factory Workflow | Output | Volume |
+|-----------------|--------|--------|
+| Metrics Collector | Daily metrics tracking agent ecosystem performance | 41 discussions |
+| Portfolio Analyst | Cost reduction opportunities & token optimization | 7 analysis discussions |
+| Audit Workflows | Meta-agent analyzing logs, costs, errors, success patterns | 93 audit reports, 9 issues |
+
+<div class="info-box purple">
+<h4>📌 Case Study: CNCF</h4>
+<p>The <strong>Cloud Native Computing Foundation (CNCF)</strong> has adopted reporting workflows for improved team reporting across the organization, demonstrating the pattern works at enterprise scale.</p>
+</div>
+
+---
+
+### 🛡️ 6. Security & Vulnerability Triage
+
+Security workflows act as automated guardians — scanning for vulnerabilities, exposed credentials, malicious code patterns, and compliance violations.
+
+| Factory Workflow | Output | Results |
+|-----------------|--------|---------|
+| Security Compliance | Vulnerability campaigns with deadline tracking | SLA-driven remediation |
+| Firewall | Network security validation | 59 daily reports, 5 smoke tests |
+| Daily Secrets Analysis | Credential exposure scanning | Continuous monitoring |
+| Daily Malicious Code Scan | Suspicious pattern detection | Supply chain defense |
+| Static Analysis Report | Security audits (zizmor, poutine, actionlint) | 57 discussions, 12 reports |
+
+**📄 `.github/workflows/pr-security-reviewer.md`**
+
+```yaml
+---
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+tools:
+  github:
+    toolsets: [default, pull_requests]
+
+safe-outputs:
+  add-comment:
+    max: 1
+---
+
+# PR Security Reviewer
+
+Review the pull request diff for security concerns.
+
+## What to Check
+1. **Secrets & Credentials** — hardcoded API keys, tokens, passwords
+2. **Injection Vulnerabilities** — SQL injection, XSS, command injection
+3. **Dependency Changes** — new deps with known vulnerabilities
+4. **Permission Escalation** — changes to auth/access control logic
+5. **GitHub Actions Security** — unsafe workflow patterns
+
+## Output Format
+Post a single comment with:
+- 🔴 **Critical** findings that must be addressed before merge
+- 🟡 **Warning** findings that should be reviewed
+- 🟢 **Info** observations about security-related changes
+- If no issues found, post a brief "Security review passed" comment
+```
+
+<div class="info-box green">
+<h4>💡 Why It Works</h4>
+<p>By running on every PR, the security reviewer catches issues <strong>before they merge</strong>. The severity-tiered output (🔴🟡🟢) ensures the team focuses on what matters. The <code>max: 1</code> constraint on comments prevents notification spam.</p>
+</div>
+
+---
+
+### ✨ 7. Code Quality & Continuous Refactoring
+
+Refactoring agents continuously analyze code structure and propose improvements — splitting oversized files, extracting duplicated logic, and identifying dead code.
+
+**📄 `.github/workflows/code-simplifier.md`**
+
+```yaml
+---
+on:
+  schedule: daily
+
+permissions:
+  contents: read
+
+tools:
+  github:
+    toolsets: [default]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[simplify] "
+    branch-pattern: "^automated/simplify-.*"
+---
+
+# Continuous Code Simplifier
+
+Identify opportunities to simplify and improve code quality.
+
+## Analysis Tasks
+- Find files over 300 lines that could be split into focused modules
+- Identify duplicated code blocks for shared utilities extraction
+- Look for overly complex functions (high cyclomatic complexity)
+- Find dead code (unused imports, unreachable branches, commented-out code)
+
+## Output
+- Create one focused pull request per simplification
+- Each PR should address a single concern
+- Include before/after metrics (lines of code, complexity score)
+- Ensure all existing tests continue to pass
+- Explain the refactoring rationale clearly in the PR description
+```
+
+**📄 `.github/workflows/performance-auditor.md`**
+
+```yaml
+---
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+safe-outputs:
+  add-comment: {}
+---
+
+# Big O Performance Auditor
+
+Review the pull request for algorithmic performance concerns.
+
+## Analysis
+- Estimate time and space complexity of changed functions
+- Identify potential bottlenecks (nested loops, repeated collection scans)
+- Flag operations that scale poorly with input size
+
+## Output Format
+Post a structured comment with:
+- Complexity estimate for each flagged function
+- The specific bottleneck identified
+- A refactored implementation suggestion
+- Estimated performance impact
+```
+
+---
+
+### 🚀 8. Release Notes & Changelog Generation
+
+Automate version bumps and human-readable changelog entries. The Changeset workflow in Peli's Agent Factory achieved a **78% merge rate** (22 merged out of 28 proposed PRs).
+
+**📄 `.github/workflows/release-changelog.md`**
+
+```yaml
+---
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+tools:
+  github:
+    toolsets: [default, pull_requests]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[changelog] "
+    branch-pattern: "^automated/changelog-.*"
+---
+
+# Release Changelog Generator
+
+A new release has been published. Generate a comprehensive changelog.
+
+## Tasks
+1. Analyze all commits since the previous release tag
+2. Categorize changes into:
+   - 🚀 **Features** — new functionality
+   - 🐛 **Bug Fixes** — resolved issues
+   - 📖 **Documentation** — doc improvements
+   - ⚡ **Performance** — speed or efficiency improvements
+   - 🔧 **Maintenance** — refactoring, dependency updates, CI changes
+   - 💥 **Breaking Changes** — backward-incompatible modifications
+3. Generate a human-readable changelog entry
+4. Update the CHANGELOG.md file
+
+## Guidelines
+- Link each entry to the relevant PR or commit
+- Credit contributors by @mention
+- Highlight breaking changes prominently at the top
+- Follow the Keep a Changelog format (keepachangelog.com)
+```
+
+---
+
+### 📦 9. Dependency Management
+
+Agentic workflows analyze dependency updates with contextual awareness that simple automated tools lack — assessing risk, checking changelogs, and grouping related updates intelligently.
+
+**📄 `.github/workflows/dependency-auditor.md`**
+
+```yaml
+---
+on:
+  schedule:
+    - cron: "0 10 * * MON"
+
+permissions:
+  contents: read
+
+tools:
+  github:
+    toolsets: [default]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[deps] "
+    branch-pattern: "^automated/deps-.*"
+  create-issue:
+    title-prefix: "[dep-alert] "
+    labels: [dependencies, needs-review]
+---
+
+# Weekly Dependency Audit
+
+Analyze project dependencies for updates, vulnerabilities, and health.
+
+## Analysis Tasks
+1. Check for outdated dependencies and their latest versions
+2. Assess risk and breaking change potential for each update
+3. Identify deprecated packages that need migration
+4. Review dependency health signals (maintenance activity, download trends)
+
+## Output
+- For safe, minor updates: create a PR grouping related updates together
+- For major version bumps: create an issue with a migration guide
+- For security vulnerabilities: create a high-priority issue with remediation
+- Include a risk assessment for each proposed change
+
+## Guidelines
+- Group related dependency updates into coherent PRs
+- Never update multiple major versions simultaneously
+- Include test results confirming compatibility
+- Link to changelogs and migration guides
+```
+
+<div class="info-box green">
+<h4>💡 Why It Works</h4>
+<p>Unlike traditional Dependabot PRs that flood your inbox with one-per-dependency updates, this agent <strong>groups related updates</strong>, assesses risk, and provides context. Major version bumps become issues with migration guides rather than surprise PRs.</p>
+</div>
+
+---
+
+### 😤 10. Code Review Assistance
+
+Pull request review agents provide contextual feedback on code changes without replacing human judgment. The Grumpy Reviewer from githubnext/agentics is the standout example.
+
+| Factory Workflow | Output | Volume |
+|-----------------|--------|--------|
+| Schema Consistency Checker | Detects schema/code/doc drift | 55 analysis discussions |
+| Breaking Change Checker | Backward-incompatibility alerts | Alert issues |
+| Big O Performance Auditor | Complexity estimates on PRs | PR comments |
+
+**📄 `.github/workflows/grumpy-reviewer.md` — from githubnext/agentics**
+
+```yaml
+---
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+tools:
+  github:
+    toolsets: [default, pull_requests]
+
+safe-outputs:
+  add-comment:
+    max: 1
+---
+
+# Grumpy Code Reviewer
+
+You are a grumpy but thorough senior developer performing an on-demand
+code review. You've seen every anti-pattern, survived every production
+incident, and have strong opinions backed by decades of experience.
+
+## When Triggered
+Respond when a maintainer comments "/review" on a pull request.
+
+## Review Focus
+1. **Correctness** — Will this code actually work? Edge cases? Error handling?
+2. **Performance** — Any obvious bottlenecks or scaling issues?
+3. **Security** — Input validation? Injection risks? Auth issues?
+4. **Maintainability** — Will future-you understand this in 6 months?
+5. **Testing** — Are the tests actually testing anything meaningful?
+
+## Tone
+- Be direct and opinionated, but never mean
+- Use dry humor sparingly
+- Always explain WHY something is a problem, not just THAT it is
+- Acknowledge good code when you see it (grudgingly)
+```
+
+**📄 `.github/workflows/breaking-change-checker.md`**
+
+```yaml
+---
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+safe-outputs:
+  add-comment:
+    max: 1
+  create-issue:
+    title-prefix: "[breaking-change] "
+    labels: [breaking-change, needs-review]
+---
+
+# Breaking Change Checker
+
+Analyze the pull request for backward-incompatible changes.
+
+## What Constitutes a Breaking Change
+- Removed or renamed public functions, classes, or methods
+- Changed function signatures (added required parameters, changed return types)
+- Modified data structures or API response shapes
+- Changed default values for configuration options
+- Removed or renamed CLI commands or flags
+- Database schema changes that aren't additive
+
+## Output
+- If breaking changes found: post a comment + create a tracking issue
+- If no breaking changes, post a brief confirmation comment
+```
+
+---
+
+## 🧩 Design Patterns
+
+Operational patterns that structure how agentic workflows are organized and triggered.
+
+<div class="pattern-grid">
+<div class="pattern-card" style="border-top: 3px solid var(--color-blue)">
+<h4 style="color: var(--color-blue)">⏰ DailyOps</h4>
+<p>Scheduled daily maintenance and reporting workflows that run on <code>on: schedule: daily</code>. Best for continuous improvement tasks that compound over time.</p>
+<div class="examples">Examples: Documentation updater, test improver, code simplifier, security scanner, metrics collector</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-green)">
+<h4 style="color: var(--color-green)">🎫 IssueOps</h4>
+<p>Workflows triggered by issue events using <code>on: issues</code> or <code>on: issue_comment</code>. React to issue creation, labeling, or comment-based commands.</p>
+<div class="examples">Examples: Triage agent, onboarding guide, plan command (/plan), priority assignment</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-purple)">
+<h4 style="color: var(--color-purple)">💬 ChatOps</h4>
+<p>Interactive workflows via comment-based slash commands. Users trigger automation with commands like <code>/review</code>, <code>/plan</code>, or <code>/archie</code>.</p>
+<div class="examples">Examples: Grumpy reviewer (/review), Archie diagrams (/archie), plan command (/plan)</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-orange)">
+<h4 style="color: var(--color-orange)">📈 DataOps</h4>
+<p>Data processing and analysis workflows that collect metrics, analyze trends, and produce actionable insights from repository activity.</p>
+<div class="examples">Examples: Metrics collector, portfolio analyst, audit workflows, cost analysis</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-red)">
+<h4 style="color: var(--color-red)">📋 ProjectOps</h4>
+<p>Project management automation for status tracking, milestone reporting, and cross-issue coordination.</p>
+<div class="examples">Examples: Status tracking, milestone reports, backlog prioritization, sprint summaries</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-green-hover)">
+<h4 style="color: var(--color-green-hover)">🌐 MultiRepoOps</h4>
+<p>Cross-repository coordination workflows that enforce organization-wide standards, sync configurations, and manage multi-repo changes.</p>
+<div class="examples">Examples: Org standards enforcement, config sync, cross-repo refactoring, dependency alignment</div>
+</div>
+<div class="pattern-card" style="border-top: 3px solid var(--color-blue-hover)">
+<h4 style="color: var(--color-blue-hover)">🔗 Orchestration</h4>
+<p>Workflow-of-workflows coordination where meta-agents monitor, analyze, and optimize other agentic workflows.</p>
+<div class="examples">Examples: Q workflow optimizer, audit workflows, portfolio analyst, agent health monitoring</div>
+</div>
+</div>
+
+---
+
+## 🔒 Safe-Outputs Quick Reference
+
+The core security mechanism — every write operation must be declared in frontmatter.
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Safe Output</th><th>Purpose</th><th>Example Configuration</th></tr>
+</thead>
+<tbody>
+<tr><td><code>add-labels</code></td><td>Add labels to issues/PRs</td><td><code>allowed: [bug, feature, docs]</code></td></tr>
+<tr><td><code>add-comment</code></td><td>Post comments</td><td><code>max: 1</code></td></tr>
+<tr><td><code>create-issue</code></td><td>Create GitHub issues</td><td><code>title-prefix: "[bot] "</code>, <code>labels: [automated]</code>, <code>close-older-issues: true</code></td></tr>
+<tr><td><code>create-pull-request</code></td><td>Create PRs</td><td><code>title-prefix: "[ai] "</code>, <code>branch-pattern: "^automated/.*"</code></td></tr>
+<tr><td><code>close-issue</code></td><td>Close issues</td><td><code>target: "triggering"</code>, <code>required-labels: [stale]</code></td></tr>
+<tr><td><code>update-issue</code></td><td>Update issue title/body</td><td><code>status: true</code>, <code>title: true</code></td></tr>
+<tr><td><code>create-pull-request-review-comment</code></td><td>PR review comments</td><td><code>max: 3</code></td></tr>
+<tr><td><code>upload-asset</code></td><td>Upload files to a branch</td><td><code>branch: "assets/my-workflow"</code></td></tr>
+<tr><td><code>dispatch-workflow</code></td><td>Trigger other workflows</td><td><code>max: 1</code></td></tr>
+<tr><td><code>noop</code></td><td>Explicitly do nothing</td><td>Auto-enabled with most outputs</td></tr>
+</tbody>
+</table>
+</div>
+
+---
+
+## 🏭 Peli's Agent Factory
+
+GitHub Next's internal collection — the most extensive real-world deployment of agentic workflows.
+
+<div class="factory-hero">
+<h3>🍫 The Candy Shop Chocolate Factory</h3>
+<blockquote>"It's basically a candy shop chocolate factory of agentic workflows."</blockquote>
+<div class="attr">— Don Syme, GitHub Next</div>
+</div>
+
+<div class="factory-stats">
+<div class="factory-stat"><div class="num">100+</div><div class="lbl">Agentic Workflows</div></div>
+<div class="factory-stat"><div class="num">19</div><div class="lbl">"Meet the Workflows" Blog Posts</div></div>
+<div class="factory-stat"><div class="num">Hundreds</div><div class="lbl">Merged PRs</div></div>
+<div class="factory-stat"><div class="num">github/gh-aw</div><div class="lbl">Repository</div></div>
+</div>
+
+### 🎓 Key Lessons Learned
+
+<div class="lessons-grid">
+<div class="lesson-card">
+<div class="num">01</div>
+<h5>Repo-Level Automation Is Powerful</h5>
+<p>Agents embedded in the development workflow have outsized impact compared to external tools.</p>
+</div>
+<div class="lesson-card">
+<div class="num">02</div>
+<h5>Cost-Quality Tradeoffs Are Real</h5>
+<p>Longer analyses aren't always better. Optimize for signal, not token count.</p>
+</div>
+<div class="lesson-card">
+<div class="num">03</div>
+<h5>Specialization Beats Generalization</h5>
+<p>Many focused agents outperform one general-purpose agent. Each does one thing well.</p>
+</div>
+<div class="lesson-card">
+<div class="num">04</div>
+<h5>Observability Is Essential</h5>
+<p>Meta-agents monitoring other agents proved invaluable for debugging and optimization.</p>
+</div>
+<div class="lesson-card">
+<div class="num">05</div>
+<h5>Incremental Progress Compounds</h5>
+<p>Small, frequent improvements beat heroic refactoring efforts. One test per day adds up.</p>
+</div>
+<div class="lesson-card">
+<div class="num">06</div>
+<h5>Security Must Be Built In</h5>
+<p>Guardrails aren't optional. Safe-outputs, read-only defaults, and sandboxing are fundamental.</p>
+</div>
+</div>
+
+### 📦 The Agentics Collection (githubnext/agentics)
+
+Community-contributed, MIT-licensed reusable workflows. Install with `gh aw add-wizard`.
+
+<div class="agentics-grid">
+<div class="agc-card"><div class="emoji">🏷️</div><div><div class="name">Issue Triage</div><div class="desc">Triage labelling of issues and pull requests</div></div></div>
+<div class="agc-card"><div class="emoji">🤖</div><div><div class="name">Repo Assist</div><div class="desc">Multi-task backlog burner, bug fixer, general assistant</div></div></div>
+<div class="agc-card"><div class="emoji">🛡️</div><div><div class="name">AI Moderator</div><div class="desc">Detect and moderate spam, link spam, and AI-generated content</div></div></div>
+<div class="agc-card"><div class="emoji">😤</div><div><div class="name">Grumpy Reviewer</div><div class="desc">On-demand opinionated code review by a grumpy senior dev</div></div></div>
+<div class="agc-card"><div class="emoji">🔍</div><div><div class="name">PR Nitpick Reviewer</div><div class="desc">Fine-grained review focusing on style and subtle issues</div></div></div>
+<div class="agc-card"><div class="emoji">🔄</div><div><div class="name">Autoloop</div><div class="desc">Iterative optimization agent with metrics evaluation</div></div></div>
+<div class="agc-card"><div class="emoji">📚</div><div><div class="name">Weekly Research</div><div class="desc">Collect research updates and industry trends</div></div></div>
+<div class="agc-card"><div class="emoji">📊</div><div><div class="name">Weekly Issue Summary</div><div class="desc">Weekly issue activity report with trend charts</div></div></div>
+<div class="agc-card"><div class="emoji">👥</div><div><div class="name">Daily Repo Status</div><div class="desc">Assess repo activity and create status reports</div></div></div>
+<div class="agc-card"><div class="emoji">📊</div><div><div class="name">Archie</div><div class="desc">Generate Mermaid diagrams with /archie command</div></div></div>
+<div class="agc-card"><div class="emoji">📋</div><div><div class="name">Plan Command</div><div class="desc">Break down issues into sub-tasks with /plan</div></div></div>
+<div class="agc-card"><div class="emoji">🔧</div><div><div class="name">Q — Workflow Optimizer</div><div class="desc">Expert system that analyzes and optimizes workflows</div></div></div>
+</div>
+
+<div class="install-block">
+<div class="comment-line"># Install the gh-aw CLI extension</div>
+<div><span class="prompt">$</span> gh extension install github/gh-aw</div>
+<br />
+<div class="comment-line"># Add a workflow from the agentics collection</div>
+<div><span class="prompt">$</span> gh aw add-wizard https://github.com/githubnext/agentics/blob/main/.github/workflows/issue-triage.md</div>
+<br />
+<div class="comment-line"># Compile and commit</div>
+<div><span class="prompt">$</span> gh aw compile</div>
+<div><span class="prompt">$</span> git add .github/workflows/</div>
+<div><span class="prompt">$</span> git commit -m "Add issue triage agentic workflow"</div>
+</div>
+
+---
+
+## 🧭 Choosing the Right Approach
+
+Not everything should be an agentic workflow. Here's how to decide.
+
+<div class="decision-grid">
+<div class="decision-card good">
+<h4>✅ Great Fit for Agentic Workflows</h4>
+<ul>
+<li>Context-heavy, repetitive tasks that vary in detail</li>
+<li>Tasks requiring summarization, judgment, and communication</li>
+<li>Processes requiring guardrailed automation with human review</li>
+<li>Work that would be painful or impractical to script imperatively</li>
+<li>Anything needing natural language understanding of code + issues</li>
+</ul>
+</div>
+<div class="decision-card caution">
+<h4>⚙️ Better Suited for Traditional CI/CD</h4>
+<ul>
+<li>Ultra-deterministic build, test, and deploy steps</li>
+<li>Millisecond-latency critical paths</li>
+<li>Situations requiring strictly identical output every run</li>
+<li>Container builds, artifact packaging, and deployment pipelines</li>
+<li>Binary pass/fail gates with no interpretation needed</li>
+</ul>
+</div>
+</div>
+
+<div class="info-box blue">
+<h4>💡 The Practical Rule</h4>
+<p>Keep deterministic pipelines deterministic. Use agentic workflows where interpretation and adaptation add value. The two complement each other — they don't compete.</p>
+</div>
+
+---
+
+## 🚦 Getting Started Progression
+
+A recommended path from first workflow to full automation suite.
+
+<div class="pattern-grid">
+<div class="pattern-card" style="border-left: 3px solid var(--color-green)">
+<h4 style="color: var(--color-green)">1️⃣ Start Simple</h4>
+<p>Begin with a low-risk daily status report or issue triage agent with strict guardrails. Comments and labels only — no PR creation yet.</p>
+</div>
+<div class="pattern-card" style="border-left: 3px solid var(--color-blue)">
+<h4 style="color: var(--color-blue)">2️⃣ Add Safe-Outputs</h4>
+<p>Introduce predictable PR and issue behavior with title prefixes, branch patterns, and label constraints.</p>
+</div>
+<div class="pattern-card" style="border-left: 3px solid var(--color-purple)">
+<h4 style="color: var(--color-purple)">3️⃣ Expand to Maintenance</h4>
+<p>Add documentation updates, test improvements, and CI failure investigation workflows.</p>
+</div>
+<div class="pattern-card" style="border-left: 3px solid var(--color-orange)">
+<h4 style="color: var(--color-orange)">4️⃣ Extract Reusable Agents</h4>
+<p>Share common patterns via imports with version pinning across multiple repositories.</p>
+</div>
+<div class="pattern-card" style="border-left: 3px solid var(--color-red)">
+<h4 style="color: var(--color-red)">5️⃣ Introduce MCP Servers</h4>
+<p>Add specialist context (Terraform, database tools, etc.) only where domain tools provide clear value.</p>
+</div>
+<div class="pattern-card" style="border-left: 3px solid var(--color-blue-hover)">
+<h4 style="color: var(--color-blue-hover)">6️⃣ Monitor & Optimize</h4>
+<p>Add metrics collection and portfolio analysis as the number of workflows grows. Use meta-agents to watch your agents.</p>
+</div>
+</div>

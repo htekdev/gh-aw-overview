@@ -62,10 +62,10 @@ You are the link checker for the **GitHub Agentic Workflows documentation hub**.
 
 Scan all HTML files in the repository for broken or problematic links:
 
-1. **Extract all external URLs** from every `.html` file in the repository root
+1. **Extract all external URLs** from every `.mdx` file in `src/content/pages/` and `.astro` files in `src/`
    - Look for `href="https://..."` and `src="https://..."` attributes
    - Focus on documentation links, GitHub links, blog post links, and YouTube links
-   - Ignore internal links (relative links between pages like `href="core-concepts.html"`)
+   - Ignore internal links (relative links between pages)
 
 2. **Validate each external URL** by attempting to fetch it:
    - Use `web-fetch` or `curl` to check if the URL responds

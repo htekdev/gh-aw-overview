@@ -55,7 +55,7 @@ Generate a comprehensive weekly status report and post it as a GitHub issue. The
 - Recently merged PRs
 
 ### 📄 Content Inventory
-- List all HTML pages with approximate word/line counts
+- List all MDX content files in `src/content/pages/` with approximate word/line counts
 - Flag any pages that seem significantly shorter than others
 - Note the last modification date for each page
 

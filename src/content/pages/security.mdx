@@ -1,0 +1,888 @@
+---
+title: "Security & Governance — GitHub Agentic Workflows"
+description: "Defense-in-depth security architecture — Agent Workflow Firewall, threat detection, protected files, prompt injection defenses, and governance."
+navLabel: "Security"
+navOrder: 4
+heroEmoji: "🔒"
+heroSubtitle: "Defense-in-depth security architecture and governance"
+accentColor: "red"
+---
+
+<style>{`
+  /* ── Layer Diagram ── */
+  .layer-stack { max-width: 820px; margin: 0 auto; }
+  .layer-box {
+    border-radius: 10px; padding: 24px 28px; margin-bottom: 4px;
+    border: 1px solid; position: relative;
+  }
+  .layer-box:first-child { border-radius: 10px 10px 4px 4px; }
+  .layer-box:last-child { border-radius: 4px 4px 10px 10px; margin-bottom: 0; }
+  .layer-box h3 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .layer-box p { font-size: 0.88rem; color: var(--color-text-muted); margin: 0; }
+  .layer-box .layer-tag {
+    position: absolute; top: 12px; right: 16px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    padding: 2px 10px; border-radius: 20px;
+  }
+  .layer-planning {
+    background: rgba(88,166,255,0.06); border-color: rgba(88,166,255,0.3);
+  }
+  .layer-planning h3 { color: var(--color-blue); }
+  .layer-planning .layer-tag { background: var(--color-blue-dim); color: var(--color-blue); }
+  .layer-config {
+    background: rgba(188,140,255,0.06); border-color: rgba(188,140,255,0.3);
+  }
+  .layer-config h3 { color: var(--color-purple); }
+  .layer-config .layer-tag { background: var(--color-purple-dim); color: var(--color-purple); }
+  .layer-substrate {
+    background: rgba(63,185,80,0.06); border-color: rgba(63,185,80,0.3);
+  }
+  .layer-substrate h3 { color: var(--color-green); }
+  .layer-substrate .layer-tag { background: var(--color-green-dim); color: var(--color-green); }
+
+  /* ── Pipeline Flow ── */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0;
+    max-width: 900px; margin: 0 auto; flex-wrap: wrap; justify-content: center;
+  }
+  .pipeline-step {
+    flex: 1; min-width: 200px; padding: 24px 20px;
+    border: 1px solid var(--color-border); background: var(--color-surface);
+    text-align: center; position: relative;
+  }
+  .pipeline-step:first-child { border-radius: 10px 0 0 10px; }
+  .pipeline-step:last-child { border-radius: 0 10px 10px 0; }
+  .pipeline-step .step-num {
+    display: inline-block; width: 28px; height: 28px; line-height: 28px;
+    border-radius: 50%; font-size: 13px; font-weight: 700; margin-bottom: 10px;
+  }
+  .pipeline-step h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+  .pipeline-step p { font-size: 0.82rem; color: var(--color-text-muted); margin: 0; }
+  .pipeline-arrow {
+    display: flex; align-items: center; font-size: 24px; color: var(--color-text-subtle); padding: 0 2px;
+  }
+  @media (max-width: 700px) {
+    .pipeline { flex-direction: column; align-items: center; }
+    .pipeline-step { border-radius: 10px !important; width: 100%; max-width: 340px; }
+    .pipeline-arrow { transform: rotate(90deg); padding: 4px 0; }
+  }
+
+  /* ── Callouts ── */
+  .callout {
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .callout h4 { font-weight: 600; margin-bottom: 4px; font-size: 0.95rem; }
+  .callout p { color: var(--color-text-muted); font-size: 0.88rem; margin: 0; }
+  .callout.threat {
+    background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.25);
+  }
+  .callout.threat h4 { color: var(--color-red); }
+  .callout.protect {
+    background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.25);
+  }
+  .callout.protect h4 { color: var(--color-green); }
+  .callout.info {
+    background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25);
+  }
+  .callout.info h4 { color: var(--color-blue); }
+
+  /* ── Firewall Diagram ── */
+  .fw-diagram {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; flex-wrap: wrap; margin: 32px 0;
+  }
+  .fw-box {
+    padding: 18px 22px; border-radius: 10px; text-align: center;
+    min-width: 150px; border: 1px solid;
+  }
+  .fw-box h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+  .fw-box p { font-size: 0.78rem; margin: 0; }
+  .fw-arrow { font-size: 20px; color: var(--color-text-subtle); padding: 0 8px; }
+  .fw-agent { background: rgba(248,81,73,0.06); border-color: rgba(248,81,73,0.3); }
+  .fw-agent h4 { color: var(--color-red); }
+  .fw-proxy { background: rgba(210,153,34,0.06); border-color: rgba(210,153,34,0.3); }
+  .fw-proxy h4 { color: var(--color-orange); }
+  .fw-allowed { background: rgba(63,185,80,0.06); border-color: rgba(63,185,80,0.3); }
+  .fw-allowed h4 { color: var(--color-green); }
+  .fw-blocked { background: rgba(248,81,73,0.06); border-color: rgba(248,81,73,0.3); }
+  .fw-blocked h4 { color: var(--color-red); }
+  @media (max-width: 700px) {
+    .fw-diagram { flex-direction: column; }
+    .fw-arrow { transform: rotate(90deg); padding: 4px 0; }
+  }
+
+  /* ── Container Cards ── */
+  .container-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .container-card-sm {
+    background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px;
+    padding: 22px; text-align: center;
+  }
+  .container-card-sm .cc-icon { font-size: 28px; margin-bottom: 8px; }
+  .container-card-sm h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+  .container-card-sm p { color: var(--color-text-muted); font-size: 0.82rem; margin: 0; }
+
+  /* ── Scanner Cards ── */
+  .scanner-card {
+    background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px;
+    padding: 28px; position: relative; overflow: hidden;
+  }
+  .scanner-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .scanner-card.sc-lint::before { background: linear-gradient(90deg, var(--color-blue), var(--color-blue-hover)); }
+  .scanner-card.sc-sec::before { background: linear-gradient(90deg, var(--color-red), var(--color-red-hover)); }
+  .scanner-card.sc-supply::before { background: linear-gradient(90deg, var(--color-orange), var(--color-orange-hover)); }
+  .scanner-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+  .scanner-card .scanner-flag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 10px; }
+  .scanner-card p { color: var(--color-text-muted); font-size: 0.88rem; margin: 0; }
+
+  /* ── Stats Strip ── */
+  .stats-strip {
+    display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+    padding: 24px 0; margin: 32px 0;
+    border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface);
+  }
+  .stat-item { text-align: center; min-width: 130px; padding: 8px 16px; }
+  .stat-val { font-size: 1.8rem; font-weight: 800; }
+  .stat-val.green { color: var(--color-green); }
+  .stat-val.blue { color: var(--color-blue); }
+  .stat-val.orange { color: var(--color-orange); }
+  .stat-lbl { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px; }
+
+  /* ── Numbered Rules ── */
+  .rule-item {
+    display: flex; gap: 18px; align-items: flex-start;
+    padding: 20px 0; border-bottom: 1px solid var(--color-border-subtle);
+  }
+  .rule-item:last-child { border-bottom: none; }
+  .rule-num {
+    flex-shrink: 0; width: 36px; height: 36px; line-height: 36px;
+    text-align: center; border-radius: 50%; font-weight: 700; font-size: 0.95rem;
+    background: var(--color-orange-dim); color: var(--color-orange);
+  }
+  .rule-item h4 { font-weight: 600; margin-bottom: 4px; }
+  .rule-item p { color: var(--color-text-muted); font-size: 0.9rem; margin: 0; }
+
+  /* ── Governance Features ── */
+  .gov-feature {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 20px 0; border-bottom: 1px solid var(--color-border-subtle);
+  }
+  .gov-feature:last-child { border-bottom: none; }
+  .gov-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .gov-feature h4 { font-weight: 600; margin-bottom: 4px; }
+  .gov-feature p { color: var(--color-text-muted); font-size: 0.9rem; margin: 0; }
+
+  /* ── Code Block ── */
+  .code-block {
+    background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px;
+    padding: 18px 20px; font-family: var(--font-mono);
+    font-size: 0.82rem; overflow-x: auto; color: var(--color-text-muted); line-height: 1.7;
+    white-space: pre; word-wrap: break-word;
+  }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .str { color: #a5d6ff; }
+  .code-block .cmt { color: var(--color-text-subtle); }
+  .code-block .fn { color: #d2a8ff; }
+
+  /* ── Blockquote ── */
+  .bq {
+    border-left: 3px solid var(--color-border); padding: 16px 24px; margin: 32px 0;
+    background: rgba(22,27,34,0.6); border-radius: 0 8px 8px 0;
+    font-style: italic; color: var(--color-text-muted); font-size: 0.95rem;
+  }
+  .bq cite { display: block; margin-top: 10px; font-style: normal; font-size: 0.82rem; color: var(--color-blue); }
+
+  /* ── Info Table wrapper ── */
+  .table-wrap { overflow-x: auto; }
+  .table-wrap table { margin: 0; }
+`}</style>
+
+{/* ═══════ 1. CORE PHILOSOPHY ═══════ */}
+
+<section id="philosophy">
+<div class="section-label" style="color: var(--color-green);">Foundation</div>
+
+## Core Security Philosophy
+
+Four principles guide every design decision in the gh-aw security architecture.
+
+<div class="grid-4">
+  <div class="card">
+    <div style="font-size: 32px; margin-bottom: 12px;">🛡️</div>
+    <h3>Defense in Depth</h3>
+    <p>Multiple independent layers ensure a failure in one layer does not compromise the system. No single control is the sole line of defense — substrate isolation, configuration hardening, and runtime planning all enforce distinct security properties independently.</p>
+  </div>
+  <div class="card">
+    <div style="font-size: 32px; margin-bottom: 12px;">🔑</div>
+    <h3>Zero-Secret Agents</h3>
+    <p>Agents have <strong style="color: var(--color-red);">zero access</strong> to authentication tokens, API keys, or credentials. LLM keys live in an isolated API Proxy container. MCP credentials live in a separate MCP Gateway container. This is an architectural boundary, not a policy.</p>
+  </div>
+  <div class="card">
+    <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+    <h3>Stage &amp; Vet All Writes</h3>
+    <p>Every write operation is buffered as a structured artifact, analyzed by deterministic filters and a security-focused AI agent, then executed by separate permission-scoped jobs. The agent never writes directly to external state.</p>
+  </div>
+  <div class="card">
+    <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+    <h3>Log Everything</h3>
+    <p>Comprehensive observability at every trust boundary enables forensic reconstruction, anomaly detection, and future information-flow controls. Logging is a structural feature of the security model, not optional instrumentation.</p>
+  </div>
+</div>
+
+<div class="bq">
+  "Our first mitigation was to isolate the agent in a dedicated container with tightly controlled egress: firewalled internet access, MCP access through a trusted MCP gateway, and LLM API calls through an API proxy."
+  <cite>— Landon Cox &amp; Jiaxiao Zhou, GitHub Engineering Blog</cite>
+</div>
+</section>
+
+{/* ═══════ 2. THREAT MODEL ═══════ */}
+
+<section id="threats">
+<div class="section-label" style="color: var(--color-red);">Threat Model</div>
+
+## What the Adversary Can Do
+
+Two properties fundamentally change the threat model: agents reason autonomously over untrusted inputs, and GitHub Actions provides a shared, highly-permissive trust domain.
+
+<div class="grid-2" style="margin-bottom: 28px;">
+  <div class="callout threat">
+    <div class="callout-icon">⚠️</div>
+    <div>
+      <h4>Access &amp; Corrupt Shared State</h4>
+      <p>A compromised agent can read environment variables, config files, SSH keys, <code>/proc</code> state, and workflow logs to discover credentials and sensitive data.</p>
+    </div>
+  </div>
+  <div class="callout threat">
+    <div class="callout-icon">⚠️</div>
+    <div>
+      <h4>Communicate Over Unintended Channels</h4>
+      <p>Encode secrets in PR descriptions, issue bodies, comments, or other public-facing objects to exfiltrate data through legitimate GitHub features.</p>
+    </div>
+  </div>
+  <div class="callout threat">
+    <div class="callout-icon">⚠️</div>
+    <div>
+      <h4>Abuse Legitimate Channels</h4>
+      <p>Spam issues and PRs to overwhelm maintainers, inject objectionable content, or trigger cost escalation through excessive API usage.</p>
+    </div>
+  </div>
+  <div class="callout threat">
+    <div class="callout-icon">⚠️</div>
+    <div>
+      <h4>Confuse Control Logic</h4>
+      <p>Deviate from expected workflows, manipulate upstream decision-making, or exploit prompt injection via crafted issues, comments, and hidden Unicode.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section-label" style="color: var(--color-orange); margin-top: 36px;">Risk Classes</div>
+
+### Three Primary Risk Classes
+
+<div class="grid-3">
+  <div class="card" style="border-color: rgba(248,81,73,0.3);">
+    <span class="badge badge-red">Critical</span>
+    <h3 style="margin-top: 12px;">Data Exfiltration</h3>
+    <p>Agent leaks context — including tokens — to unintended destinations via network calls or encoded in public-facing objects like PR descriptions.</p>
+  </div>
+  <div class="card" style="border-color: rgba(210,153,34,0.3);">
+    <span class="badge badge-orange">High</span>
+    <h3 style="margin-top: 12px;">Impersonation</h3>
+    <p>Unclear who issued a directive or who is accountable for agent actions. Without proper attribution, malicious actions can be concealed.</p>
+  </div>
+  <div class="card" style="border-color: rgba(210,153,34,0.3);">
+    <span class="badge badge-orange">High</span>
+    <h3 style="margin-top: 12px;">Prompt Injection</h3>
+    <p>Malicious users craft inputs — issues, files, comments with hidden Unicode — that trick agents into performing unauthorized behavior.</p>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 3. THREE-LAYER ARCHITECTURE ═══════ */}
+
+<section id="layers">
+<div class="section-label" style="color: var(--color-blue);">Architecture</div>
+
+## Three-Layer Defense in Depth
+
+Each layer enforces independent security properties and constrains the impact of failures in the layers above it.
+
+<div class="layer-stack">
+  <div class="layer-box layer-planning">
+    <span class="layer-tag">Layer 3</span>
+    <h3>🧠 Planning Layer</h3>
+    <p>Constrains behavior <strong style="color: var(--color-text);">over time</strong>. SafeOutputs MCP buffers writes as artifacts. Content sanitization strips injection vectors. Threat detection AI analyzes all outputs. Secret redaction scrubs credentials. GitHub Lockdown Mode filters untrusted input in public repos.</p>
+  </div>
+  <div class="layer-box layer-config">
+    <span class="layer-tag">Layer 2</span>
+    <h3>⚙️ Configuration Layer</h3>
+    <p>Declarative artifacts and a trusted compiler produce security-hardened <code>.lock.yml</code> workflows. Schema validation, expression allowlists, Action SHA pinning via <code>actions-lock.json</code>, and security scanners (actionlint, zizmor, poutine) all run at compile time. Strict mode adds further constraints.</p>
+  </div>
+  <div class="layer-box layer-substrate">
+    <span class="layer-tag">Layer 1</span>
+    <h3>🏗️ Substrate Layer</h3>
+    <p>Kernel-enforced isolation via Actions runner VM, Docker containers, iptables, and cgroups. Three privileged containers — <strong style="color: var(--color-text);">Network Firewall (AWF)</strong>, <strong style="color: var(--color-text);">API Proxy</strong>, and <strong style="color: var(--color-text);">MCP Gateway</strong> — mediate all external communication. Holds <em>even if the agent container is fully compromised</em>.</p>
+  </div>
+</div>
+
+<div class="callout protect" style="margin-top: 28px; max-width: 820px; margin-left: auto; margin-right: auto;">
+  <div class="callout-icon">✅</div>
+  <div>
+    <h4>Critical Guarantee</h4>
+    <p>Substrate protections hold even if the agent executes arbitrary code. A breach at this layer would require vulnerabilities in the container runtime, kernel, hypervisor, or hardware.</p>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 4. SAFE OUTPUTS PIPELINE ═══════ */}
+
+<section id="safe-outputs">
+<div class="section-label" style="color: var(--color-green);">Write Control</div>
+
+## Safe Outputs Pipeline
+
+All write operations follow a staged pipeline: buffer → detect → apply. The agent never writes directly to external state.
+
+<div class="pipeline">
+  <div class="pipeline-step" style="border-color: rgba(88,166,255,0.3);">
+    <div class="step-num" style="background: var(--color-blue-dim); color: var(--color-blue);">1</div>
+    <h4 style="color: var(--color-blue);">Buffer</h4>
+    <p>Agent runs with <strong>read-only</strong> permissions. Write actions (create issue, open PR) are buffered as structured JSON artifacts — never executed immediately.</p>
+    <div style="margin-top: 10px;"><span class="badge badge-blue">Read-Only Perms</span></div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step" style="border-color: rgba(210,153,34,0.3);">
+    <div class="step-num" style="background: var(--color-orange-dim); color: var(--color-orange);">2</div>
+    <h4 style="color: var(--color-orange);">Detect</h4>
+    <p>Buffered artifacts pass through deterministic filters and a <strong>security-focused AI agent</strong>. Threat detection emits a pass/fail verdict that gates all writes.</p>
+    <div style="margin-top: 10px;"><span class="badge badge-orange">No Write Perms</span></div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step" style="border-color: rgba(63,185,80,0.3);">
+    <div class="step-num" style="background: var(--color-green-dim); color: var(--color-green);">3</div>
+    <h4 style="color: var(--color-green);">Apply</h4>
+    <p>Only artifacts that survive the full pipeline are applied by separate, <strong>permission-scoped</strong> jobs — create_issue, add_comment, create_pr, add_labels.</p>
+    <div style="margin-top: 10px;"><span class="badge badge-green">Scoped Write Perms</span></div>
+  </div>
+</div>
+
+<div style="max-width: 900px; margin: 36px auto 0;">
+
+### Three Categories of Control
+
+<div class="card table-wrap">
+
+| Control | Description | Example |
+|---------|-------------|---------|
+| Operation Allowlisting | Authors specify which write operations an agent may perform | `create-issue`, `create-pull-request`, `add-comment` |
+| Volume Limits | Cap the number of allowed operations per run | At most 3 PRs per run |
+| Content Sanitization | Analyze and filter output content | Remove untrusted URLs, potential secrets, objectionable content |
+
+</div>
+</div>
+
+<div class="callout info" style="margin-top: 24px; max-width: 900px; margin-left: auto; margin-right: auto;">
+  <div class="callout-icon">💡</div>
+  <div>
+    <h4>Missing-Data Safe Output</h4>
+    <p>A built-in safe output called <code>missing-data</code> encourages agents to explicitly report when they lack data to complete a task, rather than hallucinating. This rewards honest agent behavior and creates a feedback loop for improvement.</p>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 5. AGENT WORKFLOW FIREWALL ═══════ */}
+
+<section id="firewall">
+<div class="section-label" style="color: var(--color-green);">Network Isolation</div>
+
+## Agent Workflow Firewall (AWF)
+
+Open-source network firewall (<a href="https://github.com/github/gh-aw-firewall" target="_blank">github/gh-aw-firewall</a>) that containerizes the agent, isolates the network, and routes all traffic through a Squid proxy with configurable domain allowlists.
+
+<div class="fw-diagram">
+  <div class="fw-box fw-agent">
+    <h4>🤖 Agent Container</h4>
+    <p style="color: var(--color-text-muted);">Isolated network<br/>namespace</p>
+  </div>
+  <div class="fw-arrow">→</div>
+  <div class="fw-box fw-proxy">
+    <h4>🔀 Squid Proxy</h4>
+    <p style="color: var(--color-text-muted);">Domain allowlist<br/>at 172.30.0.10</p>
+  </div>
+  <div class="fw-arrow">→</div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div class="fw-box fw-allowed">
+      <h4>✅ Allowed</h4>
+      <p style="color: var(--color-text-muted);">Traffic proceeds</p>
+    </div>
+    <div class="fw-box fw-blocked">
+      <h4>🚫 Blocked</h4>
+      <p style="color: var(--color-text-muted);">Dropped &amp; logged</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top: 28px;">
+  <div>
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">How It Works</h3>
+    <ol style="color: var(--color-text-muted); font-size: 0.9rem; padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <li>AWF establishes an isolated network namespace with a Squid proxy</li>
+      <li>iptables rules redirect all HTTP/HTTPS traffic through the proxy</li>
+      <li>The proxy evaluates each request against the domain allowlist</li>
+      <li>Allowed traffic proceeds; blocked traffic is dropped and logged</li>
+      <li><strong style="color: var(--color-green);">AWF drops its iptables capabilities</strong> before launching the agent, preventing network reconfiguration</li>
+    </ol>
+  </div>
+  <div>
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">Configuration</h3>
+    <div class="code-block"><span class="kw">network</span>:{'\n'}  <span class="kw">firewall</span>: <span class="str">true</span>{'\n'}  <span class="kw">allowed</span>:{'\n'}    - <span class="str">defaults</span>        <span class="cmt"># Certificates, JSON schema</span>{'\n'}    - <span class="str">python</span>          <span class="cmt"># PyPI, Conda</span>{'\n'}    - <span class="str">node</span>            <span class="cmt"># npm, npmjs.com</span>{'\n'}    - <span class="str">"api.example.com"</span>  <span class="cmt"># Custom domain</span></div>
+  </div>
+</div>
+
+### Three-Container Design
+
+<div class="container-grid">
+  <div class="container-card-sm">
+    <div class="cc-icon">🔀</div>
+    <h4>Squid Proxy</h4>
+    <p>Filters all outbound traffic by domain allowlist. Supports SSL Bump for HTTPS content inspection and URL path filtering.</p>
+  </div>
+  <div class="container-card-sm">
+    <div class="cc-icon">🤖</div>
+    <h4>Agent Container</h4>
+    <p>Runs the command with all HTTP/HTTPS routed through Squid. Cannot reconfigure iptables — capabilities are dropped pre-launch.</p>
+  </div>
+  <div class="container-card-sm">
+    <div class="cc-icon">🔑</div>
+    <h4>API Proxy Sidecar</h4>
+    <p>Holds LLM API keys so they never reach the agent process. Injects credentials into outbound requests transparently.</p>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top: 28px;">
+  <div class="callout protect">
+    <div class="callout-icon">🔒</div>
+    <div>
+      <h4>Chroot Mode for Coding Agents</h4>
+      <p>Host filesystem mounted read-only at <code>/host</code>. Selected paths overlaid with empty tmpfs layers. Agent runs in a chroot jail, retaining access to host binaries (Python, Node, Go) while controlling network access.</p>
+    </div>
+  </div>
+  <div class="callout protect">
+    <div class="callout-icon">✍️</div>
+    <div>
+      <h4>Cosign-Signed Releases</h4>
+      <p>All AWF release artifacts are cosign-signed for image verification. All network traffic is logged for forensic analysis. SSL Bump enables HTTPS content inspection.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 6. THREAT DETECTION JOB ═══════ */}
+
+<section id="threat-detection">
+<div class="section-label" style="color: var(--color-red);">Detection</div>
+
+## Threat Detection Job
+
+A critical sub-stage within SafeOutputs that runs as a separate, isolated job — analyzing all agent outputs before any writes are externalized.
+
+<div class="grid-2">
+  <div>
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">How It Works</h3>
+    <ol style="color: var(--color-text-muted); font-size: 0.9rem; padding-left: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <li><strong style="color: var(--color-text);">Downloads</strong> the buffered artifacts — agent outputs, git patches, prompt context</li>
+      <li><strong style="color: var(--color-text);">Invokes a security-focused AI agent</strong> with a hardened system prompt to analyze them</li>
+      <li><strong style="color: var(--color-text);">Emits a pass/fail verdict</strong> that gates all subsequent safe output jobs</li>
+    </ol>
+    <p style="color: var(--color-red); font-size: 0.9rem; margin-top: 16px; font-weight: 500;">If threats are detected, the workflow terminates before any writes are externalized.</p>
+  </div>
+  <div>
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">What It Scans For</h3>
+    <div class="callout threat" style="margin-bottom: 12px;">
+      <div class="callout-icon">🔍</div>
+      <div>
+        <h4>Secret Leaks</h4>
+        <p>API keys, tokens, credentials embedded in outputs or code patches</p>
+      </div>
+    </div>
+    <div class="callout threat" style="margin-bottom: 12px;">
+      <div class="callout-icon">🔍</div>
+      <div>
+        <h4>Malicious Patches</h4>
+        <p>Backdoors, vulnerabilities, suspicious code modifications in git diffs</p>
+      </div>
+    </div>
+    <div class="callout threat" style="margin-bottom: 0;">
+      <div class="callout-icon">🔍</div>
+      <div>
+        <h4>Policy Violations</h4>
+        <p>Scope violations, unauthorized operations, out-of-bounds actions</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 28px;">
+
+### Key Properties
+
+<div class="grid-4">
+  <div class="card" style="text-align: center; padding: 20px;">
+    <div style="font-size: 24px; margin-bottom: 8px;">🔐</div>
+    <h3 style="font-size: 0.88rem;">Isolated Execution</h3>
+    <p style="font-size: 0.8rem;">No write permissions, no access to the agent's runtime state</p>
+  </div>
+  <div class="card" style="text-align: center; padding: 20px;">
+    <div style="font-size: 24px; margin-bottom: 8px;">🤖</div>
+    <h3 style="font-size: 0.88rem;">AI-Powered Analysis</h3>
+    <p style="font-size: 0.8rem;">Uses the same AI engine with a security-focused system prompt</p>
+  </div>
+  <div class="card" style="text-align: center; padding: 20px;">
+    <div style="font-size: 24px; margin-bottom: 8px;">📦</div>
+    <h3 style="font-size: 0.88rem;">Artifact-Based</h3>
+    <p style="font-size: 0.8rem;">Only sees buffered artifacts, not live repository state</p>
+  </div>
+  <div class="card" style="text-align: center; padding: 20px;">
+    <div style="font-size: 24px; margin-bottom: 8px;">🚫</div>
+    <h3 style="font-size: 0.88rem;">Blocking Gate</h3>
+    <p style="font-size: 0.8rem;">Must emit a "safe" verdict before any writes proceed</p>
+  </div>
+</div>
+</div>
+
+<div style="margin-top: 28px;">
+
+### Custom Detection
+
+<div class="code-block"><span class="kw">threat-detection</span>:{'\n'}  <span class="kw">prompt</span>: <span class="str">|</span>{'\n'}    <span class="str">Additionally check for:</span>{'\n'}    <span class="str">- References to internal infrastructure URLs</span>{'\n'}    <span class="str">- Attempts to modify CI/CD configuration files</span>{'\n'}    <span class="str">- Changes to security-sensitive files</span>{'\n'}  <span class="kw">steps</span>:{'\n'}    - <span class="kw">name</span>: <span class="str">Run TruffleHog</span>{'\n'}      <span class="kw">run</span>: <span class="fn">trufflehog filesystem . --only-verified</span>{'\n'}    - <span class="kw">name</span>: <span class="str">Run Semgrep</span>{'\n'}      <span class="kw">run</span>: <span class="fn">semgrep scan aw.patch --config=auto</span>{'\n'}    - <span class="kw">name</span>: <span class="str">Run LlamaGuard</span>{'\n'}      <span class="kw">run</span>: <span class="fn">llamaguard analyze agent_output.json</span></div>
+</div>
+</section>
+
+{/* ═══════ 7. API PROXY & MCP GATEWAY ═══════ */}
+
+<section id="token-isolation">
+<div class="section-label" style="color: var(--color-green);">Token Isolation</div>
+
+## API Proxy &amp; MCP Gateway
+
+Secrets never enter the agent container. Two trusted sidecar containers hold all authentication material and mediate every external call.
+
+<div class="grid-2">
+  <div class="card" style="border-top: 3px solid var(--color-green);">
+    <h3 style="color: var(--color-green);">🔑 API Proxy</h3>
+    <p style="margin-bottom: 14px;">A trusted sidecar that holds agent authentication tokens (LLM API keys) so they never enter the agent container.</p>
+    <ul style="color: var(--color-text-muted); font-size: 0.88rem; padding-left: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <li>Agents route model traffic through the proxy</li>
+      <li>Proxy injects credentials into outbound requests</li>
+      <li>Agent sees only the proxy endpoint — never actual API keys</li>
+      <li>All request/response metadata, token usage, and details are logged</li>
+    </ul>
+  </div>
+  <div class="card" style="border-top: 3px solid var(--color-purple);">
+    <h3 style="color: var(--color-purple);">🌐 MCP Gateway</h3>
+    <p style="margin-bottom: 14px;">A trusted container managing communication between the agent and MCP (Model Context Protocol) servers.</p>
+    <ul style="color: var(--color-text-muted); font-size: 0.88rem; padding-left: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <li>Spawns isolated MCP server containers — prevents cross-server attacks</li>
+      <li>Holds MCP authentication material outside agent boundary</li>
+      <li>Logs every tool invocation: name, arguments, result, timing</li>
+      <li>Routes all MCP requests through a unified HTTP endpoint</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout protect" style="margin-top: 24px;">
+  <div class="callout-icon">🛡️</div>
+  <div>
+    <h4>Why This Matters</h4>
+    <p>Prompt-injected agents with shell access could read config files, SSH keys, <code>/proc</code> state, and workflow logs to discover credentials. The API Proxy and MCP Gateway eliminate this entire attack surface by keeping secrets outside the agent's isolation boundary.</p>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 8. SECURITY SCANNERS ═══════ */}
+
+<section id="scanners">
+<div class="section-label" style="color: var(--color-purple);">Static Analysis</div>
+
+## Security Scanners
+
+Three security scanners integrate into the compilation pipeline, catching issues before workflows ever execute.
+
+<div class="grid-3">
+  <div class="scanner-card sc-lint">
+    <span class="badge badge-blue">Linting</span>
+    <h3 style="margin-top: 12px;">actionlint</h3>
+    <div class="scanner-flag"><code>--actionlint</code></div>
+    <p>Workflow linting — catches syntax errors, type mismatches, and best-practice violations in GitHub Actions workflow definitions.</p>
+  </div>
+  <div class="scanner-card sc-sec">
+    <span class="badge badge-red">Security</span>
+    <h3 style="margin-top: 12px;">zizmor</h3>
+    <div class="scanner-flag"><code>--zizmor</code></div>
+    <p>Security auditing — detects script injection vulnerabilities, excessive permissions, and unsafe GitHub context expressions that could enable privilege escalation.</p>
+  </div>
+  <div class="scanner-card sc-supply">
+    <span class="badge badge-orange">Supply Chain</span>
+    <h3 style="margin-top: 12px;">poutine</h3>
+    <div class="scanner-flag"><code>--poutine</code></div>
+    <p>Supply-chain security — identifies unpinned action references, dangerous pull request event triggers, and other supply chain attack vectors.</p>
+  </div>
+</div>
+
+<div style="margin-top: 28px;">
+
+### Compilation Commands
+
+<div class="code-block"><span class="cmt"># Standard compilation</span>{'\n'}<span class="fn">gh aw compile</span>{'\n'}{'\n'}<span class="cmt"># With all security scanners</span>{'\n'}<span class="fn">gh aw compile --actionlint --zizmor --poutine</span>{'\n'}{'\n'}<span class="cmt"># Strict mode with validation</span>{'\n'}<span class="fn">gh aw compile --strict</span>{'\n'}{'\n'}<span class="cmt"># Full validation (compile --validate --no-emit --zizmor --actionlint --poutine)</span>{'\n'}<span class="fn">gh aw validate</span></div>
+</div>
+
+### Real-World Results
+
+From the December 2025 static analysis report scanning 119 agentic workflows:
+
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-val green">0</div>
+    <div class="stat-lbl">Linting Errors<br/>(actionlint)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val green">0</div>
+    <div class="stat-lbl">Supply Chain Issues<br/>(poutine)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val blue">13</div>
+    <div class="stat-lbl">Info/Low Warnings<br/>(zizmor)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val orange">3</div>
+    <div class="stat-lbl">Medium Severity<br/>(permissions)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val green">0</div>
+    <div class="stat-lbl">Critical/High<br/>Severity</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val green">93%</div>
+    <div class="stat-lbl">Workflows Passed<br/>All Checks</div>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 9. CONTENT SANITIZATION ═══════ */}
+
+<section id="sanitization">
+<div class="section-label" style="color: var(--color-green);">Input Filtering</div>
+
+## Content Sanitization Pipeline
+
+User-generated content is sanitized before the agent ever sees it, neutralizing injection vectors at the activation boundary.
+
+<div class="card table-wrap">
+
+| Mechanism | Example | Protection |
+|-----------|---------|------------|
+| @mention Neutralization | `@user` → `` `@user` `` | Prevents unintended notifications |
+| Bot Trigger Protection | `fixes #123` → `` `fixes #123` `` | Prevents automatic issue linking |
+| XML/HTML Tag Conversion | `<script>` → `(script)` | Prevents injection via HTML tags |
+| URI Filtering | `http://evil.com` → `(redacted)` | Restricts to HTTPS from trusted domains |
+| Unicode Normalization | Homoglyphs → normalized forms | Prevents visual spoofing attacks |
+| Content Limits | Large payloads → truncated | Enforces 0.5 MB max, 65k lines max |
+| Control Character Removal | ANSI escapes → stripped | Removes terminal manipulation codes |
+
+</div>
+</section>
+
+{/* ═══════ 10. GITHUB'S 6 RULES ═══════ */}
+
+<section id="six-rules">
+<div class="section-label" style="color: var(--color-orange);">Principles</div>
+
+## GitHub's 6 Rules for Agentic Security
+
+From <a href="https://github.blog/ai-and-ml/github-copilot/how-githubs-agentic-security-principles-make-our-ai-agents-as-secure-as-possible/" target="_blank">Rahul Zhade's blog post</a> (November 2025) — six rules that apply across all of GitHub's hosted agentic products.
+
+<div style="max-width: 860px;">
+  <div class="rule-item">
+    <div class="rule-num">1</div>
+    <div>
+      <h4>Ensure All Context Is Visible</h4>
+      <p>Display context source files and strip invisible Unicode/HTML before passing to the agent. Users must be able to see exactly what the agent sees.</p>
+    </div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num">2</div>
+    <div>
+      <h4>Firewall the Agent</h4>
+      <p>AWF limits network access with configurable domain allowlists. Agents cannot reach arbitrary endpoints — all traffic is proxied and filtered.</p>
+    </div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num">3</div>
+    <div>
+      <h4>Limit Access to Sensitive Information</h4>
+      <p>Only provide information absolutely necessary for the task. CI secrets are excluded. Authentication tokens are revoked after each session completes.</p>
+    </div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num">4</div>
+    <div>
+      <h4>Prevent Irreversible State Changes</h4>
+      <p>Agents create pull requests — not direct commits. CI doesn't auto-run on agent PRs. A human must validate the code and manually trigger workflows.</p>
+    </div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num">5</div>
+    <div>
+      <h4>Consistently Attribute Actions</h4>
+      <p>Actions are co-committed by the initiating user. The agent identity (Copilot) is clearly marked on all PRs. Accountability chains are always visible.</p>
+    </div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num">6</div>
+    <div>
+      <h4>Only Gather Context from Authorized Users</h4>
+      <p>Agents can only be assigned by users with write access. In public repos, agents only read comments from users with write access — preventing context poisoning.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+{/* ═══════ 11. ENTERPRISE GOVERNANCE ═══════ */}
+
+<section id="enterprise">
+<div class="section-label" style="color: var(--color-purple);">Enterprise</div>
+
+## Enterprise Governance
+
+Centralized policy management, comprehensive audit trails, and role-based controls for organizations operating agents at scale.
+
+<div class="grid-2" style="margin-bottom: 32px;">
+  <div>
+    <div class="gov-feature">
+      <div class="gov-icon">📦</div>
+      <div>
+        <h4>Centralized Policy via Imports</h4>
+        <p>Organizations maintain shared agents, skills, and security policies in a central repository and distribute them via version-pinned imports across all repos.</p>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top: 8px; margin-bottom: 20px;"><span class="kw">imports</span>:{'\n'}  - <span class="str">org/security-policies/.github/agents/secure-agent.agent.md@v2.1.0</span>{'\n'}  - <span class="str">org/shared-skills/.github/skills/compliance-check/SKILL.md@v1.0.0</span></div>
+
+    <div class="gov-feature">
+      <div class="gov-icon">👤</div>
+      <div>
+        <h4>Role-Based Activation</h4>
+        <p>Pre-activation validates that the triggering user has appropriate permissions. Integrates with GitHub's roles (read, triage, write, maintain, admin) and can be further constrained with <code>roles:</code> restrictions.</p>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="gov-feature">
+      <div class="gov-icon">📜</div>
+      <div>
+        <h4>Complete Audit Trail</h4>
+        <p>Every workflow run produces a downloadable artifact trail enabling post-incident forensics, policy compliance validation, cost monitoring, and anomaly detection.</p>
+      </div>
+    </div>
+    <div class="gov-feature">
+      <div class="gov-icon">🏛️</div>
+      <div>
+        <h4>Repository Ruleset Integration</h4>
+        <p>All existing rulesets and branch protections apply. Required reviewers, status checks, CODEOWNERS, and merge queue policies gate agent PRs exactly as human PRs.</p>
+      </div>
+    </div>
+    <div class="gov-feature">
+      <div class="gov-icon">🚫</div>
+      <div>
+        <h4>No Auto-Merge, No Auto-CI</h4>
+        <p>Pull requests from agents are <strong style="color: var(--color-red);">never auto-merged</strong>. CI does not auto-run on agent PRs. A human must inspect, approve, and manually trigger — preserving the human-in-the-loop boundary.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+### Observability &amp; Auditing
+
+<div class="card table-wrap">
+
+| Boundary | What Is Logged |
+|----------|----------------|
+| Network Firewall | All HTTP/HTTPS requests: destination, status, bytes transferred |
+| API Proxy | LLM request/response metadata, token usage, authenticated request details |
+| MCP Gateway | Every tool invocation: tool name, arguments, result, timing |
+| MCP Servers | Individual tool call details and responses |
+| Agent Container | Environment variable accesses, file operations, process execution |
+
+</div>
+
+### Saved Artifacts per Run
+
+<div class="grid-3">
+  <div class="card" style="text-align: center; padding: 18px;">
+    <div style="font-size: 20px; margin-bottom: 6px;">📄</div>
+    <h3 style="font-size: 0.85rem;"><code>agent_output.json</code></h3>
+    <p style="font-size: 0.78rem;">Agent decisions &amp; buffered actions</p>
+  </div>
+  <div class="card" style="text-align: center; padding: 18px;">
+    <div style="font-size: 20px; margin-bottom: 6px;">💬</div>
+    <h3 style="font-size: 0.85rem;"><code>prompt.txt</code></h3>
+    <p style="font-size: 0.78rem;">Generated prompts sent to AI engine</p>
+  </div>
+  <div class="card" style="text-align: center; padding: 18px;">
+    <div style="font-size: 20px; margin-bottom: 6px;">🔧</div>
+    <h3 style="font-size: 0.85rem;"><code>aw.patch</code></h3>
+    <p style="font-size: 0.78rem;">Git diff of code changes</p>
+  </div>
+</div>
+</section>
+
+{/* ═══════ COMPLETE SECURITY SUMMARY ═══════ */}
+
+<section id="summary">
+<div class="section-label" style="color: var(--color-green);">Summary</div>
+
+## Complete Security Layers
+
+Every layer from kernel isolation to AI-powered detection working together to ensure automation scales without scaling risk.
+
+<div class="card table-wrap">
+
+| Layer | Mechanism | Protects Against |
+|-------|-----------|------------------|
+| <span class="badge badge-green">Substrate</span> | Actions runner VM (kernel, hypervisor) | Memory corruption, privilege escalation, host escape |
+| <span class="badge badge-green">Substrate</span> | Docker container isolation | Process isolation bypass, shared state access |
+| <span class="badge badge-green">Substrate</span> | AWF network controls (iptables + Squid) | Data exfiltration, unauthorized API calls |
+| <span class="badge badge-green">Substrate</span> | MCP sandboxing (per-server containers) | Cross-server attacks, unauthorized tool access |
+| <span class="badge badge-purple">Config</span> | Schema validation, expression allowlist | Invalid configurations, secret exposure |
+| <span class="badge badge-purple">Config</span> | Action SHA pinning | Supply-chain attacks, tag hijacking |
+| <span class="badge badge-purple">Config</span> | Security scanners (actionlint, zizmor, poutine) | Privilege escalation, misconfigurations |
+| <span class="badge badge-blue">Plan</span> | Content sanitization &amp; Lockdown Mode | @mention abuse, injection, context poisoning |
+| <span class="badge badge-blue">Plan</span> | Secret redaction (pre-upload) | Credential leakage in logs/artifacts |
+| <span class="badge badge-blue">Plan</span> | AI-powered threat detection | Malicious patches, secret leaks |
+| <span class="badge badge-blue">Plan</span> | SafeOutputs permission separation | Direct write access abuse |
+
+</div>
+
+<div class="bq" style="margin-top: 32px;">
+  "AI agents cannot be trusted the way deterministic automation can. Rather than attempting to make agents trustworthy, the system makes them containable."
+  <cite>— GitHub Engineering, Agentic Workflows Security Architecture</cite>
+</div>
+</section>
+
+{/* ═══════ SOURCES ═══════ */}
+
+<section id="sources" style="padding: 40px 0 20px;">
+<div class="section-label" style="color: var(--color-blue);">Sources</div>
+
+### References &amp; Further Reading
+
+<div style="font-size: 0.85rem; color: var(--color-text-muted); display: flex; flex-direction: column; gap: 8px;">
+  <p>1. Cox, L. &amp; Zhou, J. (2026). <a href="https://github.blog/ai-and-ml/generative-ai/under-the-hood-security-architecture-of-github-agentic-workflows/" target="_blank">"Under the hood: Security architecture of GitHub Agentic Workflows."</a> <em>GitHub Blog</em>.</p>
+  <p>2. Zhade, R. (2025). <a href="https://github.blog/ai-and-ml/github-copilot/how-githubs-agentic-security-principles-make-our-ai-agents-as-secure-as-possible/" target="_blank">"How GitHub's agentic security principles make our AI agents as secure as possible."</a> <em>GitHub Blog</em>.</p>
+  <p>3. GitHub. <a href="https://github.com/github/gh-aw-firewall" target="_blank">github/gh-aw-firewall</a> — Open-source network firewall for agentic workflows.</p>
+  <p>4. GitHub. <a href="https://github.github.com/gh-aw/" target="_blank">GitHub Agentic Workflows — Official Documentation</a>.</p>
+  <p>5. GitHub. <a href="https://github.com/github/gh-aw/discussions/6973" target="_blank">Static Analysis Report — December 2025</a>.</p>
+</div>
+</section>

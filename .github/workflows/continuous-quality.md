@@ -45,7 +45,7 @@ You are the CI failure investigator for the **GitHub Agentic Workflows documenta
 
 ## Context
 
-This repository is a static HTML site deployed via GitHub Pages. The deployment workflow (`pages.yml`) uses `actions/deploy-pages` to publish HTML files from the repository root.
+This repository is an Astro static site deployed via GitHub Pages. The deployment workflow (`pages.yml`) uses `withastro/action@v3` to build the site and `actions/deploy-pages` to deploy. The site uses `@astrojs/mdx` for content, with pages in `src/content/pages/*.mdx` and shared components in `src/components/`.
 
 ## Your Task
 
@@ -54,12 +54,12 @@ When the "Deploy to GitHub Pages" workflow fails:
 1. **Read the failed workflow run logs** to understand what went wrong
 2. **Investigate the root cause**:
    - Was it a deployment configuration issue?
-   - Was it an HTML file that caused the build to fail?
+   - Was it an Astro build error (MDX syntax, component issue, missing dependency)?
    - Was it a transient infrastructure error?
    - Was it a permissions issue?
 3. **Check recent commits** to identify what changed
 4. **If fixable**, open a PR with the fix:
-   - Fix the HTML issue causing the failure
+   - Fix the Astro/MDX issue causing the failure
    - Fix any workflow configuration problems
    - Include a clear explanation of what went wrong and why your fix resolves it
 5. **If not fixable by code** (infrastructure issue, transient failure), post a comment on the most recent commit explaining the situation

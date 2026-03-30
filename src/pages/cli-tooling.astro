@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('pages', 'cli-tooling');
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description} currentPage="cli-tooling">
+  <div class="container" style="padding-top: 80px; padding-bottom: 60px;">
+    <div class="hero" style="min-height: auto; padding: 64px 24px 48px;">
+      <div class="hero-content">
+        <div class="hero-emoji">{entry.data.heroEmoji}</div>
+        <h1 class="hero-title">{entry.data.navLabel}</h1>
+        <p class="hero-subtitle">{entry.data.heroSubtitle}</p>
+      </div>
+    </div>
+    <div class="mdx-content">
+      <Content />
+    </div>
+  </div>
+</BaseLayout>

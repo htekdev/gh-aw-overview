@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+import '../styles/core-concepts.css';
+
+const page = await getEntry('pages', 'core-concepts');
+const { Content } = await page.render();
+---
+
+<BaseLayout title={page.data.title} description={page.data.description} currentPage="core-concepts">
+  <Content />
+</BaseLayout>

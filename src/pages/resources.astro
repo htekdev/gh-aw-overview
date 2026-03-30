@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('pages', 'resources');
+const { Content } = await entry.render();
+
+const { title, description, heroEmoji, heroSubtitle } = entry.data;
+---
+
+<BaseLayout title={title} description={description} currentPage="resources">
+  <header class="hero" style="min-height: auto;">
+    <div class="hero-content">
+      <div class="hero-emoji">{heroEmoji}</div>
+      <h1 class="hero-title">{entry.data.navLabel}</h1>
+      <p class="hero-subtitle">{heroSubtitle}</p>
+      <div class="stats-row" style="margin-top: 24px;">
+        <div class="stat-card">
+          <div class="stat-value">8+</div>
+          <div class="stat-label">Official Docs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Blog Posts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Repositories</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">19</div>
+          <div class="stat-label">Blog Series Parts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Community Articles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">45+</div>
+          <div class="stat-label">Total Resources</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mdx-content">
+    <Content />
+  </div>
+</BaseLayout>

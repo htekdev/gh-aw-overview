@@ -1,0 +1,17 @@
+{
+  "name": "gh-aw-overview",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "GitHub Agentic Workflows overview - comprehensive documentation site",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "@astrojs/mdx": "^4.2.0",
+    "@astrojs/sitemap": "^3.3.0"
+  }
+}
