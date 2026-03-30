@@ -213,22 +213,22 @@ Four principles guide every design decision in the gh-aw security architecture.
   <div class="card">
     <div style="font-size: 32px; margin-bottom: 12px;">🛡️</div>
     <h3>Defense in Depth</h3>
-    <p>Multiple independent layers ensure a failure in one layer does not compromise the system. No single control is the sole line of defense — substrate isolation, configuration hardening, and runtime planning all enforce distinct security properties independently.</p>
+    <p>Multiple independent layers — substrate isolation, configuration hardening, and runtime planning — each enforce distinct security properties independently.</p>
   </div>
   <div class="card">
     <div style="font-size: 32px; margin-bottom: 12px;">🔑</div>
     <h3>Zero-Secret Agents</h3>
-    <p>Agents have <strong style="color: var(--color-red);">zero access</strong> to authentication tokens, API keys, or credentials. LLM keys live in an isolated API Proxy container. MCP credentials live in a separate MCP Gateway container. This is an architectural boundary, not a policy.</p>
+    <p>Agents have <strong style="color: var(--color-red);">zero access</strong> to tokens, keys, or credentials. LLM keys live in an isolated API Proxy; MCP credentials in a separate Gateway. Architectural boundary, not policy.</p>
   </div>
   <div class="card">
     <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
     <h3>Stage &amp; Vet All Writes</h3>
-    <p>Every write operation is buffered as a structured artifact, analyzed by deterministic filters and a security-focused AI agent, then executed by separate permission-scoped jobs. The agent never writes directly to external state.</p>
+    <p>Every write is buffered as a structured artifact, analyzed by deterministic filters and a security-focused AI, then executed by separate permission-scoped jobs.</p>
   </div>
   <div class="card">
     <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
     <h3>Log Everything</h3>
-    <p>Comprehensive observability at every trust boundary enables forensic reconstruction, anomaly detection, and future information-flow controls. Logging is a structural feature of the security model, not optional instrumentation.</p>
+    <p>Comprehensive observability at every trust boundary enables forensic reconstruction and anomaly detection. Logging is a structural feature, not optional instrumentation.</p>
   </div>
 </div>
 

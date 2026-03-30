@@ -45,7 +45,7 @@
   --nav-height: 56px;
   --container-max: 1400px;
   --container-padding: 24px;
-  --section-padding: 80px;
+  --section-padding: 56px;
   --card-radius: 12px;
   --card-padding: 28px;
 
@@ -161,6 +161,24 @@ section + section {
   border-top: 1px solid var(--color-border-subtle);
 }
 
+/* Tight spacing for first element inside MDX content (after page-hero) */
+.mdx-content > *:first-child {
+  margin-top: 0;
+}
+.mdx-content > section:first-child,
+.mdx-content > section:first-of-type {
+  padding-top: 16px;
+}
+.mdx-content > div:first-child,
+.mdx-content > h2:first-child {
+  padding-top: 0;
+  margin-top: 0;
+}
+/* Collapse top margin on first heading inside any first-child wrapper */
+.mdx-content > *:first-child > h2:first-child {
+  margin-top: 0;
+}
+
 .section-label {
   font-size: 13px;
   font-weight: 600;
@@ -204,7 +222,16 @@ section + section {
   text-align: center;
   position: relative;
   overflow: hidden;
-  padding: 120px 24px 48px;
+  padding: 88px 24px 24px;
+}
+
+/* Reduce top padding on first element after page-hero */
+.page-hero + .container > *:first-child {
+  padding-top: 16px;
+  margin-top: 0;
+}
+.page-hero + .container > section:first-child {
+  padding-top: 16px;
 }
 
 .hero::before {
@@ -1516,7 +1543,7 @@ footer a:hover {
 
 @media (max-width: 768px) {
   :root {
-    --section-padding: 60px;
+    --section-padding: 40px;
     --card-padding: 20px;
     --container-padding: 16px;
   }
