@@ -38,6 +38,15 @@ accentColor: "green"
       <span class="check-box">✓</span>
       <div class="check-body">
         <div class="check-step">Step 3</div>
+        <div class="check-title">Configure Authentication</div>
+        <div class="check-desc">Create a <strong>fine-grained PAT</strong> with the <em>Copilot Requests</em> permission. Store it as a repo secret and set <code>COPILOT_GITHUB_TOKEN</code> in your workflow. For third-party engines, add API keys to the <code>copilot</code> environment in repo Settings → Environments.</div>
+      </div>
+    </label>
+    <label class="check-item">
+      <input type="checkbox" />
+      <span class="check-box">✓</span>
+      <div class="check-body">
+        <div class="check-step">Step 4</div>
         <div class="check-title">Initialize Your Repository</div>
         <div class="check-desc">Run <code>gh aw init --engine copilot</code> in your repo</div>
       </div>
@@ -46,7 +55,7 @@ accentColor: "green"
       <input type="checkbox" />
       <span class="check-box">✓</span>
       <div class="check-body">
-        <div class="check-step">Step 4</div>
+        <div class="check-step">Step 5</div>
         <div class="check-title">Create Your First Workflow</div>
         <div class="check-desc">Add a Markdown workflow to <code>.github/workflows/</code></div>
       </div>
@@ -55,7 +64,7 @@ accentColor: "green"
       <input type="checkbox" />
       <span class="check-box">✓</span>
       <div class="check-body">
-        <div class="check-step">Step 5</div>
+        <div class="check-step">Step 6</div>
         <div class="check-title">Compile the Workflow</div>
         <div class="check-desc">Run <code>gh aw compile</code> to generate the Actions YAML</div>
       </div>
@@ -64,7 +73,7 @@ accentColor: "green"
       <input type="checkbox" />
       <span class="check-box">✓</span>
       <div class="check-body">
-        <div class="check-step">Step 6</div>
+        <div class="check-step">Step 7</div>
         <div class="check-title">Enable in Your Repository</div>
         <div class="check-desc">Push to GitHub and enable the workflow in the Actions tab</div>
       </div>
