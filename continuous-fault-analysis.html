@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Continuous Fault Analysis — GH Agentic Workflows</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+    .hero { padding: 140px 24px 60px; text-align: center; background: linear-gradient(135deg, rgba(248,81,73,0.08) 0%, rgba(210,153,34,0.06) 40%, rgba(88,166,255,0.08) 100%); border-bottom: 1px solid #30363d; }
+    .hero-emoji { font-size: 64px; margin-bottom: 16px; display: block; }
+    .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #f85149, #d29922, #58a6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 18px; color: #8b949e; max-width: 700px; margin: 0 auto 24px; }
+    .hero-stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 24px; }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 28px; font-weight: 700; color: #f85149; }
+    .hero-stat .lbl { font-size: 13px; color: #8b949e; }
+
+    section { padding: 64px 0; }
+    section + section { border-top: 1px solid #21262d; }
+    .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .section-sub { color: #8b949e; margin-bottom: 32px; font-size: 15px; max-width: 800px; line-height: 1.7; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .feature-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; transition: all 0.2s; position: relative; overflow: hidden; }
+    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+    .feature-card:nth-child(1)::before { background: linear-gradient(90deg, #f85149, #d29922); }
+    .feature-card:nth-child(2)::before { background: linear-gradient(90deg, #d29922, #58a6ff); }
+    .feature-card:nth-child(3)::before { background: linear-gradient(90deg, #58a6ff, #bc8cff); }
+    .feature-card:nth-child(4)::before { background: linear-gradient(90deg, #bc8cff, #3fb950); }
+    .feature-card:hover { border-color: #484f58; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .feature-card .icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: #8b949e; line-height: 1.6; }
+
+    .code-block { position: relative; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; margin: 20px 0; overflow: hidden; }
+    .code-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: #161b22; border-bottom: 1px solid #30363d; font-size: 13px; color: #8b949e; }
+    .code-header .filename { font-family: 'SFMono-Regular', Consolas, monospace; }
+    .copy-btn { background: rgba(88,166,255,0.1); color: #58a6ff; border: 1px solid #30363d; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .copy-btn:hover { background: rgba(88,166,255,0.2); }
+    .code-block pre { padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; color: #e6edf3; margin: 0; }
+    .code-block pre .comment { color: #8b949e; }
+    .code-block pre .key { color: #ff7b72; }
+    .code-block pre .string { color: #a5d6ff; }
+    .code-block pre .heading { color: #d2a8ff; font-weight: 600; }
+    .code-block pre .value { color: #79c0ff; }
+
+    .why-box { background: #161b22; border: 1px solid #30363d; border-left: 3px solid #f85149; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .why-box h4 { color: #f85149; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .why-box p, .why-box li { color: #8b949e; font-size: 14px; }
+    .why-box ul { padding-left: 20px; margin-top: 8px; }
+    .why-box li { margin-bottom: 4px; }
+
+    .case-study { background: linear-gradient(135deg, rgba(248,81,73,0.06), rgba(210,153,34,0.06)); border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+    .case-study h4 { color: #d29922; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .case-study p { color: #8b949e; font-size: 14px; line-height: 1.7; }
+
+    .flow-diagram { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 32px 0; }
+    .flow-step { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px 20px; text-align: center; min-width: 140px; transition: all 0.2s; }
+    .flow-step:hover { border-color: #f85149; transform: translateY(-2px); }
+    .flow-step .step-icon { font-size: 24px; margin-bottom: 6px; }
+    .flow-step .step-label { font-size: 13px; font-weight: 600; }
+    .flow-step .step-desc { font-size: 11px; color: #8b949e; margin-top: 4px; }
+    .flow-arrow { font-size: 20px; color: #30363d; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+
+    /* Failure anatomy */
+    .anatomy-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; margin: 16px 0; }
+    .anatomy-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #f85149; }
+    .anatomy-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .anatomy-row:last-child { margin-bottom: 0; }
+    .anatomy-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+    .anatomy-text { font-size: 14px; color: #8b949e; }
+    .anatomy-text strong { color: #e6edf3; }
+
+    footer { border-top: 1px solid #30363d; padding: 32px 24px; text-align: center; color: #8b949e; font-size: 13px; }
+
+    @media (max-width: 768px) {
+      .feature-grid { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .flow-diagram { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #30363d;padding:12px 24px;">
+  <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <a href="index.html" style="color:#e6edf3;text-decoration:none;font-weight:600;font-size:18px;">⚡ GH Agentic Workflows</a>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:14px;">
+      <a href="index.html" style="color:#8b949e;text-decoration:none;">Home</a>
+      <a href="core-concepts.html" style="color:#8b949e;text-decoration:none;">Core Concepts</a>
+      <a href="architecture.html" style="color:#8b949e;text-decoration:none;">Architecture</a>
+      <a href="security.html" style="color:#8b949e;text-decoration:none;">Security</a>
+      <a href="use-cases.html" style="color:#8b949e;text-decoration:none;">Use Cases</a>
+      <a href="continuous-triage.html" style="color:#8b949e;text-decoration:none;">Triage</a>
+      <a href="continuous-summarization.html" style="color:#8b949e;text-decoration:none;">Summarization</a>
+      <a href="continuous-fault-analysis.html" style="color:#3fb950;text-decoration:none;">Fault Analysis</a>
+      <a href="continuous-quality.html" style="color:#8b949e;text-decoration:none;">Quality</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <span class="hero-emoji">🔥</span>
+    <h1>Continuous Fault Analysis</h1>
+    <p>Watch for failed CI runs and offer explanations of them with contextual insights. Turn cryptic build failures into actionable intelligence — automatically.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">~70%</div><div class="lbl">Faster Root Cause</div></div>
+      <div class="hero-stat"><div class="num">Auto</div><div class="lbl">Log Analysis</div></div>
+      <div class="hero-stat"><div class="num">Fix PRs</div><div class="lbl">Optional Output</div></div>
+      <div class="hero-stat"><div class="num">Medium</div><div class="lbl">Complexity</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- What is it -->
+<section>
+  <h2 class="section-title">What is Continuous Fault Analysis?</h2>
+  <p class="section-sub">
+    CI failures are one of the biggest productivity drains in software engineering. A developer pushes code, the build breaks, and then they spend 20 minutes scrolling through log output trying to find the relevant error buried in thousands of lines. Continuous Fault Analysis automates this: when a workflow run fails, an AI agent reads the logs, correlates the failure with the code changes that triggered it, identifies the root cause, and posts a clear explanation — optionally with a draft PR containing the fix.
+  </p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon">📋</div>
+      <h3>Automated Log Parsing</h3>
+      <p>The agent reads the full CI log output, filters noise, and extracts the actual error messages, stack traces, and failing test names — saving developers from scrolling through thousands of lines.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔗</div>
+      <h3>Change Correlation</h3>
+      <p>Cross-references the failure with the commit diff that triggered the run. The agent identifies which specific code changes likely caused the failure and explains the connection.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💡</div>
+      <h3>Root Cause Explanation</h3>
+      <p>Posts a human-readable explanation of why the build failed, what the error means, and what the developer should look at — written in plain English, not log-speak.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔧</div>
+      <h3>Suggested Fix PRs</h3>
+      <p>For common failure patterns (missing imports, type errors, config issues), the agent can optionally open a draft PR with the proposed fix for the developer to review.</p>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section>
+  <h2 class="section-title">How It Works</h2>
+  <p class="section-sub">Triggered by a failed workflow run, the agent investigates the failure and reports its findings.</p>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="step-icon">❌</div>
+      <div class="step-label">CI Fails</div>
+      <div class="step-desc">workflow_run completed</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-icon">📜</div>
+      <div class="step-label">Read Logs</div>
+      <div class="step-desc">Download &amp; parse output</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-icon">🔍</div>
+      <div class="step-label">Correlate</div>
+      <div class="step-desc">Diff vs. error analysis</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-icon">🧠</div>
+      <div class="step-label">Diagnose</div>
+      <div class="step-desc">Root cause identification</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-icon">📝</div>
+      <div class="step-label">Report</div>
+      <div class="step-desc">Issue or PR via safe-outputs</div>
+    </div>
+  </div>
+</section>
+
+<!-- Example Workflow -->
+<section>
+  <h2 class="section-title">Example Workflow</h2>
+  <p class="section-sub">A fault analysis workflow that triggers on CI failures and investigates the root cause.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="filename">📄 .github/workflows/fault-analysis.md</span>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').textContent)">Copy</button>
+        </div>
+        <pre><span class="comment">---</span>
+<span class="key">name</span>: <span class="string">CI Fault Analysis</span>
+<span class="key">description</span>: <span class="string">Investigate CI failures and explain root cause</span>
+
+<span class="key">on</span>:
+  <span class="key">workflow_run</span>:
+    <span class="key">workflows</span>: [<span class="string">"CI"</span>, <span class="string">"Tests"</span>, <span class="string">"Build"</span>]
+    <span class="key">types</span>: [<span class="string">completed</span>]
+    <span class="key">branches</span>: [<span class="string">main</span>]
+
+<span class="key">permissions</span>:
+  <span class="key">contents</span>: <span class="value">read</span>
+  <span class="key">actions</span>: <span class="value">read</span>
+  <span class="key">issues</span>: <span class="value">read</span>
+  <span class="key">pull-requests</span>: <span class="value">read</span>
+
+<span class="key">safe-outputs</span>:
+  <span class="key">create-issue</span>:
+    <span class="key">title-prefix</span>: <span class="string">"[ci-failure] "</span>
+    <span class="key">labels</span>:
+      - <span class="string">ci-failure</span>
+      - <span class="string">needs-investigation</span>
+    <span class="key">max</span>: <span class="value">1</span>
+
+<span class="key">tools</span>:
+  <span class="key">github</span>:
+<span class="comment">---</span>
+
+<span class="heading"># CI Fault Analysis</span>
+
+You are a CI/CD debugging expert for
+<span class="value">${{ github.repository }}</span>.
+
+A workflow run has just completed. If it
+<span class="string">failed</span>, investigate:
+
+1. <span class="string">Download and read the workflow run logs</span>
+2. <span class="string">Identify the specific error messages,
+   failing tests, or build errors</span>
+3. <span class="string">Examine the commit(s) that triggered
+   this run and their diffs</span>
+4. <span class="string">Correlate the changes with the failures</span>
+5. <span class="string">Determine the root cause</span>
+
+Create an issue with:
+- <span class="string">A clear summary of what failed</span>
+- <span class="string">The root cause explanation</span>
+- <span class="string">The relevant code changes</span>
+- <span class="string">A suggested fix or next steps</span>
+
+If the run <span class="string">succeeded</span>, do nothing.</pre>
+      </div>
+    </div>
+
+    <div>
+      <div class="why-box">
+        <h4>Security Considerations</h4>
+        <ul>
+          <li><strong>workflow_run trigger:</strong> Fires after the CI workflow completes, not during — the agent never interferes with the actual build</li>
+          <li><strong>actions: read:</strong> Allows the agent to download workflow run logs but not modify or re-trigger runs</li>
+          <li><strong>Conditional execution:</strong> The prompt instructs the agent to do nothing on success — no unnecessary compute</li>
+          <li><strong>Single issue output:</strong> The agent can create at most one issue per failure, preventing noise</li>
+          <li><strong>No write access to code:</strong> The agent cannot push fixes directly; it can only report findings</li>
+        </ul>
+      </div>
+
+      <div class="anatomy-card">
+        <h4>Anatomy of a Fault Analysis Report</h4>
+        <div class="anatomy-row">
+          <div class="anatomy-num">1</div>
+          <div class="anatomy-text"><strong>Failure Summary:</strong> "Tests failed in `auth/login.test.ts` — 3 assertions failed in the session validation suite"</div>
+        </div>
+        <div class="anatomy-row">
+          <div class="anatomy-num">2</div>
+          <div class="anatomy-text"><strong>Root Cause:</strong> "Commit `a3f2b1c` changed the session token format from JWT to opaque tokens, but the test fixtures still use JWT format"</div>
+        </div>
+        <div class="anatomy-row">
+          <div class="anatomy-num">3</div>
+          <div class="anatomy-text"><strong>Relevant Code:</strong> Links to the specific lines in the diff that caused the mismatch</div>
+        </div>
+        <div class="anatomy-row">
+          <div class="anatomy-num">4</div>
+          <div class="anatomy-text"><strong>Suggested Fix:</strong> "Update test fixtures in `auth/__fixtures__/` to use the new opaque token format"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Advanced: Fix PRs -->
+<section>
+  <h2 class="section-title">Advanced: Auto-Fix PRs</h2>
+  <p class="section-sub">For teams that want the agent to go beyond reporting and actually propose fixes, add <code style="color:#79c0ff;">create-pull-request</code> to safe-outputs.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="filename">📄 Extended safe-outputs for auto-fix</span>
+    </div>
+    <pre><span class="comment"># Add to the frontmatter to enable fix PRs</span>
+<span class="key">safe-outputs</span>:
+  <span class="key">create-issue</span>:
+    <span class="key">title-prefix</span>: <span class="string">"[ci-failure] "</span>
+    <span class="key">labels</span>: [<span class="string">ci-failure</span>]
+    <span class="key">max</span>: <span class="value">1</span>
+  <span class="key">create-pull-request</span>:
+    <span class="key">title-prefix</span>: <span class="string">"[auto-fix] "</span>
+    <span class="key">labels</span>: [<span class="string">auto-fix</span>, <span class="string">needs-review</span>]
+    <span class="key">max</span>: <span class="value">1</span>
+    <span class="key">draft</span>: <span class="value">true</span></pre>
+  </div>
+
+  <div class="case-study">
+    <h4>When to Use Auto-Fix PRs</h4>
+    <p>Auto-fix PRs work best for deterministic failure patterns: missing imports, type mismatches, outdated test fixtures, and configuration drift. For complex logic bugs, the issue-only approach is safer — the agent explains the problem and lets a human write the fix. Always set <code style="color:#79c0ff;">draft: true</code> so fixes require explicit human approval before merging.</p>
+  </div>
+</section>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>
+      Built with ⚡ by <a href="https://github.com/htekdev" target="_blank" rel="noopener noreferrer">htekdev</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/github/gh-aw" target="_blank" rel="noopener noreferrer">github/gh-aw</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.github.com/gh-aw/" target="_blank" rel="noopener noreferrer">Official Docs</a>
+    </p>
+    <p style="margin-top:8px;font-size:12px;color:#30363d;">
+      This is a community resource — not an official GitHub product.
+    </p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const text = btn.closest('.code-block').querySelector('pre').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

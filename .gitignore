@@ -1,0 +1,12 @@
+# Speaker notes (personal reference only)
+continuous-ai-speaker-notes.md
+*-speaker-notes.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
