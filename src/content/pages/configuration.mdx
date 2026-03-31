@@ -33,24 +33,46 @@ Before creating agentic workflows, ensure you have the following:
   <div class="card card-accent-green">
     <h3>✅ Required</h3>
     <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
-      <li><strong>GitHub Copilot subscription</strong> — Pro, Pro+, Business, or Enterprise plan with Copilot coding agent enabled</li>
+      <li><strong>GitHub Copilot subscription</strong> — Pro, Pro+, Business, or Enterprise plan</li>
       <li><strong>GitHub CLI</strong> — <code>gh</code> v2.45.0 or above (<a href="https://cli.github.com" target="_blank" rel="noopener noreferrer">cli.github.com</a>)</li>
       <li><strong>gh-aw extension</strong> — <code>gh extension install github/gh-aw</code></li>
-      <li><strong>Repository admin access</strong> — required to configure the Copilot environment and enable the coding agent</li>
+      <li><strong>Repository admin access</strong> — needed to manage secrets and enable workflows</li>
     </ul>
   </div>
   <div class="card card-accent-blue">
     <h3>🔑 Tokens & Secrets</h3>
     <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
-      <li><strong><code>COPILOT_GITHUB_TOKEN</code></strong> — fine-grained PAT for Copilot CLI in Actions (see <a href="#auth">Authentication</a>)</li>
-      <li><strong><code>copilot</code> environment</strong> — repo environment for coding agent secrets (API keys, MCP tokens)</li>
-      <li><strong>Custom PAT or GitHub App</strong> — optional, for safe-output write operations under a different identity</li>
+      <li><strong><code>COPILOT_GITHUB_TOKEN</code></strong> — required repo secret; fine-grained PAT with <em>Copilot Requests</em> permission (see <a href="#auth">Authentication</a>)</li>
+      <li><strong><code>GH_AW_AGENT_TOKEN</code></strong> — optional repo secret; PAT for <code>assign-to-agent</code> safe output</li>
+      <li><strong>Custom PAT or GitHub App</strong> — optional, for safe-output writes under a different identity</li>
     </ul>
   </div>
 </div>
 
-<div class="callout callout-blue">
-  <p>💡 The Copilot coding agent receives <strong>its own token automatically</strong> for standard operations. You only need custom tokens when running Copilot CLI in Actions workflows, using third-party engines, or routing safe-output writes through a different identity.</p>
+### What `gh aw init` Does
+
+Running `gh aw init` in your repository:
+
+<div class="card card-accent-green" style={{marginBottom: '16px'}}>
+  <ul style={{margin: '8px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
+    <li>✅ Creates <code>.github/workflows/copilot-setup-steps.yml</code> — the environment setup file for the agentic workflow runner</li>
+    <li>✅ Walks you through selecting an AI engine (Copilot, Claude, Codex)</li>
+    <li>✅ Provides instructions for setting up required secrets</li>
+    <li>❌ Does <strong>not</strong> create the <code>COPILOT_GITHUB_TOKEN</code> secret — you must do this manually</li>
+  </ul>
+</div>
+
+```bash
+# Initialize the repo
+gh aw init --engine copilot
+
+# Then manually create the required secret
+gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
+# (paste your fine-grained PAT when prompted)
+```
+
+<div class="callout callout-orange">
+  <p>⚠️ Without <code>COPILOT_GITHUB_TOKEN</code>, the activation step will fail immediately. This is the first thing to check when troubleshooting a failed workflow run.</p>
 </div>
 
 <div class="section-hdr" id="overview">
@@ -96,55 +118,47 @@ Explain your reasoning in a comment.
   <h2>Authentication & Tokens</h2>
 </div>
 
-Agentic workflows interact with GitHub APIs at multiple levels. Understanding which token is used where is critical for security and proper operation.
+Agentic workflows use repository secrets for authentication. The compiled `.lock.yml` workflow references these secrets at runtime during the activation and safe-outputs steps.
 
-### `COPILOT_GITHUB_TOKEN` — Copilot CLI in Actions
+### `COPILOT_GITHUB_TOKEN` — The Core Requirement
 
-When running Copilot CLI programmatically inside GitHub Actions (e.g., scheduled summaries, automated analysis), you authenticate with a **fine-grained Personal Access Token (PAT)**.
+Every agentic workflow needs `COPILOT_GITHUB_TOKEN` — a **fine-grained PAT** from a user with an active Copilot license. The compiled workflow validates this secret during activation; without it, the run fails immediately.
 
 <div class="card card-accent-blue" style={{marginBottom: '24px'}}>
-  <h3>Setup Steps</h3>
+  <h3>Creating the Token</h3>
   <ol style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
-    <li>Create a <strong>fine-grained PAT</strong> at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">github.com/settings/personal-access-tokens</a></li>
-    <li>Grant the <strong>"Copilot Requests"</strong> permission (required scope)</li>
-    <li>Store as a <strong>repository secret</strong> in Settings → Secrets and variables → Actions</li>
-    <li>Reference in your workflow:</li>
+    <li>Go to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">github.com/settings/personal-access-tokens</a></li>
+    <li>Select <strong>Fine-grained token</strong> → choose your target repository or <em>Public Repositories</em></li>
+    <li>Under <strong>Account permissions</strong>, grant <strong>Copilot Requests: Read-only</strong></li>
+    <li>Copy the generated token and store it as a repo secret:</li>
   </ol>
 </div>
 
-```yaml
-- name: Run Copilot CLI
-  env:
-    COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
-  run: |
-    copilot -p "Summarize today's changes" \
-      --allow-tool='shell(git:*)' --no-ask-user
+```bash
+gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
+# Paste your fine-grained PAT when prompted
 ```
 
 <div class="callout callout-orange">
-  <p>⚠️ <code>COPILOT_GITHUB_TOKEN</code> is separate from the built-in <code>GITHUB_TOKEN</code>. It requires a PAT from a user with an active Copilot license. The token owner's Copilot subscription is consumed for premium requests.</p>
+  <p>⚠️ <code>COPILOT_GITHUB_TOKEN</code> is <strong>not</strong> the built-in <code>GITHUB_TOKEN</code>. It must be a PAT from a user whose Copilot subscription is consumed for premium requests. The token owner's account must have Copilot access.</p>
 </div>
 
-### `copilot` Environment — Coding Agent Secrets
+### Additional Secrets
 
-The Copilot coding agent (the one that creates PRs from issues) gets its own token automatically. For additional secrets — API keys for third-party engines, MCP server tokens, etc. — use the **`copilot` GitHub environment**.
+Depending on your workflow configuration, you may need additional repository secrets:
 
-<div class="card card-accent-green" style={{marginBottom: '24px'}}>
-  <h3>Adding Secrets to the Copilot Environment</h3>
-  <ol style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
-    <li>Go to repo <strong>Settings → Environments → copilot</strong></li>
-    <li>Under <strong>"Environment secrets"</strong>, click <strong>Add environment secret</strong></li>
-    <li>Add your secret (e.g., <code>ANTHROPIC_API_KEY</code>, <code>SLACK_BOT_TOKEN</code>)</li>
-    <li>For MCP servers, prefix secrets with <strong><code>COPILOT_MCP_</code></strong></li>
-  </ol>
+| Secret | When Needed | Permission |
+|---|---|---|
+| `COPILOT_GITHUB_TOKEN` | **Always** — every agentic workflow | Copilot Requests: Read-only |
+| `GH_AW_AGENT_TOKEN` | Using `assign-to-agent` safe output | Issues: Read & Write |
+| `ANTHROPIC_API_KEY` | Using `engine: claude` | — |
+| `OPENAI_API_KEY` | Using `engine: codex` | — |
+| `GEMINI_API_KEY` | Using `engine: gemini` | — |
+| `GH_AW_SECURITY_ALERTS_TOKEN` | Security monitoring workflows | Dependabot, Code scanning, Secret scanning alerts |
+
+<div class="callout callout-blue">
+  <p>💡 All secrets are stored as <strong>regular repository secrets</strong> (Settings → Secrets and variables → Actions). MCP server secrets referenced in the workflow frontmatter also go here, using the <code>{'${{ secrets.NAME }}'}</code> syntax.</p>
 </div>
-
-```yaml
-# These secrets are set in the copilot environment, not in the workflow
-engine: claude          # → reads ANTHROPIC_API_KEY from copilot env
-engine: codex           # → reads OPENAI_API_KEY from copilot env
-engine: gemini          # → reads GEMINI_API_KEY from copilot env
-```
 
 ### Custom Tokens for Safe Outputs
 
@@ -196,14 +210,13 @@ safe-outputs:
   <p>⚠️ <strong>GitHub App limitation:</strong> The <code>assign-to-agent</code> safe output requires a <strong>fine-grained PAT</strong> — GitHub App installation tokens are not supported by the Copilot assignment API. If you use <code>github-app:</code> for other safe outputs, set the <code>GH_AW_AGENT_TOKEN</code> repository secret (a PAT) as a fallback for agent assignment.</p>
 </div>
 
-### Token Decision Matrix
+### Token Summary
 
 | Scenario | Token Type | Where to Configure |
 |---|---|---|
-| Copilot CLI in Actions workflows | Fine-grained PAT | Repo secret → `COPILOT_GITHUB_TOKEN` env var |
-| Copilot coding agent (standard) | Automatic | No config needed — agent gets its own token |
-| Third-party engine API keys | API key | `copilot` environment secret |
-| MCP server secrets | Secret with `COPILOT_MCP_` prefix | `copilot` environment secret |
+| Running any agentic workflow | Fine-grained PAT | `COPILOT_GITHUB_TOKEN` repo secret |
+| Third-party engine (Claude, Codex, Gemini) | API key | Engine-specific repo secret |
+| MCP server authentication | Secret | Repo secret, referenced via `${{ secrets.NAME }}` |
 | Safe-output writes (custom identity) | PAT or GitHub App | `github-token:` or `github-app:` in frontmatter |
 | Assign-to-agent | Fine-grained PAT only | `GH_AW_AGENT_TOKEN` repo secret |
 

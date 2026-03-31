@@ -38,8 +38,8 @@ accentColor: "green"
       <span class="check-box">✓</span>
       <div class="check-body">
         <div class="check-step">Step 3</div>
-        <div class="check-title">Configure Authentication</div>
-        <div class="check-desc">Create a <strong>fine-grained PAT</strong> with the <em>Copilot Requests</em> permission. Store it as a repo secret and set <code>COPILOT_GITHUB_TOKEN</code> in your workflow. For third-party engines, add API keys to the <code>copilot</code> environment in repo Settings → Environments.</div>
+        <div class="check-title">Set Up Authentication</div>
+        <div class="check-desc">Create a <strong>fine-grained PAT</strong> with <em>Copilot Requests: Read-only</em> permission and add it as a repo secret: <code>gh secret set COPILOT_GITHUB_TOKEN</code>. Without this, workflows will fail at the activation step.</div>
       </div>
     </label>
     <label class="check-item">
