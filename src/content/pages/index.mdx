@@ -1,0 +1,257 @@
+---
+title: "GitHub Agentic Workflows — The Complete Guide"
+description: "The complete guide to GitHub Agentic Workflows — AI-powered repository automation with natural language instructions, strong guardrails, and continuous AI."
+navLabel: "Home"
+navOrder: 0
+heroEmoji: "⚡"
+heroSubtitle: "The Complete Guide to AI-Powered Repository Automation"
+accentColor: "green"
+---
+
+import HomeCodeExample from '../../components/HomeCodeExample.astro';
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-emoji">⚡</div>
+    <h1 class="hero-title">GitHub Agentic Workflows</h1>
+    <p class="hero-subtitle">The Complete Guide to AI-Powered Repository Automation</p>
+    <p class="hero-desc">
+      Describe your automation goals in plain Markdown. Compile to a hardened GitHub Actions workflow.
+      Let coding agents — Copilot, Claude, or Codex — handle triage, documentation, testing, and reporting
+      while humans stay in the loop. Welcome to <strong>Continuous AI</strong>.
+    </p>
+    <div class="hero-buttons">
+      <a href="core-concepts/" class="btn btn-primary">Get Started →</a>
+      <a href="use-cases/" class="btn btn-secondary">View Examples →</a>
+    </div>
+  </div>
+</section>
+
+<section id="what-is">
+  <div class="container">
+    <span class="section-label">Introduction</span>
+    <h2 class="section-title">What is GitHub Agentic Workflows?</h2>
+    <div class="what-is-grid">
+      <div class="what-is-text">
+        <p>
+          <strong>GitHub Agentic Workflows (gh-aw)</strong> are AI-powered automations that can
+          understand context, make decisions, and take meaningful actions — all from
+          <strong>natural language instructions written in Markdown</strong>.
+        </p>
+        <p>
+          Unlike traditional automation with fixed if-then rules, agentic workflows use
+          <strong>coding agents</strong> to interpret your instructions and carry out tasks that
+          normally require human judgment — triaging issues, investigating CI failures, updating
+          documentation, and improving tests.
+        </p>
+        <p>
+          Created by <strong>Don Syme</strong> and <strong>Peli de Halleux</strong> at
+          <strong>GitHub Next</strong>, the project is fully open source under the MIT license,
+          with 313+ releases and a vibrant community.
+        </p>
+        <div class="quote-block">
+          <p>"A useful mental model: if repetitive work in a repository can be described in words,
+             it might be a good fit for an agentic workflow."</p>
+          <cite>— GitHub Blog</cite>
+        </div>
+      </div>
+      <div class="what-is-visual">
+        <h3 class="what-is-visual-heading">How It Works</h3>
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <h4>Write</h4>
+            <p>Describe automation intent in Markdown with YAML frontmatter</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <h4>Compile</h4>
+            <p>Transform to a hardened Actions workflow via <code>gh aw compile</code></p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <h4>Push</h4>
+            <p>Commit both <code>.md</code> source and <code>.lock.yml</code> to your repo</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <h4>Run</h4>
+            <p>Triggers automatically via GitHub Actions on events or schedules</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <h4>Review</h4>
+            <p>Agent produces issues, PRs, and comments for human review</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="continuous-ai">
+  <div class="container">
+    <span class="section-label">The Vision</span>
+    <h2 class="section-title">The Six Pillars of Continuous AI</h2>
+    <p class="section-desc">
+      Continuous AI is the systematic, automated application of AI to software collaboration —
+      natural-language rules combined with agentic reasoning, executed continuously inside your repository.
+      It augments CI/CD for judgment-heavy, context-dependent tasks.
+    </p>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">🏷️</div>
+        <h3>Continuous Triage</h3>
+        <p>Automatically summarize, label, and route new issues. The agent understands context and intent — far beyond keyword matching.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">📝</div>
+        <h3>Continuous Documentation</h3>
+        <p>Keep READMEs and docs aligned with code changes. Detect mismatches between docstrings and implementations, then open PRs to fix them.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🧹</div>
+        <h3>Continuous Code Simplification</h3>
+        <p>Identify refactoring opportunities — dead code, complex conditionals, repeated patterns — and propose targeted improvements via PRs.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🧪</div>
+        <h3>Continuous Test Improvement</h3>
+        <p>Assess test coverage and add high-value tests. One experiment: 5% → near 100% coverage, 1,400+ tests written over 45 days for ~$80.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🔧</div>
+        <h3>Continuous Quality Hygiene</h3>
+        <p>Proactively investigate CI failures and propose targeted fixes — flaky tests, dependency conflicts, and configuration issues.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">📊</div>
+        <h3>Continuous Reporting</h3>
+        <p>Generate regular reports on repository health, synthesizing data from issues, PRs, commits, and CI into actionable insights.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stats">
+  <div class="container glow-green">
+    <span class="section-label">By the Numbers</span>
+    <h2 class="section-title">Project at a Glance</h2>
+    <p class="section-desc">
+      An actively developed open source project from GitHub Next, with rapid iteration and a growing community.
+    </p>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">4,167+</div>
+        <div class="stat-label">GitHub Stars</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">313+</div>
+        <div class="stat-label">Releases</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">AI Engines Supported</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">MIT</div>
+        <div class="stat-label">Open Source License</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="explore">
+  <div class="container">
+    <span class="section-label">Explore the Guide</span>
+    <h2 class="section-title">Dive Deeper</h2>
+    <p class="section-desc">
+      This guide covers everything from foundational concepts to advanced security, ecosystem integrations,
+      and real-world use cases. Pick a topic to get started.
+    </p>
+    <div class="nav-grid">
+      <a href="core-concepts/" class="nav-card">
+        <span class="nav-card-icon">📚</span>
+        <h3>Core Concepts</h3>
+        <p>Markdown-first authoring, Continuous AI philosophy, the compilation flow, and how agentic workflows differ from traditional automation.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="architecture/" class="nav-card">
+        <span class="nav-card-icon">🏗️</span>
+        <h3>Architecture</h3>
+        <p>Workflow compilation pipeline, runtime execution model, safe outputs system, and the defense-in-depth security architecture.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="configuration/" class="nav-card">
+        <span class="nav-card-icon">⚙️</span>
+        <h3>Configuration</h3>
+        <p>YAML frontmatter reference, engine selection, tool configuration, permissions, triggers, and safe output options.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="security/" class="nav-card">
+        <span class="nav-card-icon">🔒</span>
+        <h3>Security</h3>
+        <p>Agent Workflow Firewall, threat detection, protected files, prompt injection defenses, and the read-only-by-default model.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="ecosystem/" class="nav-card">
+        <span class="nav-card-icon">🧩</span>
+        <h3>Ecosystem</h3>
+        <p>Copilot, Claude Code, OpenAI Codex engines, MCP protocol, GitHub MCP Server, browser automation, and extensibility.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="use-cases/" class="nav-card">
+        <span class="nav-card-icon">🎯</span>
+        <h3>Use Cases</h3>
+        <p>Real-world patterns — ChatOps, DailyOps, IssueOps, multi-repo orchestration, and lessons from Peli's Agent Factory.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="cli-tooling/" class="nav-card">
+        <span class="nav-card-icon">🛠️</span>
+        <h3>CLI &amp; Tooling</h3>
+        <p>The <code>gh aw</code> CLI extension — install, compile, validate, run, and debug your agentic workflows.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="videos/" class="nav-card">
+        <span class="nav-card-icon">🎥</span>
+        <h3>Videos</h3>
+        <p>Conference talks, demo walkthroughs, and community content covering GitHub Agentic Workflows in action.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+      <a href="resources/" class="nav-card">
+        <span class="nav-card-icon">📖</span>
+        <h3>Resources</h3>
+        <p>Official docs, blog posts, the 19-part "Meet the Workflows" series, community links, and further reading.</p>
+        <span class="learn-more">Learn more →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="example">
+  <div class="container">
+    <span class="section-label">Quick Example</span>
+    <h2 class="section-title">Your First Agentic Workflow</h2>
+    <p class="section-desc">
+      A complete workflow in plain Markdown — a daily repository status report that runs every morning and files an issue with insights.
+    </p>
+    <HomeCodeExample />
+  </div>
+</section>
+
+<style>{`
+  .what-is-visual-heading {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-blue);
+  }
+`}</style>

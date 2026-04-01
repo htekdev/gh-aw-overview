@@ -61,23 +61,25 @@ You are the documentation maintenance agent for the **GitHub Agentic Workflows (
 
 ## Repository Context
 
-This is a static HTML site with 10 pages covering all aspects of GitHub Agentic Workflows:
-- `index.html` — Landing page
-- `core-concepts.html` — What is GH-AW, Continuous AI, markdown-first paradigm
-- `architecture.html` — Compilation pipeline, trust model, runtime
-- `configuration.html` — Frontmatter schema, triggers, permissions, tools, safe outputs
-- `security.html` — Security layers, AWF, threat detection
-- `ecosystem.html` — Copilot coding agent, custom agents, skills, MCP, hooks
-- `use-cases.html` — Real-world automation patterns with examples
-- `cli-tooling.html` — gh aw CLI commands, IDE integration
-- `videos.html` — YouTube video library
-- `resources.html` — Links, blog posts, repositories
+This is an Astro static site (built with `@astrojs/mdx`) with 10 pages covering all aspects of GitHub Agentic Workflows. Content lives in MDX files under `src/content/pages/`:
+- `src/content/pages/index.mdx` — Landing page
+- `src/content/pages/core-concepts.mdx` — What is GH-AW, Continuous AI, markdown-first paradigm
+- `src/content/pages/architecture.mdx` — Compilation pipeline, trust model, runtime
+- `src/content/pages/configuration.mdx` — Frontmatter schema, triggers, permissions, tools, safe outputs
+- `src/content/pages/security.mdx` — Security layers, AWF, threat detection
+- `src/content/pages/ecosystem.mdx` — Copilot coding agent, custom agents, skills, MCP, hooks
+- `src/content/pages/use-cases.mdx` — Real-world automation patterns with examples
+- `src/content/pages/cli-tooling.mdx` — gh aw CLI commands, IDE integration
+- `src/content/pages/videos.mdx` — YouTube video library
+- `src/content/pages/resources.mdx` — Links, blog posts, repositories
+
+Shared layout and components are in `src/layouts/` and `src/components/`. Global CSS is in `src/styles/global.css`.
 
 ## Your Task
 
 Perform a weekly documentation health check:
 
-1. **Read each HTML file** in the repository root
+1. **Read each MDX file** in `src/content/pages/`
 2. **Check for accuracy issues**:
    - Are version numbers current? (gh-aw is actively developed)
    - Are code examples syntactically correct?
@@ -92,10 +94,11 @@ Perform a weekly documentation health check:
 4. **Check for consistency**:
    - Is terminology consistent across pages?
    - Are navigation links correct across all pages?
-   - Do all pages have the same nav bar structure?
-5. **Check HTML quality**:
+   - Do all pages use the shared BaseLayout consistently?
+5. **Check build quality**:
+   - Run `npm run build` to verify the site builds without errors
    - Are there any broken internal links between pages?
-   - Are there any HTML structure issues?
+   - Are there any MDX or Astro component issues?
 
 ## Output
 
@@ -112,6 +115,6 @@ If everything looks good, do nothing — no need to create noise.
 ## Guidelines
 
 - Don't make subjective style changes — focus on accuracy and correctness
-- Preserve the existing design and CSS — only fix content
+- Preserve the existing design and CSS (in src/styles/global.css) — only fix content
 - Be specific about what you found and where (include file names and line references)
 - Prioritize factual accuracy over formatting

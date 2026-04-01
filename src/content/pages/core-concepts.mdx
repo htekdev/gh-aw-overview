@@ -1,0 +1,741 @@
+---
+title: "Core Concepts — GitHub Agentic Workflows"
+description: "Foundational understanding of GitHub Agentic Workflows — philosophy, Continuous AI, the Six Pillars, markdown-first authoring, and design patterns."
+navLabel: "Core Concepts"
+navOrder: 1
+heroEmoji: "📚"
+heroSubtitle: "Foundational understanding of GitHub Agentic Workflows"
+accentColor: "green"
+---
+
+<style>{`
+  .code-block {
+    background: var(--color-bg, #0d1117);
+    border: 1px solid var(--color-border, #30363d);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--color-surface, #161b22);
+    border-bottom: 1px solid var(--color-border, #30363d);
+    font-size: 13px; color: var(--color-text-muted, #8b949e);
+  }
+  .code-block pre {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--color-text, #e6edf3);
+    white-space: pre;
+    margin: 0;
+  }
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(180deg, var(--color-green, #3fb950), var(--color-blue, #58a6ff), var(--color-purple, #bc8cff));
+    border-radius: 2px;
+  }
+  .timeline-item { position: relative; padding-bottom: 28px; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-dot {
+    position: absolute; left: -27px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--color-green, #3fb950); border: 2px solid var(--color-bg, #0d1117);
+  }
+  .timeline-item:nth-child(2) .timeline-dot { background: var(--color-blue, #58a6ff); }
+  .timeline-item:nth-child(3) .timeline-dot { background: var(--color-purple, #bc8cff); }
+  .timeline-item:nth-child(4) .timeline-dot { background: var(--color-blue, #58a6ff); }
+  .timeline-item:nth-child(5) .timeline-dot { background: var(--color-green, #3fb950); }
+  .timeline-date { font-size: 13px; font-weight: 600; color: var(--color-blue, #58a6ff); margin-bottom: 4px; }
+  .timeline-content { color: var(--color-text-muted, #8b949e); font-size: 0.95rem; }
+  .timeline-content strong { color: var(--color-text, #e6edf3); }
+  .compare-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .compare-table th {
+    padding: 14px 16px; text-align: left; font-weight: 600;
+    border-bottom: 2px solid var(--color-border, #30363d);
+  }
+  .compare-table th:first-child { background: var(--color-surface, #161b22); color: var(--color-text-muted, #8b949e); width: 180px; }
+  .compare-table th:nth-child(2) { background: rgba(210,153,34,0.08); color: var(--color-orange, #d29922); }
+  .compare-table th:nth-child(3) { background: rgba(63,185,80,0.08); color: var(--color-green, #3fb950); }
+  .compare-table td { padding: 12px 16px; border-bottom: 1px solid var(--color-border-subtle, #21262d); }
+  .compare-table td:first-child { color: var(--color-text, #e6edf3); font-weight: 500; background: var(--color-surface, #161b22); }
+  .compare-table td:nth-child(2) { color: var(--color-text-muted, #8b949e); }
+  .compare-table td:nth-child(3) { color: var(--color-text-muted, #8b949e); }
+  .compare-table tr:hover td { background: rgba(88,166,255,0.03); }
+  .compare-table tr:hover td:first-child { background: rgba(88,166,255,0.06); }
+  .styled-table {
+    width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem;
+  }
+  .styled-table th {
+    text-align: left; padding: 12px 16px;
+    background: var(--color-surface, #161b22); color: var(--color-text, #e6edf3); font-weight: 600;
+    border-bottom: 2px solid var(--color-border, #30363d);
+  }
+  .styled-table td {
+    padding: 12px 16px; border-bottom: 1px solid var(--color-border-subtle, #21262d); color: var(--color-text-muted, #8b949e);
+  }
+  .styled-table tr:hover td { background: rgba(88,166,255,0.04); }
+  .styled-table .highlight { color: var(--color-text, #e6edf3); font-weight: 500; }
+  .prop-table { width: 100%; border-collapse: collapse; }
+  .prop-table td { padding: 10px 16px; border-bottom: 1px solid var(--color-border-subtle, #21262d); }
+  .prop-table td:first-child { font-weight: 600; color: var(--color-blue, #58a6ff); width: 160px; font-size: 0.9rem; }
+  .prop-table td:last-child { color: var(--color-text-muted, #8b949e); }
+  .gap-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .gap-table th { padding: 12px 16px; font-weight: 600; border-bottom: 2px solid var(--color-border, #30363d); text-align: left; }
+  .gap-table th:first-child { background: rgba(210,153,34,0.08); color: var(--color-orange, #d29922); }
+  .gap-table th:last-child { background: rgba(63,185,80,0.08); color: var(--color-green, #3fb950); }
+  .gap-table td { padding: 10px 16px; color: var(--color-text-muted, #8b949e); border-bottom: 1px solid var(--color-border-subtle, #21262d); }
+  .glossary-item {
+    padding: 20px 0; border-bottom: 1px solid var(--color-border-subtle, #21262d);
+    display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: start;
+  }
+  .glossary-term {
+    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9rem; font-weight: 600; color: var(--color-purple, #bc8cff);
+    background: rgba(188,140,255,0.08); padding: 4px 10px;
+    border-radius: 6px; border: 1px solid rgba(188,140,255,0.2); display: inline-block;
+  }
+  .glossary-def { color: var(--color-text-muted, #8b949e); font-size: 0.95rem; }
+  .engine-card {
+    background: var(--color-surface, #161b22); border: 1px solid var(--color-border, #30363d); border-radius: 12px;
+    padding: 28px; text-align: center;
+  }
+  .engine-card:hover { border-color: var(--color-blue, #58a6ff); transform: translateY(-2px); transition: all 0.2s; }
+  .engine-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .engine-card h3 { font-size: 1.15rem; font-weight: 600; color: var(--color-text, #e6edf3); margin-bottom: 6px; }
+  .engine-status {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600; margin-bottom: 12px;
+  }
+  .engine-status.default { background: rgba(63,185,80,0.15); color: var(--color-green, #3fb950); }
+  .engine-status.supported { background: rgba(88,166,255,0.15); color: var(--color-blue, #58a6ff); }
+  .engine-card p { color: var(--color-text-muted, #8b949e); font-size: 0.92rem; }
+  .formula-banner {
+    background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1));
+    border: 1px solid rgba(63,185,80,0.3); border-radius: 12px;
+    padding: 32px; text-align: center; margin: 32px 0;
+  }
+  .formula-banner .formula {
+    font-size: clamp(1rem, 2.5vw, 1.35rem); font-weight: 700; color: var(--color-text, #e6edf3);
+    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+  .formula-banner .formula .hl-green { color: var(--color-green, #3fb950); }
+  .formula-banner .formula .hl-blue { color: var(--color-blue, #58a6ff); }
+  .formula-banner .formula .hl-purple { color: var(--color-purple, #bc8cff); }
+  .flow-diagram {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; flex-wrap: wrap; padding: 24px 0;
+  }
+  .flow-step {
+    background: var(--color-surface, #161b22); border: 1px solid var(--color-border, #30363d); border-radius: 10px;
+    padding: 16px 20px; text-align: center; min-width: 140px;
+  }
+  .flow-step .step-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .flow-step .step-label { font-size: 13px; font-weight: 600; color: var(--color-text, #e6edf3); }
+  .flow-step .step-desc { font-size: 12px; color: var(--color-text-muted, #8b949e); margin-top: 4px; }
+  .flow-arrow { color: var(--color-border, #30363d); font-size: 1.5rem; }
+  .pillar-metric {
+    display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px;
+    font-weight: 600; background: rgba(63,185,80,0.12); color: var(--color-green, #3fb950);
+  }
+  .badge-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  @media (max-width: 768px) {
+    .glossary-item { grid-template-columns: 1fr; }
+    .flow-diagram { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .compare-table { font-size: 0.85rem; }
+    .compare-table th, .compare-table td { padding: 8px 10px; }
+  }
+`}</style>
+
+<div class="badge-row" style="margin-bottom: 32px;">
+  <span class="badge badge-green">✦ Technical Preview</span>
+  <span class="badge badge-blue">⚙ v0.64.0</span>
+  <span class="badge badge-purple">⭐ 4,167 Stars</span>
+  <span class="badge badge-orange">📦 MIT License</span>
+</div>
+
+<section class="section" id="what-is-ghaw">
+<div class="section-label">Definition</div>
+
+## What is GitHub Agentic Workflows?
+
+<p class="section-desc">AI-powered automations that understand context, make decisions, and take action — from natural language instructions in Markdown.</p>
+
+<p style="color: var(--color-text-muted, #8b949e); margin-bottom: 24px; font-size: 1rem;">Unlike fixed if-then rules, agentic workflows use <strong style="color: var(--color-text, #e6edf3);">coding agents</strong> (Copilot, Claude Code, OpenAI Codex) to interpret instructions and handle tasks requiring judgment — triaging issues, fixing CI failures, updating docs.</p>
+
+<h3 style="font-size: 1.15rem; color: var(--color-text, #e6edf3); margin-bottom: 16px;">How It Works</h3>
+<div class="flow-diagram">
+<div class="flow-step"><div class="step-icon">✍️</div><div class="step-label">Write</div><div class="step-desc">Markdown + YAML frontmatter</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step"><div class="step-icon">⚙️</div><div class="step-label">Compile</div><div class="step-desc"><code>gh aw compile</code></div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step"><div class="step-icon">📤</div><div class="step-label">Push</div><div class="step-desc">.md + .lock.yml</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step"><div class="step-icon">🚀</div><div class="step-label">Run</div><div class="step-desc">GitHub Actions</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step"><div class="step-icon">👀</div><div class="step-label">Review</div><div class="step-desc">Human-in-the-loop</div></div>
+</div>
+
+<h3 style="font-size: 1.15rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">Key Properties</h3>
+<div class="card" style="overflow-x: auto;">
+<table class="prop-table">
+<tr><td>Platform</td><td>Runs inside GitHub Actions as standard workflows</td></tr>
+<tr><td>Authoring</td><td>Natural language in Markdown with YAML frontmatter</td></tr>
+<tr><td>Security</td><td>Read-only by default; writes only through "safe outputs"</td></tr>
+<tr><td>Agents</td><td>Copilot CLI (default), Claude Code, OpenAI Codex</td></tr>
+<tr><td>License</td><td>MIT — fully open source</td></tr>
+<tr><td>Language</td><td>CLI written in Go (70.8%), JavaScript (27.6%)</td></tr>
+<tr><td>Homepage</td><td><a href="https://gh.io/gh-aw">gh.io/gh-aw</a></td></tr>
+</table>
+</div>
+</section>
+
+<section class="section" id="history">
+<div class="section-label">Origins</div>
+
+## History &amp; Origins
+
+<p class="section-desc">Created at GitHub Next by Don Syme and Peli de Halleux — from private R&amp;D to 4,000+ stars in under a year.</p>
+
+<div class="grid-2">
+<div>
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin-bottom: 20px;">Timeline</h3>
+<div class="timeline">
+<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">August 12, 2025</div><div class="timeline-content"><strong>Repository created</strong> — private development begins at GitHub Next</div></div>
+<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">January 12–13, 2026</div><div class="timeline-content"><strong>"Peli's Agent Factory"</strong> blog series launches — 19-part series documenting 100+ workflows</div></div>
+<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">February 5, 2026</div><div class="timeline-content"><strong>"Continuous AI in Practice"</strong> blog post published on the GitHub Blog</div></div>
+<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">February 13, 2026</div><div class="timeline-content"><strong>Official Technical Preview</strong> — announced on GitHub Blog and Changelog</div></div>
+<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">March 25, 2026</div><div class="timeline-content"><strong>v0.64.0 released</strong> — 313 total releases, 40 contributors, 4,167 stars</div></div>
+</div>
+</div>
+<div>
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin-bottom: 20px;">Creators</h3>
+<div class="card" style="margin-bottom: 16px;"><h3 style="color: var(--color-blue, #58a6ff);">Don Syme</h3><p>Principal Researcher at Microsoft Research, creator of F#, now at GitHub Next. Lead author of the official blog posts and the 19-part "Meet the Workflows" blog series.</p></div>
+<div class="card" style="margin-bottom: 16px;"><h3 style="color: var(--color-purple, #bc8cff);">Peli de Halleux</h3><p>Researcher at GitHub Next. Creator of "Peli's Agent Factory" — a collection of 100+ automated agentic workflows run continuously in the gh-aw repository and across GitHub internally.</p></div>
+<div class="card"><h3 style="color: var(--color-green, #3fb950);">Collaboration</h3><p>A collaboration between <strong style="color: var(--color-text, #e6edf3);">GitHub</strong>, <strong style="color: var(--color-text, #e6edf3);">Microsoft Research</strong>, and <strong style="color: var(--color-text, #e6edf3);">Azure Core Upstream</strong>. Top contributors include Copilot (AI), dsyme, pelikhan, and 40 others.</p></div>
+</div>
+</div>
+</section>
+
+<section class="section" id="vision">
+<div class="section-label">Vision</div>
+
+## "Waking Up to a Healthier Repository"
+
+<p class="section-desc">The founding vision: what does repository automation with strong guardrails look like in the era of AI coding agents?</p>
+
+<div class="quote-callout">
+<blockquote>"Imagine visiting your repository in the morning and feeling calm because you see:"</blockquote>
+<div class="attr">— Don Syme &amp; Peli de Halleux, <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog, February 13, 2026</a></div>
+</div>
+
+<div class="grid-2" style="margin-top: 24px;">
+<div class="card" style="border-left: 3px solid var(--color-green, #3fb950);"><h3>🏷️ Issues Triaged &amp; Labelled</h3><p>New issues automatically analyzed, categorized, and assigned to the right teams — semantically, not just by keywords.</p></div>
+<div class="card" style="border-left: 3px solid var(--color-blue, #58a6ff);"><h3>🔧 CI Failures Investigated</h3><p>Failed builds analyzed and correlated with recent changes, with proposed fixes ready for your review.</p></div>
+<div class="card" style="border-left: 3px solid var(--color-purple, #bc8cff);"><h3>📝 Documentation Updated</h3><p>Docs automatically aligned with recent code changes — no more stale READMEs or outdated API references.</p></div>
+<div class="card" style="border-left: 3px solid var(--color-orange, #d29922);"><h3>🧪 Testing PRs Await Review</h3><p>New pull requests that improve test coverage are ready for human review — small, focused, and incremental.</p></div>
+</div>
+
+<div class="quote-callout green" style="margin-top: 32px;">
+<blockquote>"All of it visible, inspectable, and operating within the boundaries you've defined."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+
+<div class="quote-callout purple" style="margin-top: 16px;">
+<blockquote>"A useful mental model: if repetitive work in a repository can be described in words, it might be a good fit for an agentic workflow."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+
+<div class="card" style="margin-top: 32px; border-left: 3px solid var(--color-blue, #58a6ff);">
+<h3 style="color: var(--color-blue, #58a6ff);">🏭 Peli's Agent Factory — The Living Proof</h3>
+<p style="margin-top: 8px;">A collection of <strong style="color: var(--color-text, #e6edf3);">100+ automated agentic workflows</strong> running continuously in the gh-aw repository. These specialized agents handle documentation, style, cleanup, security, triage, and culture.</p>
+<p style="margin-top: 8px; font-style: italic; color: var(--color-blue, #58a6ff);">"These agents never take a day off, quietly working to make our codebase better."</p>
+</div>
+</section>
+
+<section class="section" id="continuous-ai">
+<div class="section-label">Philosophy</div>
+
+## Continuous AI
+
+<p class="section-desc">The systematic, automated application of AI to software collaboration — augmenting CI/CD with judgment-based, context-dependent automation.</p>
+
+<div class="quote-callout green">
+<blockquote>"GitHub Agentic Workflows hosts coding agents in GitHub Actions, to perform complex, multi-step tasks automatically. This enables Continuous AI — systematic, automated application of AI to software collaboration."</blockquote>
+<div class="attr">— <a href="https://github.github.com/gh-aw/introduction/how-they-work/">How They Work — Official Docs</a></div>
+</div>
+
+<div class="formula-banner">
+<div class="formula"><span class="hl-green">Continuous AI</span> = <span class="hl-blue">natural-language rules</span> + <span class="hl-purple">agentic reasoning</span>, executed continuously inside your repository</div>
+<div style="color: var(--color-text-muted, #8b949e); font-size: 0.85rem; margin-top: 12px;">— GitHub Blog</div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">Not a Replacement for CI/CD</h3>
+<div class="quote-callout orange">
+<blockquote>"GitHub Agentic Workflows and Continuous AI are designed to augment existing CI/CD rather than replace it. They do not replace build, test, or release pipelines, and their use cases largely do not overlap with deterministic CI/CD workflows."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">The Gap Continuous AI Fills</h3>
+<div class="card" style="overflow-x: auto;">
+<table class="gap-table">
+<thead><tr><th>CI/CD (Deterministic)</th><th>Continuous AI (Judgment-Based)</th></tr></thead>
+<tbody>
+<tr><td>Tests pass or fail</td><td>Does documentation match implementation?</td></tr>
+<tr><td>Builds succeed or don't</td><td>Is this issue properly triaged?</td></tr>
+<tr><td>Linter flags violations</td><td>Are there performance anti-patterns?</td></tr>
+<tr><td>Rules-based automation</td><td>Intent-based automation</td></tr>
+<tr><td>YAML configuration</td><td>Natural language instructions</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="quote-callout" style="margin-top: 24px;">
+<blockquote>"CI isn't failing. It's doing exactly what it was designed to do. But many of the hardest and most time-consuming parts of engineering are judgment-heavy and context-dependent."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/generative-ai/continuous-ai-in-practice-what-developers-can-automate-today-with-agentic-ci/">Continuous AI in Practice, GitHub Blog</a></div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">The 30+ Year Vision</h3>
+<div class="grid-2">
+<div class="quote-callout purple">
+<blockquote>"The first era of AI for code was about code generation. The second era involves cognition and tackling the cognitively heavy chores off of developers."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+<div class="quote-callout">
+<blockquote>"This is the first harbinger of the new phase of AI. We're moving from generation to reasoning."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">Humans Stay in the Loop</h3>
+<div class="quote-callout green">
+<blockquote>"Agentic workflows create an agent-only, sub-loop that's able to be autonomous because agents are acting under defined terms. But it's important that humans stay in the broader loop of forward progress in the repository, through reports, issues, and pull requests. With GitHub Agentic Workflows, pull requests are never merged automatically, and humans must always review and approve."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+</section>
+
+<section class="section" id="six-pillars">
+<div class="section-label">Framework</div>
+
+## The Six Pillars of Continuous AI
+
+<p class="section-desc">Six categories of repository automation that showcase what's possible when AI handles judgment-heavy, context-dependent tasks — things that "would be difficult or impossible to accomplish with traditional YAML workflows alone."</p>
+
+<div class="grid-2">
+<div class="pillar-card">
+<div class="pillar-icon">🏷️</div>
+<h3>Pillar 1: Continuous Triage</h3>
+<p>Automatically summarize, label, and route new issues. The agent reads incoming issues, understands their content semantically, applies appropriate labels, assigns to the right team members, and adds helpful summaries or requests for clarification.</p>
+<p style="margin-top: 8px;"><strong style="color: var(--color-text, #e6edf3);">Example workflows:</strong> Issue Clarifier, Auto-labeler, Priority Router</p>
+</div>
+<div class="pillar-card">
+<div class="pillar-icon">📖</div>
+<h3>Pillar 2: Continuous Documentation</h3>
+<p>Keep READMEs and documentation aligned with code changes. The agent reads function docstrings, compares them to implementations, detects mismatches, and opens PRs to update either the code or documentation.</p>
+<div style="margin-top: 12px;"><span class="pillar-metric">57 merged PRs — 96% merge rate</span> <span class="pillar-metric" style="margin-left: 8px;">Glossary: 100% merge rate</span></div>
+</div>
+<div class="pillar-card">
+<div class="pillar-icon">🔄</div>
+<h3>Pillar 3: Continuous Code Simplification</h3>
+<p>Repeatedly identify code improvements and open pull requests. Pre-compiling regex patterns, removing dead code, simplifying complex conditionals, and extracting reusable functions.</p>
+<div style="margin-top: 12px;"><span class="pillar-metric">88 merged / 103 proposed — 85% rate</span></div>
+</div>
+<div class="pillar-card">
+<div class="pillar-icon">🧪</div>
+<h3>Pillar 4: Continuous Test Improvement</h3>
+<p>Assess test coverage and add high-value tests. Small PRs daily, developers review incrementally.</p>
+<div style="margin-top: 12px;"><span class="pillar-metric">&#126;5% → near 100% coverage</span> <span class="pillar-metric" style="margin-left: 8px;">1,400+ tests in 45 days</span> <span class="pillar-metric" style="margin-left: 8px;">&#126;$80 in tokens</span></div>
+</div>
+<div class="pillar-card">
+<div class="pillar-icon">🛡️</div>
+<h3>Pillar 5: Continuous Quality Hygiene</h3>
+<p>Proactively investigate CI failures and propose targeted fixes. Analyzes failed CI runs, correlates with recent changes, proposes fixes for flaky tests, identifies dependency conflicts, and suggests configuration improvements.</p>
+</div>
+<div class="pillar-card">
+<div class="pillar-icon">📊</div>
+<h3>Pillar 6: Continuous Reporting</h3>
+<p>Create regular reports on repository health, activity, and trends. Pulls from issues, PRs, commits, and CI results to synthesize cross-source insights.</p>
+<div class="quote-callout" style="margin-top: 12px; padding: 12px 16px;">
+<blockquote style="font-size: 0.9rem;">"The value isn't the report itself. It's the synthesis across multiple data sources that would otherwise require manual analysis."</blockquote>
+</div>
+</div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">📊 Real Metrics from Peli's Agent Factory — Documentation Pillar</h3>
+<div class="card" style="overflow-x: auto;">
+<table class="styled-table">
+<thead><tr><th>Workflow</th><th>Merged PRs</th><th>Proposed PRs</th><th>Merge Rate</th></tr></thead>
+<tbody>
+<tr><td class="highlight">Daily Documentation Updater</td><td>57</td><td>59</td><td style="color: var(--color-green, #3fb950); font-weight: 600;">96%</td></tr>
+<tr><td class="highlight">Glossary Maintainer</td><td>10</td><td>10</td><td style="color: var(--color-green, #3fb950); font-weight: 600;">100%</td></tr>
+<tr><td class="highlight">Documentation Unbloat</td><td>88</td><td>103</td><td style="color: var(--color-green, #3fb950); font-weight: 600;">85%</td></tr>
+<tr><td class="highlight">Documentation Noob Tester</td><td>9</td><td>21</td><td style="color: var(--color-orange, #d29922); font-weight: 600;">43%</td></tr>
+<tr><td class="highlight">Slide Deck Maintainer</td><td>2</td><td>5</td><td style="color: var(--color-orange, #d29922); font-weight: 600;">40%</td></tr>
+<tr><td class="highlight">Multi-device Docs Tester</td><td>2</td><td>2</td><td style="color: var(--color-green, #3fb950); font-weight: 600;">100%</td></tr>
+<tr><td class="highlight">Blog Auditor</td><td>5 passed, 1 flagged</td><td>6 audits</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="section" id="markdown-authoring">
+<div class="section-label">Authoring</div>
+
+## Markdown-First Authoring
+
+<p class="section-desc">A fundamental shift from "programming your automation" to "describing your automation" — write your intent in Markdown, compile it to a hardened workflow.</p>
+
+<div class="quote-callout green">
+<blockquote>"The concept behind GitHub Agentic Workflows is straightforward: you describe the outcomes you want in plain Markdown, add this as an automated workflow to your repository, and it executes using a coding agent in GitHub Actions."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">Workflow File Structure</h3>
+<div class="grid-2">
+<div class="card" style="border-top: 3px solid var(--color-blue, #58a6ff);">
+<h3 style="color: var(--color-blue, #58a6ff);">📋 YAML Frontmatter</h3>
+<p style="margin-top: 8px; font-size: 0.9rem;">Configuration between <code style="color: var(--color-purple, #bc8cff);">---</code> markers:</p>
+<ul style="margin-top: 12px; padding-left: 20px; color: var(--color-text-muted, #8b949e); font-size: 0.9rem;">
+<li>Triggers (<code style="color: var(--color-purple, #bc8cff);">on:</code>) — schedule, events, manual</li>
+<li>Permissions — read-only by default</li>
+<li>Tools — github, browser, web-search</li>
+<li>Safe Outputs — pre-approved write operations</li>
+<li>Engine configuration — copilot, claude, codex</li>
+</ul>
+</div>
+<div class="card" style="border-top: 3px solid var(--color-green, #3fb950);">
+<h3 style="color: var(--color-green, #3fb950);">📝 Markdown Instructions</h3>
+<p style="margin-top: 8px; font-size: 0.9rem;">Natural language task description:</p>
+<ul style="margin-top: 12px; padding-left: 20px; color: var(--color-text-muted, #8b949e); font-size: 0.9rem;">
+<li>What to analyze or investigate</li>
+<li>Style and format guidance</li>
+<li>Process steps (guidance, not rigid procedures)</li>
+<li>Scope and specificity controls</li>
+</ul>
+</div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 32px 0 16px;">The Compilation Flow</h3>
+<div class="flow-diagram">
+<div class="flow-step" style="border-color: var(--color-blue, #58a6ff);"><div class="step-icon">📄</div><div class="step-label" style="color: var(--color-blue, #58a6ff);">workflow.md</div><div class="step-desc">Human-readable intent</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step" style="border-color: var(--color-purple, #bc8cff);"><div class="step-icon">⚙️</div><div class="step-label" style="color: var(--color-purple, #bc8cff);">gh aw compile</div><div class="step-desc">Validates, hardens, restricts</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step" style="border-color: var(--color-green, #3fb950);"><div class="step-icon">🔒</div><div class="step-label" style="color: var(--color-green, #3fb950);">workflow.lock.yml</div><div class="step-desc">Machine-executable</div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step" style="border-color: var(--color-orange, #d29922);"><div class="step-icon">🚀</div><div class="step-label" style="color: var(--color-orange, #d29922);">GitHub Actions</div><div class="step-desc">Runs as standard workflow</div></div>
+</div>
+
+<p style="color: var(--color-text-muted, #8b949e); font-size: 0.92rem; margin-top: 16px;">Both the <code style="color: var(--color-blue, #58a6ff);">.md</code> source file and the <code style="color: var(--color-green, #3fb950);">.lock.yml</code> compiled file are committed to the repository. The <code>.md</code> is the <strong style="color: var(--color-text, #e6edf3);">editable source of truth</strong>, while the <code>.lock.yml</code> is the <strong style="color: var(--color-text, #e6edf3);">compiled, security-hardened</strong> version that actually executes.</p>
+
+<div class="quote-callout purple" style="margin-top: 24px;">
+<blockquote>"Your workflows can range from very general ('Improve the software') to very specific ('Check that all technical documentation and error messages for this educational software are written in a style suitable for an audience of age 10 or above')."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+</section>
+
+<section class="section" id="comparison">
+<div class="section-label">Comparison</div>
+
+## Agentic vs. Traditional Workflows
+
+<p class="section-desc">A side-by-side comparison across 10 dimensions showing how agentic workflows differ from — and complement — traditional GitHub Actions.</p>
+
+<div class="card" style="overflow-x: auto;">
+<table class="compare-table">
+<thead><tr><th>Dimension</th><th>⚙️ Traditional GitHub Actions</th><th>⚡ GitHub Agentic Workflows</th></tr></thead>
+<tbody>
+<tr><td>Authoring</td><td>YAML with explicit step definitions</td><td>Markdown with natural language intent</td></tr>
+<tr><td>Logic</td><td>Deterministic if/then rules</td><td>AI-driven contextual reasoning</td></tr>
+<tr><td>Behavior</td><td>Fixed — same input = same output</td><td>Adaptive — interprets context flexibly</td></tr>
+<tr><td>Decision Making</td><td>Pre-programmed steps</td><td>Agent makes autonomous decisions</td></tr>
+<tr><td>Outputs</td><td>Direct writes with granted permissions</td><td>Controlled "safe outputs" with validation</td></tr>
+<tr><td>Security Model</td><td>Permissions granted to workflow</td><td>Read-only by default, explicit safe outputs</td></tr>
+<tr><td>Use Cases</td><td>Builds, tests, deployments, linting</td><td>Triage, documentation, code quality, reporting</td></tr>
+<tr><td>Execution</td><td>Steps run sequentially as coded</td><td>Agent reasons through instructions</td></tr>
+<tr><td>Error Handling</td><td>Explicit error handlers</td><td>Agent adapts based on context</td></tr>
+<tr><td>Review</td><td>Automated outputs applied directly</td><td>Human review required for all mutations</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="quote-callout" style="margin-top: 24px;">
+<blockquote>"Traditional workflows execute pre-programmed steps with fixed if/then logic. They do exactly what you tell them, every time, in the same way. Agentic workflows use AI to understand context, make decisions, and generate content by interpreting natural language instructions flexibly."</blockquote>
+<div class="attr">— <a href="https://github.github.com/gh-aw/introduction/how-they-work/">How They Work — Official Docs</a></div>
+</div>
+
+<div class="quote-callout orange" style="margin-top: 16px;">
+<blockquote>"Don't use agentic workflows as a replacement for GitHub Actions YAML workflows for CI/CD. This approach extends continuous automation to more subjective, repetitive tasks that traditional CI/CD struggle to express."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+</section>
+
+<section class="section" id="engines">
+<div class="section-label">Engines</div>
+
+## Supported Coding Agents
+
+<p class="section-desc">The same workflow format works across all supported engines — choose the coding agent that best fits your needs.</p>
+
+<div class="grid-3">
+<div class="engine-card">
+<div class="engine-icon">🤖</div>
+<h3>GitHub Copilot CLI</h3>
+<span class="engine-status default">Default Engine</span>
+<p>GitHub's native coding agent. Each run typically incurs two premium requests: one for agentic work, one for guardrail checks. Models can be configured to manage costs.</p>
+<div class="code-block" style="margin-top: 16px; text-align: left;"><pre>engine: copilot</pre></div>
+</div>
+<div class="engine-card">
+<div class="engine-icon">🧠</div>
+<h3>Claude Code</h3>
+<span class="engine-status supported">Supported</span>
+<p>Anthropic's Claude agent. Requires an <code style="color: var(--color-purple, #bc8cff);">ANTHROPIC_API_KEY</code> secret added to the repository.</p>
+<div class="code-block" style="margin-top: 16px; text-align: left;"><pre>engine: claude</pre></div>
+</div>
+<div class="engine-card">
+<div class="engine-icon">⚡</div>
+<h3>OpenAI Codex</h3>
+<span class="engine-status supported">Supported</span>
+<p>OpenAI's coding agent. Requires an <code style="color: var(--color-purple, #bc8cff);">OPENAI_API_KEY</code> secret added to the repository.</p>
+<div class="code-block" style="margin-top: 16px; text-align: left;"><pre>engine: codex</pre></div>
+</div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">Tools &amp; Model Context Protocol (MCP)</h3>
+<p style="color: var(--color-text-muted, #8b949e); margin-bottom: 20px;">All engines interact with repository data through the <strong style="color: var(--color-text, #e6edf3);">Model Context Protocol (MCP)</strong> — a standardized protocol for connecting AI agents to external tools and services.</p>
+
+<div class="code-block">
+<div class="code-header"><span>yaml — Tool Configuration</span></div>
+<pre>{`tools:
+  github:              # GitHub MCP server
+  browser:             # Playwright-based browser automation
+  web-search:          # Web search capabilities`}</pre>
+</div>
+
+<div class="grid-3" style="margin-top: 20px;">
+<div class="card" style="border-top: 2px solid var(--color-green, #3fb950);"><h3 style="color: var(--color-green, #3fb950); font-size: 0.95rem;">Repositories</h3><p style="font-size: 0.88rem;">Code, files, branches, commits</p></div>
+<div class="card" style="border-top: 2px solid var(--color-blue, #58a6ff);"><h3 style="color: var(--color-blue, #58a6ff); font-size: 0.95rem;">Issues &amp; PRs</h3><p style="font-size: 0.88rem;">Create, read, comment, label</p></div>
+<div class="card" style="border-top: 2px solid var(--color-purple, #bc8cff);"><h3 style="color: var(--color-purple, #bc8cff); font-size: 0.95rem;">GitHub Actions</h3><p style="font-size: 0.88rem;">Workflow runs, jobs, logs</p></div>
+</div>
+</section>
+
+<section class="section" id="terminology">
+<div class="section-label">Glossary</div>
+
+## Key Terminology
+
+<p class="section-desc">Essential terms and concepts for working with GitHub Agentic Workflows.</p>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin-bottom: 16px;">Core Terms</h3>
+<div class="card" style="padding: 0 28px;">
+<div class="glossary-item"><span class="glossary-term">Agentic Workflow</span><span class="glossary-def">An AI-powered automation written in Markdown that uses a coding agent to understand context, make decisions, and take actions within controlled boundaries.</span></div>
+<div class="glossary-item"><span class="glossary-term">Coding Agent / Engine</span><span class="glossary-def">The AI model/provider (Copilot CLI, Claude Code, or Codex) that interprets natural language instructions and executes them using configured tools and permissions.</span></div>
+<div class="glossary-item"><span class="glossary-term">Continuous AI (CAI)</span><span class="glossary-def">The systematic, automated application of AI to software collaboration — natural-language rules + agentic reasoning, executed continuously inside your repository. Augments CI/CD, does not replace it.</span></div>
+<div class="glossary-item"><span class="glossary-term">Frontmatter</span><span class="glossary-def">The YAML configuration section between <code>---</code> markers at the top of a workflow Markdown file. Defines triggers, permissions, tools, engine, and safe outputs.</span></div>
+<div class="glossary-item"><span class="glossary-term">Safe Outputs</span><span class="glossary-def">Pre-approved, validated GitHub operations that an agent is allowed to perform (e.g., create-issue, create-pull-request, add-comment). Agents run read-only by default; writes only happen through safe outputs.</span></div>
+<div class="glossary-item"><span class="glossary-term">Lock File (.lock.yml)</span><span class="glossary-def">The compiled output — a security-hardened GitHub Actions workflow file generated from the Markdown source via <code>gh aw compile</code>. Both files are committed to the repository.</span></div>
+<div class="glossary-item"><span class="glossary-term">MCP</span><span class="glossary-def">Model Context Protocol — a standardized protocol for connecting AI agents to external tools and services. Used for GitHub operations, external APIs, file operations, and custom integrations.</span></div>
+<div class="glossary-item"><span class="glossary-term">Threat Detection</span><span class="glossary-def">An automated security layer that analyzes agent outputs for prompt injection attempts, secret leaks, and malicious code patches. Runs after the agent job but before safe outputs are applied.</span></div>
+<div class="glossary-item"><span class="glossary-term">Agent Workflow Firewall</span><span class="glossary-def">A containerized, network-layer firewall built for AI agents. Restricts agent network access using domain allowlists, preventing agents from contacting unauthorized domains.</span></div>
+<div class="glossary-item"><span class="glossary-term">Protected Files</span><span class="glossary-def">A static, rule-based protection layer guarding against supply chain attacks by preventing agents from modifying CI/CD configuration, dependency manifests, and agent instruction files.</span></div>
+<div class="glossary-item" style="border-bottom: none;"><span class="glossary-term">Peli's Agent Factory</span><span class="glossary-def">A collection of 100+ automated agentic workflows running continuously in the gh-aw repository, created by Peli de Halleux as a practical demonstration of Continuous AI.</span></div>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">Design Patterns</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 12px;">
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: var(--color-green, #3fb950); font-size: 0.95rem;">ChatOps</h3><p style="font-size: 0.85rem;">Triggered by comment commands (<code>/fix</code>, <code>/review</code>)</p></div>
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: var(--color-blue, #58a6ff); font-size: 0.95rem;">DailyOps</h3><p style="font-size: 0.85rem;">Scheduled daily workflows (reports, cleanup)</p></div>
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: var(--color-purple, #bc8cff); font-size: 0.95rem;">IssueOps</h3><p style="font-size: 0.85rem;">Triggered by issue events</p></div>
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: var(--color-orange, #d29922); font-size: 0.95rem;">DataOps</h3><p style="font-size: 0.85rem;">Workflows that process and analyze data</p></div>
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: var(--color-red, #f85149); font-size: 0.95rem;">ProjectOps</h3><p style="font-size: 0.85rem;">Project management automation</p></div>
+<div class="card" style="flex: 1; min-width: 200px;"><h3 style="color: #79c0ff; font-size: 0.95rem;">MultiRepoOps</h3><p style="font-size: 0.85rem;">Workflows spanning multiple repositories</p></div>
+</div>
+</section>
+
+<section class="section" id="examples">
+<div class="section-label">Examples</div>
+
+## Complete Workflow Examples
+
+<p class="section-desc">Real workflow files from official sources — copy, adapt, and run them in your own repository.</p>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin-bottom: 16px;">📊 Example 1: Daily Repository Status Report</h3>
+<p style="color: var(--color-text-muted, #8b949e); font-size: 0.92rem; margin-bottom: 12px;">The canonical example from the official GitHub Blog — generates a daily maintainer report as a GitHub issue.</p>
+
+<div class="code-block">
+<div class="code-header"><span>markdown — daily-status.md</span><span style="color: var(--color-green, #3fb950); font-size: 12px;">Official Example</span></div>
+<pre>{`---
+on:
+  schedule: daily
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+safe-outputs:
+  create-issue:
+    title-prefix: "[repo status] "
+    labels: [report]
+tools:
+  github:
+---
+
+# Daily Repo Status Report
+
+Create a daily status report for maintainers.
+
+Include
+- Recent repository activity (issues, PRs, discussions, releases, code changes)
+- Progress tracking, goal reminders and highlights
+- Project status and recommendations
+- Actionable next steps for maintainers
+
+Keep it concise and link to the relevant issues/PRs.`}</pre>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">🔍 Example 2: Issue Clarifier</h3>
+<p style="color: var(--color-text-muted, #8b949e); font-size: 0.92rem; margin-bottom: 12px;">Automatically asks for additional details when new issues are unclear.</p>
+
+<div class="code-block">
+<div class="code-header"><span>markdown — issue-clarifier.md</span><span style="color: var(--color-blue, #58a6ff); font-size: 12px;">IssueOps Pattern</span></div>
+<pre>{`---
+on:
+  issues:
+    types: [opened]
+permissions: read-all
+safe-outputs:
+  add-comment:
+  add-labels:
+---
+
+# Issue Clarifier
+
+Analyze the current issue and ask for additional details if the issue is unclear.
+
+- Read the issue's title and body.
+- If the report is missing key details (reproduction steps, environment,
+  expected/actual results), politely comment and request clarification.
+- Add label \`needs clarification\` if applicable.
+- If the issue is well-formed, add a \`triaged\` label and a brief
+  acknowledgment comment.`}</pre>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">📖 Example 3: Documentation Updater</h3>
+<p style="color: var(--color-text-muted, #8b949e); font-size: 0.92rem; margin-bottom: 12px;">From Peli's Agent Factory — achieved a 96% merge rate across 59 proposed PRs.</p>
+
+<div class="code-block">
+<div class="code-header"><span>markdown — docs-updater.md</span><span style="color: var(--color-purple, #bc8cff); font-size: 12px;">DailyOps Pattern</span></div>
+<pre>{`---
+description: |
+  Reviews and updates documentation to ensure accuracy and completeness.
+  Compares docstrings with implementations and proposes fixes.
+on:
+  schedule:
+    interval: daily
+  push:
+    branches: [main]
+    paths: ['src/**', 'docs/**']
+permissions:
+  contents: read
+  pull-requests: read
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[docs] "
+    labels: [documentation, automated]
+    protected-files: fallback-to-issue
+tools:
+  github:
+---
+
+# Daily Documentation Updater
+
+Review the repository documentation and ensure it accurately reflects
+the current codebase.
+
+## Tasks
+
+1. Compare function docstrings with their implementations
+2. Check that README sections match actual behavior
+3. Verify code examples still work
+4. Identify outdated references or deprecated features
+5. Propose specific, targeted fixes via pull request
+
+## Guidelines
+
+- Make small, focused changes (one topic per PR)
+- Preserve the original author's voice and style
+- Only fix genuine inaccuracies, not stylistic preferences
+- Include a clear description of what changed and why`}</pre>
+</div>
+
+<h3 style="font-size: 1.1rem; color: var(--color-text, #e6edf3); margin: 40px 0 16px;">📰 Example 4: Continuous AI News Report</h3>
+<p style="color: var(--color-text-muted, #8b949e); font-size: 0.92rem; margin-bottom: 12px;">A minimal example from the Continuous AI in Practice blog — shows how simple a workflow can be.</p>
+
+<div class="code-block">
+<div class="code-header"><span>markdown — news-report.md</span><span style="color: var(--color-orange, #d29922); font-size: 12px;">Minimal Example</span></div>
+<pre>{`---
+on: daily
+permissions: read
+safe-outputs:
+  create-issue:
+    title-prefix: "[news] "
+---
+
+Analyze the recent activity in the repository and:
+- create an upbeat daily status report about the activity
+- provide an agentic task description to improve the project
+  based on the activity.
+Create an issue with the report.`}</pre>
+</div>
+</section>
+
+<section class="section" id="quotes">
+<div class="section-label">Voices</div>
+
+## Key Quotes from Official Sources
+
+<p class="section-desc">Words from the creators and leaders behind GitHub Agentic Workflows.</p>
+
+<div class="grid-2">
+<div class="quote-callout green">
+<blockquote>"Custom agents for offline tasks, that's what Continuous AI is. Anything you couldn't outsource before, you now can."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+<div class="quote-callout purple">
+<blockquote>"Any task that requires judgment goes beyond heuristics. Any time something can't be expressed as a rule or a flow chart is a place where AI becomes incredibly helpful."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+<div class="quote-callout">
+<blockquote>"In the future, it's not about agents running in your repositories. It's about being able to presume you can cheaply define agents for anything you want off your plate permanently."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+<div class="quote-callout orange">
+<blockquote>"Designing for safety and control is non-negotiable. GitHub Agentic Workflows implements a defense-in-depth security architecture that protects against unintended behaviors and prompt-injection attacks."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+<div class="quote-callout green">
+<blockquote>"The PR is the existing noun where developers expect to review work. It's the checkpoint everyone rallies around."</blockquote>
+<div class="attr">— Idan Gazit, head of GitHub Next</div>
+</div>
+<div class="quote-callout purple">
+<blockquote>"Treat the workflow Markdown as code. Review changes, keep it small, and evolve it intentionally."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/">GitHub Blog</a></div>
+</div>
+<div class="quote-callout">
+<blockquote>"Documentation is where we challenged conventional wisdom. Can AI agents write good documentation?"</blockquote>
+<div class="attr">— <a href="https://github.github.com/gh-aw/blog/2026-01-13-meet-the-workflows-documentation/">Meet the Workflows: Continuous Documentation</a></div>
+</div>
+<div class="quote-callout orange">
+<blockquote>"AI-generated docs need human/agent review, but they're dramatically better than no docs (which is often the alternative)."</blockquote>
+<div class="attr">— <a href="https://github.github.com/gh-aw/blog/2026-01-13-meet-the-workflows-documentation/">Meet the Workflows blog</a></div>
+</div>
+</div>
+
+<div class="quote-callout" style="margin-top: 20px; text-align: center;">
+<blockquote>"Test coverage went from &#126;5% to near 100%. 1,400+ tests were written across 45 days for about &#126;$80 worth of tokens."</blockquote>
+<div class="attr">— <a href="https://github.blog/ai-and-ml/generative-ai/continuous-ai-in-practice-what-developers-can-automate-today-with-agentic-ci/">Continuous AI in Practice, GitHub Blog</a></div>
+</div>
+</section>

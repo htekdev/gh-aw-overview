@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://htekdev.github.io/gh-aw-overview/sitemap-index.xml

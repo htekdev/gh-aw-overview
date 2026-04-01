@@ -1,0 +1,153 @@
+---
+interface Props {
+  currentPage?: string;
+}
+
+const { currentPage = '' } = Astro.props;
+
+const navItems = [
+  { href: '/', label: 'Home', id: 'home' },
+  { href: '/core-concepts/', label: 'Core Concepts', id: 'core-concepts' },
+  { href: '/architecture/', label: 'Architecture', id: 'architecture' },
+  { href: '/configuration/', label: 'Configuration', id: 'configuration' },
+  { href: '/security/', label: 'Security', id: 'security' },
+  { href: '/ecosystem/', label: 'Ecosystem', id: 'ecosystem' },
+  { href: '/use-cases/', label: 'Use Cases', id: 'use-cases' },
+  { href: '/continuous-ai/', label: 'Continuous AI', id: 'continuous-ai' },
+  { href: '/cli-tooling/', label: 'CLI & Tooling', id: 'cli-tooling' },
+  { href: '/videos/', label: 'Videos', id: 'videos' },
+  { href: '/resources/', label: 'Resources', id: 'resources' },
+];
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<nav aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href={base} class="nav-brand">⚡ GH Agentic Workflows</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="nav-links" role="navigation">
+      {navItems.map((item) => (
+        <a
+          href={`${base}${item.id === 'home' ? '' : item.id + '/'}`}
+          class:list={[{ active: currentPage === item.id }]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<style>
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(13, 17, 23, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-border);
+    padding: 12px 24px;
+  }
+
+  .nav-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-brand {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .nav-brand:hover {
+    color: var(--color-text);
+  }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--color-text-muted);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+
+  .nav-links a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-text);
+  }
+
+  .nav-links a.active {
+    color: var(--color-green);
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .nav-links {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+      margin-top: 8px;
+    }
+
+    .nav-links.open {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const links = document.querySelector('.nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      links.classList.toggle('open');
+    });
+  }
+</script>

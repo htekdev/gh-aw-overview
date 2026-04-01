@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const page = await getEntry('pages', 'continuous-ai');
+const { Content } = await page.render();
+---
+
+<BaseLayout title={page.data.title} description={page.data.description} currentPage="continuous-ai">
+  <header class="page-hero">
+    <div class="hero-content">
+      <div class="hero-emoji">{page.data.heroEmoji}</div>
+      <h1 class="hero-title">Continuous AI Patterns</h1>
+      <p class="hero-subtitle">{page.data.heroSubtitle}</p>
+    </div>
+  </header>
+
+  <div class="container mdx-content">
+    <Content />
+  </div>
+</BaseLayout>

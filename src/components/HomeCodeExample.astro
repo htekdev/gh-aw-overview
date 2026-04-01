@@ -1,0 +1,77 @@
+---
+/**
+ * Code example block for the homepage showing a sample agentic workflow.
+ * Extracted as a component because the <pre> content with blank lines
+ * and markdown-like syntax conflicts with MDX parsing.
+ */
+---
+
+<div class="code-section-layout">
+  <div class="code-block-wrapper">
+    <div class="code-header">
+      <span class="code-dot" style="background:#ff5f56;"></span>
+      <span class="code-dot" style="background:#ffbd2e;"></span>
+      <span class="code-dot" style="background:#27c93f;"></span>
+      <span class="code-filename">daily-status-report.md</span>
+    </div>
+    <pre set:html={`<span class="hl-comment">---</span>
+<span class="hl-key">name</span>: <span class="hl-str">Daily Repo Status Report</span>
+<span class="hl-key">description</span>: <span class="hl-str">Creates a daily summary of repository activity</span>
+
+<span class="hl-key">on</span>:
+  <span class="hl-key">schedule</span>:
+    - <span class="hl-key">cron</span>: <span class="hl-str">"0 9 * * 1-5"</span>  <span class="hl-comment"># Weekdays at 9am UTC</span>
+  <span class="hl-key">workflow_dispatch</span>:
+
+<span class="hl-key">tools</span>:
+  <span class="hl-section">github</span>:  <span class="hl-comment"># Access to repo data</span>
+
+<span class="hl-key">safeOutputs</span>:
+  <span class="hl-key">issues</span>:
+    <span class="hl-key">create</span>: <span class="hl-bool">true</span>
+    <span class="hl-key">maxCount</span>: <span class="hl-val">1</span>
+    <span class="hl-key">addLabels</span>:
+      - <span class="hl-str">daily-report</span>
+      - <span class="hl-str">automated</span>
+<span class="hl-comment">---</span>
+
+<span class="hl-comment"># Daily Repository Status Report</span>
+
+Analyze this repository and create a concise
+daily status report covering:
+
+- **New Issues**: Summarize issues opened in
+  the last 24 hours with priority assessment
+- **PR Activity**: List merged, opened, and
+  stalled pull requests
+- **CI Health**: Report on recent workflow runs,
+  flag any failures or flaky tests
+- **Key Metrics**: Lines changed, active
+  contributors, review turnaround time
+
+Format the report as a well-structured GitHub
+issue with clear sections and actionable items.
+Keep it concise — highlight what matters.`} />
+  </div>
+  <div class="code-explanation">
+    <h3>What's happening here</h3>
+    <p>
+      This single Markdown file becomes a fully automated workflow. The YAML frontmatter
+      configures <em>when</em> it runs, <em>what tools</em> it can access, and
+      <em>what actions</em> it can take. The body is the natural language instruction
+      the AI agent follows.
+    </p>
+    <ul>
+      <li><strong>Schedule trigger</strong> — runs every weekday at 9 AM UTC</li>
+      <li><strong>GitHub tools</strong> — gives the agent read access to issues, PRs, commits, and CI data</li>
+      <li><strong>Safe outputs</strong> — can only create one issue with specific labels; no other write access</li>
+      <li><strong>Natural language body</strong> — the agent interprets these instructions with contextual reasoning</li>
+      <li><strong>Read-only by default</strong> — writes only happen through the declared safe outputs</li>
+      <li><strong>Human review</strong> — the created issue is visible for the team to inspect and act on</li>
+    </ul>
+    <p style="margin-top:24px;">
+      Run <code>gh aw compile daily-status-report.md</code>
+      to generate the hardened <code>.lock.yml</code> file, then push both to your repo.
+    </p>
+  </div>
+</div>

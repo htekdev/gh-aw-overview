@@ -1,0 +1,1257 @@
+---
+title: "Architecture — GitHub Agentic Workflows"
+description: "Deep technical dive into the system architecture — five-stage pipeline, compilation, trust model, runtime execution, and security boundaries."
+navLabel: "Architecture"
+navOrder: 2
+heroEmoji: "🏗️"
+heroSubtitle: "System design, security architecture, and runtime execution"
+accentColor: "blue"
+---
+
+<style>{`
+  /* ── Pipeline Diagram ── */
+  .pipeline-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 40px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pipeline-stage {
+    flex: 1;
+    min-width: 180px;
+    text-align: center;
+    position: relative;
+  }
+  .pipeline-box {
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--card-radius);
+    padding: 24px 16px;
+    position: relative;
+    z-index: 2;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .pipeline-box:hover { transform: translateY(-4px); }
+  .pipeline-stage:nth-child(1) .pipeline-box { border-color: var(--color-blue); }
+  .pipeline-stage:nth-child(2) .pipeline-box { border-color: var(--color-purple); }
+  .pipeline-stage:nth-child(3) .pipeline-box { border-color: var(--color-orange); }
+  .pipeline-stage:nth-child(4) .pipeline-box { border-color: var(--color-red); }
+  .pipeline-stage:nth-child(5) .pipeline-box { border-color: var(--color-green); }
+  .pipeline-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    margin: 0 auto 12px;
+  }
+  .pipeline-stage:nth-child(1) .pipeline-num { background: var(--color-blue-dim); color: var(--color-blue); }
+  .pipeline-stage:nth-child(2) .pipeline-num { background: var(--color-purple-dim); color: var(--color-purple); }
+  .pipeline-stage:nth-child(3) .pipeline-num { background: var(--color-orange-dim); color: var(--color-orange); }
+  .pipeline-stage:nth-child(4) .pipeline-num { background: var(--color-red-dim); color: var(--color-red); }
+  .pipeline-stage:nth-child(5) .pipeline-num { background: var(--color-green-dim); color: var(--color-green); }
+  .pipeline-name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; color: var(--color-text); }
+  .pipeline-artifact { font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 8px; }
+  .pipeline-desc { font-size: 0.82rem; color: var(--color-text-muted); }
+  .pipeline-arrow {
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; min-width: 48px; position: relative;
+  }
+  .pipeline-arrow::before {
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-border), var(--color-blue));
+  }
+  .pipeline-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    border: 6px solid transparent;
+    border-left: 8px solid var(--color-blue);
+  }
+
+  /* ── Compilation Steps ── */
+  .compile-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0;
+    position: relative;
+  }
+  .compile-step {
+    position: relative;
+    padding: 28px 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+  .compile-step:first-child { border-radius: var(--card-radius) 0 0 var(--card-radius); }
+  .compile-step:last-child { border-radius: 0 var(--card-radius) var(--card-radius) 0; }
+  .compile-step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  .compile-step:nth-child(1) .compile-step-num { background: var(--color-blue); color: var(--color-bg); }
+  .compile-step:nth-child(2) .compile-step-num { background: var(--color-purple); color: var(--color-bg); }
+  .compile-step:nth-child(3) .compile-step-num { background: var(--color-orange); color: var(--color-bg); }
+  .compile-step:nth-child(4) .compile-step-num { background: var(--color-green); color: var(--color-bg); }
+  .compile-step h4 { font-size: 0.95rem; margin-bottom: 8px; color: var(--color-text); }
+  .compile-step p { font-size: 0.85rem; color: var(--color-text-muted); }
+  .compile-step .mono-sm {
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted);
+    background: var(--color-bg); padding: 2px 6px; border-radius: 4px;
+    display: inline-block; margin-top: 8px;
+  }
+
+  /* ── Trust Layers Diagram ── */
+  .trust-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 900px;
+    margin: 40px auto;
+  }
+  .trust-layer {
+    padding: 28px 32px;
+    position: relative;
+    border-left: 4px solid;
+  }
+  .trust-layer-top {
+    background: linear-gradient(135deg, rgba(63,185,80,0.08), rgba(63,185,80,0.02));
+    border-color: var(--color-green);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+    border: 1px solid rgba(63,185,80,0.3);
+    border-left: 4px solid var(--color-green);
+  }
+  .trust-layer-mid {
+    background: linear-gradient(135deg, rgba(188,140,255,0.08), rgba(188,140,255,0.02));
+    border-color: var(--color-purple);
+    border: 1px solid rgba(188,140,255,0.3);
+    border-left: 4px solid var(--color-purple);
+    border-top: none;
+  }
+  .trust-layer-bot {
+    background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(88,166,255,0.02));
+    border-color: var(--color-blue);
+    border-radius: 0 0 var(--card-radius) var(--card-radius);
+    border: 1px solid rgba(88,166,255,0.3);
+    border-left: 4px solid var(--color-blue);
+    border-top: none;
+  }
+  .trust-layer-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .trust-layer-top .trust-layer-label { color: var(--color-green); }
+  .trust-layer-mid .trust-layer-label { color: var(--color-purple); }
+  .trust-layer-bot .trust-layer-label { color: var(--color-blue); }
+  .trust-layer h4 { font-size: 1.05rem; margin-bottom: 8px; color: var(--color-text); }
+  .trust-layer p { font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 12px; }
+  .trust-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .trust-chip {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  /* ── Container Cards ── */
+  .container-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    padding: 0;
+    overflow: hidden;
+  }
+  .container-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .container-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .container-card-body { padding: 20px 24px; }
+  .container-card-body p { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+  .container-card-list { list-style: none; padding: 0; margin: 0; }
+  .container-card-list li {
+    font-size: 0.85rem;
+    padding: 8px 0;
+    border-top: 1px solid var(--color-border-subtle);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--color-text-muted);
+  }
+  .container-card-list li:first-child { border-top: none; }
+  .list-icon { flex-shrink: 0; width: 18px; text-align: center; }
+
+  /* ── Artifact Flow ── */
+  .artifact-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 40px 0;
+    overflow-x: auto;
+  }
+  .artifact-step {
+    flex: 1;
+    min-width: 200px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .artifact-step:first-child { border-radius: var(--card-radius) 0 0 var(--card-radius); }
+  .artifact-step:last-child { border-radius: 0 var(--card-radius) var(--card-radius) 0; }
+  .artifact-step-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    margin: 0 auto 14px;
+  }
+  .artifact-step h4 { font-size: 0.95rem; margin-bottom: 6px; color: var(--color-text); }
+  .artifact-step p { font-size: 0.82rem; color: var(--color-text-muted); }
+  .artifact-arrow-sep {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; min-width: 40px;
+    position: relative;
+  }
+  .artifact-arrow-sep::before {
+    content: '▶';
+    color: var(--color-blue);
+    font-size: 1.2rem;
+  }
+
+  /* ── DAG Diagram ── */
+  .dag-container {
+    max-width: 600px;
+    margin: 40px auto;
+  }
+  .dag-node {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    position: relative;
+  }
+  .dag-node h4 { font-size: 0.95rem; margin-bottom: 6px; color: var(--color-text); }
+  .dag-node ul { list-style: none; padding: 0; margin: 0; }
+  .dag-node li { font-size: 0.82rem; color: var(--color-text-muted); padding: 2px 0; }
+  .dag-node li::before { content: '• '; color: var(--color-blue); }
+  .dag-connector {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+  .dag-connector-line {
+    width: 2px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--color-border), var(--color-blue));
+    position: relative;
+  }
+  .dag-connector-line::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 6px solid var(--color-blue);
+  }
+  .dag-fork {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    position: relative;
+  }
+  .dag-fork::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 25%;
+    width: 50%;
+    height: 2px;
+    background: var(--color-border);
+  }
+
+  /* ── Runtime Steps ── */
+  .runtime-steps { display: flex; flex-direction: column; gap: 0; max-width: 800px; margin: 40px auto; }
+  .runtime-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+    padding: 20px 0;
+  }
+  .runtime-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 56px;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-border-subtle);
+  }
+  .runtime-step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .runtime-step.active .runtime-step-num { border-color: var(--color-blue); color: var(--color-blue); }
+  .runtime-step-content h4 { font-size: 0.95rem; margin-bottom: 4px; color: var(--color-text); }
+  .runtime-step-content p { font-size: 0.85rem; color: var(--color-text-muted); }
+
+  /* ── Engine Grid ── */
+  .engine-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
+  .engine-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .engine-item .mono { font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-blue); margin-bottom: 4px; display: block; }
+  .engine-item .provider { font-size: 0.78rem; color: var(--color-text-muted); }
+
+  /* ── Network Diagram ── */
+  .net-diagram {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    padding: 32px;
+    max-width: 860px;
+    margin: 40px auto;
+    position: relative;
+  }
+  .net-outer-label {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .net-inner {
+    background: rgba(88,166,255,0.04);
+    border: 1px dashed rgba(88,166,255,0.3);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .net-inner-label {
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--color-bg);
+    padding: 0 8px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-blue);
+    font-weight: 600;
+  }
+  .net-boxes {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .net-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 140px;
+    flex: 1;
+  }
+  .net-box.highlight { border-color: var(--color-blue); }
+  .net-box .net-box-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--color-text); }
+  .net-box .net-box-sub { font-size: 0.75rem; color: var(--color-text-muted); font-family: var(--font-mono); }
+  .net-flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+  }
+  .net-flow-arrow span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── Code Block (inline styled) ── */
+  .code-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    overflow-x: auto;
+    color: var(--color-text);
+    line-height: 1.5;
+    white-space: pre;
+    word-wrap: break-word;
+  }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .str { color: #a5d6ff; }
+  .code-block .cmt { color: var(--color-text-muted); }
+
+  /* ── Callouts ── */
+  .callout {
+    background: rgba(88,166,255,0.06);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-left: 4px solid var(--color-blue);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 0.9rem;
+    color: #c9d1d9;
+  }
+  .callout-orange {
+    background: rgba(210,153,34,0.06);
+    border-color: rgba(210,153,34,0.2);
+    border-left-color: var(--color-orange);
+  }
+  .callout strong { color: var(--color-text); }
+
+  /* ── Observability Grid ── */
+  .obs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .obs-item {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .obs-item-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--color-text);
+  }
+  .obs-item-desc {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+
+  /* ── Sanitization Table ── */
+  .san-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  .san-table th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .san-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+  }
+  .san-table tr:last-child td { border-bottom: none; }
+  .san-table code {
+    background: var(--color-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: var(--color-text);
+    border: 1px solid var(--color-border-subtle);
+  }
+  .san-table .arrow-cell { color: var(--color-text-muted); text-align: center; font-size: 0.9rem; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .pipeline-flow { flex-direction: column; align-items: center; }
+    .pipeline-arrow { width: 48px; height: 32px; transform: rotate(90deg); }
+    .pipeline-stage { min-width: auto; width: 100%; max-width: 320px; }
+    .compile-steps { grid-template-columns: 1fr; }
+    .compile-step, .compile-step:first-child, .compile-step:last-child { border-radius: 0; }
+    .compile-step:first-child { border-radius: var(--card-radius) var(--card-radius) 0 0; }
+    .compile-step:last-child { border-radius: 0 0 var(--card-radius) var(--card-radius); }
+    .artifact-flow { flex-direction: column; align-items: center; }
+    .artifact-step, .artifact-step:first-child, .artifact-step:last-child { border-radius: var(--card-radius); min-width: auto; width: 100%; max-width: 360px; }
+    .artifact-arrow-sep { transform: rotate(90deg); height: 32px; }
+    .san-table { font-size: 0.82rem; }
+    .san-table th, .san-table td { padding: 10px 8px; }
+    .net-boxes { flex-direction: column; }
+    .dag-fork { grid-template-columns: 1fr; }
+  }
+`}</style>
+
+{/* ═══════════════════════════ 1. PIPELINE OVERVIEW ═══════════════════════════ */}
+
+<section id="pipeline">
+<div class="section-label" style="color: var(--color-blue);">Pipeline Overview</div>
+
+## The Five-Stage Pipeline
+
+<p class="section-desc">Every agentic workflow moves through five stages. Each stage enforces distinct security properties — failures in later stages cannot bypass constraints established by earlier ones.</p>
+
+<div class="pipeline-flow">
+  <div class="pipeline-stage">
+    <div class="pipeline-box">
+      <div class="pipeline-num">1</div>
+      <div class="pipeline-name">Author</div>
+      <div class="pipeline-artifact">.md file</div>
+      <div class="pipeline-desc">Natural language intent + YAML frontmatter. Human-readable, version-controlled.</div>
+    </div>
+  </div>
+  <div class="pipeline-arrow"></div>
+  <div class="pipeline-stage">
+    <div class="pipeline-box">
+      <div class="pipeline-num">2</div>
+      <div class="pipeline-name">Compile</div>
+      <div class="pipeline-artifact">.lock.yml</div>
+      <div class="pipeline-desc">Deterministic execution plan. Schema validation, SHA pinning, security scanning.</div>
+    </div>
+  </div>
+  <div class="pipeline-arrow"></div>
+  <div class="pipeline-stage">
+    <div class="pipeline-box">
+      <div class="pipeline-num">3</div>
+      <div class="pipeline-name">Execute</div>
+      <div class="pipeline-artifact">Agent Job</div>
+      <div class="pipeline-desc">Sandboxed AI runs with read-only permissions. All writes buffered as artifacts.</div>
+    </div>
+  </div>
+  <div class="pipeline-arrow"></div>
+  <div class="pipeline-stage">
+    <div class="pipeline-box">
+      <div class="pipeline-num">4</div>
+      <div class="pipeline-name">Detect</div>
+      <div class="pipeline-artifact">Threat Analysis</div>
+      <div class="pipeline-desc">AI-powered detection reviews buffered artifacts for secrets, threats, and policy violations.</div>
+    </div>
+  </div>
+  <div class="pipeline-arrow"></div>
+  <div class="pipeline-stage">
+    <div class="pipeline-box">
+      <div class="pipeline-num">5</div>
+      <div class="pipeline-name">Apply</div>
+      <div class="pipeline-artifact">Safe Outputs</div>
+      <div class="pipeline-desc">Scoped write permissions. Only approved artifacts reach the GitHub API.</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Key insight:</strong> The Markdown file you edit is <em>not</em> what GitHub Actions executes. gh-aw compiles your declarative intent into a deterministic <code>.lock.yml</code> execution plan. Editing the Markdown without recompiling changes nothing at runtime.
+</div>
+
+<div class="card" style="margin-top: 32px; overflow-x: auto;">
+  <table class="san-table">
+    <thead>
+      <tr>
+        <th>Stage</th>
+        <th>Input</th>
+        <th>Output</th>
+        <th>Security Property</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color: var(--color-blue);">Author</strong></td>
+        <td>Natural language + YAML frontmatter</td>
+        <td><code>.md</code> file</td>
+        <td>Human-readable, version-controlled intent</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--color-purple);">Compile</strong></td>
+        <td><code>.md</code> file + imports</td>
+        <td><code>.lock.yml</code> + <code>actions-lock.json</code></td>
+        <td>Schema validation, SHA pinning, security scanning</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--color-orange);">Execute</strong></td>
+        <td><code>.lock.yml</code> on Actions runner</td>
+        <td>Buffered artifacts</td>
+        <td>Read-only permissions, network firewall, container isolation</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--color-red);">Detect</strong></td>
+        <td>Buffered artifacts</td>
+        <td>Pass/fail verdict</td>
+        <td>AI-powered threat analysis in isolated job</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--color-green);">Apply</strong></td>
+        <td>Approved artifacts</td>
+        <td>GitHub API writes</td>
+        <td>Scoped write permissions per output type</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+{/* ═══════════════════════════ 2. COMPILATION PIPELINE ═══════════════════════════ */}
+
+<section id="compilation">
+<div class="section-label" style="color: var(--color-purple);">Compilation</div>
+
+## Four-Phase Compilation Pipeline
+
+<p class="section-desc">The <code>gh aw compile</code> command transforms your Markdown workflow through four sequential security phases before producing the <code>.lock.yml</code> execution plan.</p>
+
+<div class="compile-steps">
+  <div class="compile-step">
+    <div class="compile-step-num">1</div>
+    <h4>Schema Validation</h4>
+    <p>Every frontmatter field is validated against a JSON schema. Invalid field names, wrong types, and malformed configurations are rejected before any code is generated.</p>
+    <span class="mono-sm">Invalid fields → rejected</span>
+  </div>
+  <div class="compile-step">
+    <div class="compile-step-num">2</div>
+    <h4>Expression Safety</h4>
+    <p>Only allowlisted GitHub Actions expressions are permitted. Expressions referencing <code>{'secrets.*'}</code> in unsafe positions are blocked — preventing injection attacks.</p>
+    <span class="mono-sm">No secrets.{'*'} in unsafe positions</span>
+  </div>
+  <div class="compile-step">
+    <div class="compile-step-num">3</div>
+    <h4>Action SHA Pinning</h4>
+    <p>Every Action reference is resolved to its full commit SHA and recorded in <code>actions-lock.json</code>. Defends against tag-hijacking and supply-chain attacks.</p>
+    <span class="mono-sm">actions/checkout@v4 → SHA</span>
+  </div>
+  <div class="compile-step">
+    <div class="compile-step-num">4</div>
+    <h4>Security Scanners</h4>
+    <p>The compiled output passes through <strong>actionlint</strong> (workflow linting), <strong>zizmor</strong> (vulnerability detection), and <strong>poutine</strong> (supply-chain risk analysis).</p>
+    <span class="mono-sm">--actionlint --zizmor --poutine</span>
+  </div>
+</div>
+
+<div class="grid-3" style="margin-top: 32px;">
+  <div class="card">
+    <span class="badge badge-blue">Linting</span>
+    <h4 style="margin-bottom: 8px;">actionlint</h4>
+    <p style="font-size: 0.88rem; color: var(--color-text-muted);">Workflow structure linting with integrated <strong>shellcheck</strong> and <strong>pyflakes</strong>. Catches syntax errors, type mismatches, and workflow misconfigurations.</p>
+  </div>
+  <div class="card">
+    <span class="badge badge-red">Security</span>
+    <h4 style="margin-bottom: 8px;">zizmor</h4>
+    <p style="font-size: 0.88rem; color: var(--color-text-muted);">Security vulnerability detection. Scans for privilege escalation paths, security misconfigurations, and dangerous patterns in the compiled workflow.</p>
+  </div>
+  <div class="card">
+    <span class="badge badge-orange">Supply Chain</span>
+    <h4 style="margin-bottom: 8px;">poutine</h4>
+    <p style="font-size: 0.88rem; color: var(--color-text-muted);">Supply-chain risk analysis. Evaluates third-party action risks, dependency vulnerabilities, and potential for compromised upstream actions.</p>
+  </div>
+</div>
+
+<div class="callout callout-orange" style="margin-top: 32px;">
+  <strong>Strict Mode (default):</strong> Additionally enforces no write permissions on agent jobs, explicit network configuration, no wildcard domains in allowlists, and no deprecated fields.
+</div>
+</section>
+
+{/* ═══════════════════════════ 3. THREE-LAYER TRUST MODEL ═══════════════════════════ */}
+
+<section id="trust-model">
+<div class="section-label" style="color: var(--color-green);">Defense in Depth</div>
+
+## Three-Layer Trust Model
+
+<p class="section-desc">Each layer enforces distinct security properties under different failure assumptions. Breaching one layer does not compromise the guarantees of layers below it.</p>
+
+<div class="trust-stack">
+  <div class="trust-layer trust-layer-top">
+    <div class="trust-layer-label">Layer 3 — Plan-Level Trust</div>
+    <h4>Staged Execution &amp; Safe Outputs</h4>
+    <p>Constrains component behavior <em>over time</em>. Decomposes workflows into stages with distinct active components, permissions, and admissible data consumers. The SafeOutputs subsystem is the primary instantiation.</p>
+    <div class="trust-chips">
+      <span class="trust-chip">Pre-activation checks</span>
+      <span class="trust-chip">Content sanitization</span>
+      <span class="trust-chip">Agent execution (read-only)</span>
+      <span class="trust-chip">Secret redaction</span>
+      <span class="trust-chip">Threat detection</span>
+      <span class="trust-chip">Safe output application</span>
+      <span class="trust-chip">Temporal constraints</span>
+    </div>
+  </div>
+  <div class="trust-layer trust-layer-mid">
+    <div class="trust-layer-label">Layer 2 — Configuration-Level Trust</div>
+    <h4>Compiler, Schemas &amp; SHA Pinning</h4>
+    <p>Declarative artifacts and toolchains that instantiate the system's structure. Controls which components are loaded, how they connect, which channels are permitted, and what privileges each receives. Token distribution is controlled here.</p>
+    <div class="trust-chips">
+      <span class="trust-chip">JSON Schema validation</span>
+      <span class="trust-chip">Expression allowlist</span>
+      <span class="trust-chip">SHA pinning</span>
+      <span class="trust-chip">Security scanners</span>
+      <span class="trust-chip">Strict mode</span>
+      <span class="trust-chip">Token distribution</span>
+    </div>
+  </div>
+  <div class="trust-layer trust-layer-bot">
+    <div class="trust-layer-label">Layer 1 — Substrate-Level Trust</div>
+    <h4>VM, Docker, iptables &amp; Hardware</h4>
+    <p>Hardware and OS foundation. Provides memory isolation, CPU/resource isolation, and kernel-enforced communication boundaries. Guarantees hold even if the agent container is fully compromised.</p>
+    <div class="trust-chips">
+      <span class="trust-chip">CPU / MMU / Kernel</span>
+      <span class="trust-chip">Hypervisor</span>
+      <span class="trust-chip">Docker runtime</span>
+      <span class="trust-chip">Network Firewall (AWF)</span>
+      <span class="trust-chip">API Proxy</span>
+      <span class="trust-chip">MCP Gateway</span>
+      <span class="trust-chip">iptables</span>
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Trust violation at the substrate layer</strong> requires exploiting the container runtime, kernel, hypervisor, or hardware. If this layer fails, all higher-level guarantees are void — but this is the most difficult layer to breach.
+</div>
+</section>
+
+{/* ═══════════════════════════ 4. PRIVILEGED CONTAINERS ═══════════════════════════ */}
+
+<section id="privileged-containers">
+<div class="section-label" style="color: var(--color-orange);">Substrate Components</div>
+
+## Privileged Containers
+
+<p class="section-desc">Three privileged containers run alongside the untrusted agent container, each responsible for mediating a specific concern. The agent never directly accesses secrets, the network, or MCP servers.</p>
+
+<div class="grid-3">
+  <div class="container-card">
+    <div class="container-card-header">
+      <div class="container-card-icon" style="background: var(--color-blue-dim); color: var(--color-blue);">🛡️</div>
+      <div>
+        <div style="font-weight: 700; color: var(--color-text);">Network Firewall (AWF)</div>
+        <div style="font-size: 0.78rem; color: var(--color-text-muted);">Agent Workflow Firewall</div>
+      </div>
+    </div>
+    <div class="container-card-body">
+      <p>Creates a private Docker network, binds the agent, and routes all traffic through a Squid proxy enforcing domain allowlists.</p>
+      <ul class="container-card-list">
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Creates private network (172.30.0.0/24)</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> iptables-based traffic redirection</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Domain allowlist enforcement via Squid</li>
+        <li><span class="list-icon" style="color: var(--color-red);">⚠</span> Drops own iptables capabilities before agent launch</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container-card">
+    <div class="container-card-header">
+      <div class="container-card-icon" style="background: var(--color-purple-dim); color: var(--color-purple);">🔑</div>
+      <div>
+        <div style="font-weight: 700; color: var(--color-text);">API Proxy</div>
+        <div style="font-size: 0.78rem; color: var(--color-text-muted);">Token Holder</div>
+      </div>
+    </div>
+    <div class="container-card-body">
+      <p>Routes LLM traffic and holds endpoint-specific credentials. The agent sends unauthenticated requests; the proxy injects auth headers.</p>
+      <ul class="container-card-list">
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Holds API tokens (agent has none)</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Injects Authorization header</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Supports OpenAI, Anthropic, Copilot</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Captures request/response metadata</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container-card">
+    <div class="container-card-header">
+      <div class="container-card-icon" style="background: var(--color-green-dim); color: var(--color-green);">🔌</div>
+      <div>
+        <div style="font-weight: 700; color: var(--color-text);">MCP Gateway</div>
+        <div style="font-size: 0.78rem; color: var(--color-text-muted);">gh-aw-mcpg</div>
+      </div>
+    </div>
+    <div class="container-card-body">
+      <p>Spawns isolated MCP server containers via the Docker socket. Each server runs in its own container with no shared state.</p>
+      <ul class="container-card-list">
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Per-container domain allowlists</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Tool allowlisting (explicit <code>allowed:</code> lists)</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Secret injection via env vars only</li>
+        <li><span class="list-icon" style="color: var(--color-green);">✓</span> Audit logging of all tool invocations</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="net-diagram">
+  <div class="net-outer-label">Actions Runner VM</div>
+  <div class="net-inner" style="margin-top: 16px;">
+    <div class="net-inner-label">AWF Private Docker Network (172.30.0.0/24)</div>
+    <div class="net-boxes">
+      <div class="net-box highlight">
+        <div class="net-box-title">🤖 Agent Container</div>
+        <div class="net-box-sub">172.30.0.20</div>
+        <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px;">Copilot / Claude / Codex</div>
+      </div>
+      <div style="display: flex; align-items: center; color: var(--color-text-muted); font-size: 0.8rem; padding: 0 4px;">→ HTTP →</div>
+      <div class="net-box">
+        <div class="net-box-title">🔒 Squid Proxy</div>
+        <div class="net-box-sub">172.30.0.10</div>
+        <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px;">Domain allowlist</div>
+      </div>
+    </div>
+  </div>
+  <div class="net-flow-arrow"><span>↓ Allowed domains pass ↓ &nbsp;&nbsp;&nbsp; ✗ Blocked → dropped</span></div>
+  <div class="net-boxes">
+    <div class="net-box">
+      <div class="net-box-title">🔑 API Proxy</div>
+      <div class="net-box-sub">holds token</div>
+    </div>
+    <div class="net-box">
+      <div class="net-box-title">🔌 MCP Gateway</div>
+      <div class="net-box-sub">host:80→8000</div>
+    </div>
+    <div class="net-box">
+      <div class="net-box-title">📦 MCP Servers</div>
+      <div class="net-box-sub">spawned via Docker</div>
+    </div>
+  </div>
+</div>
+</section>
+
+{/* ═══════════════════════════ 5. RUNTIME EXECUTION ═══════════════════════════ */}
+
+<section id="runtime">
+<div class="section-label" style="color: var(--color-orange);">Execution</div>
+
+## Runtime Execution Flow
+
+<p class="section-desc">When a workflow triggers, the agent job follows a precise sequence of setup steps before the AI engine enters its execution loop.</p>
+
+<div class="runtime-steps">
+  <div class="runtime-step active">
+    <div class="runtime-step-num">1</div>
+    <div class="runtime-step-content">
+      <h4>Repository Checkout</h4>
+      <p>Standard <code>actions/checkout</code> (SHA-pinned) clones the repository into the runner workspace.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">2</div>
+    <div class="runtime-step-content">
+      <h4>Runtime Setup</h4>
+      <p>Language runtimes (Node.js, Python, Go) installed via setup actions. Dependencies resolved and cached.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">3</div>
+    <div class="runtime-step-content">
+      <h4>Cache Restore</h4>
+      <p>Dependency caches restored from previous runs for faster startup. Reduces re-installation overhead.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">4</div>
+    <div class="runtime-step-content">
+      <h4>MCP Container Start</h4>
+      <p>MCP Gateway spawns isolated server containers via Docker socket. Each server gets its own network and tool allowlist.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">5</div>
+    <div class="runtime-step-content">
+      <h4>Prompt Generation</h4>
+      <p>Workflow context, sanitized user input, and Markdown instructions assembled into the agent prompt.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">6</div>
+    <div class="runtime-step-content">
+      <h4>AI Engine Loop</h4>
+      <p>The selected engine (Copilot, Claude, Codex) reads the prompt, uses MCP tools, writes code. All GitHub writes are buffered by SafeOutputs MCP — never applied directly. Network requests pass through AWF's Squid proxy; LLM calls route through the API Proxy.</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">7</div>
+    <div class="runtime-step-content">
+      <h4>Secret Redaction</h4>
+      <p>Runs unconditionally (<code>if: always()</code>). Scans all files in <code>/tmp/gh-aw</code> and replaces detected secrets with masked format (first 3 chars + asterisks).</p>
+    </div>
+  </div>
+  <div class="runtime-step active">
+    <div class="runtime-step-num">8</div>
+    <div class="runtime-step-content">
+      <h4>Upload Output Artifacts</h4>
+      <p>Buffered artifacts (<code>agent_output.json</code>, <code>aw.patch</code>, <code>prompt.txt</code>) uploaded via Actions artifacts for the detection job.</p>
+    </div>
+  </div>
+  <div class="runtime-step">
+    <div class="runtime-step-num">9</div>
+    <div class="runtime-step-content">
+      <h4>Save Cache</h4>
+      <p>Updated dependency caches saved for subsequent runs.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+{/* ═══════════════════════════ 6. ARTIFACT BUFFERING ═══════════════════════════ */}
+
+<section id="artifact-buffering">
+<div class="section-label" style="color: var(--color-red);">Security Pipeline</div>
+
+## Artifact Buffering &amp; Threat Detection
+
+<p class="section-desc">The agent cannot write directly to the repository or GitHub API. Every output flows through a four-stage security pipeline before reaching the outside world.</p>
+
+<div class="artifact-flow">
+  <div class="artifact-step">
+    <div class="artifact-step-icon" style="background: var(--color-orange-dim); color: var(--color-orange);">📝</div>
+    <h4>Buffer</h4>
+    <p>Agent job produces <code>agent_output.json</code>, <code>aw.patch</code>, and <code>prompt.txt</code>. All writes go to SafeOutputs MCP — never the API.</p>
+  </div>
+  <div class="artifact-arrow-sep"></div>
+  <div class="artifact-step">
+    <div class="artifact-step-icon" style="background: var(--color-red-dim); color: var(--color-red);">🔒</div>
+    <h4>Redact</h4>
+    <p>Secret redaction scans all output files (<code>.txt</code>, <code>.json</code>, <code>.log</code>, <code>.md</code>, <code>.yml</code>). Detected secrets masked: <code>{'abc*****'}</code>.</p>
+  </div>
+  <div class="artifact-arrow-sep"></div>
+  <div class="artifact-step">
+    <div class="artifact-step-icon" style="background: var(--color-purple-dim); color: var(--color-purple);">🔍</div>
+    <h4>Detect</h4>
+    <p>Isolated detection job runs AI + custom scanners. Analyzes for secret leaks, malicious patches, and policy violations. Produces pass/fail verdict.</p>
+  </div>
+  <div class="artifact-arrow-sep"></div>
+  <div class="artifact-step">
+    <div class="artifact-step-icon" style="background: var(--color-green-dim); color: var(--color-green);">✅</div>
+    <h4>Apply</h4>
+    <p>Only if detection passes. Each safe output job receives the minimum write permission needed. Blocked if any threat detected.</p>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 32px;">
+  <h4 style="margin-bottom: 16px;">Safe Output Permission Mapping</h4>
+  <table class="san-table">
+    <thead>
+      <tr>
+        <th>Safe Output Job</th>
+        <th>Required Permission</th>
+        <th>Operation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>create_issue</code></td>
+        <td><code>issues: write</code></td>
+        <td>Creates a new GitHub issue</td>
+      </tr>
+      <tr>
+        <td><code>add_comment</code></td>
+        <td><code>issues: write</code></td>
+        <td>Adds a comment to an issue or PR</td>
+      </tr>
+      <tr>
+        <td><code>create_pull_request</code></td>
+        <td><code>contents: write</code>, <code>pull-requests: write</code></td>
+        <td>Creates a PR from the buffered patch</td>
+      </tr>
+      <tr>
+        <td><code>add_labels</code></td>
+        <td><code>issues: write</code></td>
+        <td>Applies labels to issues or PRs</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+  <h4 style="margin-bottom: 12px;">Customizable Threat Detection</h4>
+  <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 16px;">Extend detection with custom prompts and external security scanners:</p>
+  <div class="code-block"><span class="kw">threat-detection</span>:{'\n'}  <span class="kw">prompt</span>: <span class="str">|</span>{'\n'}    <span class="str">Additionally check for:</span>{'\n'}    <span class="str">- References to internal infrastructure URLs</span>{'\n'}    <span class="str">- Attempts to modify CI/CD configuration files</span>{'\n'}    <span class="str">- Changes to security-sensitive files</span>{'\n'}  <span class="kw">steps</span>:{'\n'}    - <span class="kw">name</span>: <span class="str">Run TruffleHog</span>{'\n'}      <span class="kw">run</span>: <span class="str">trufflehog filesystem /tmp/gh-aw --only-verified</span>{'\n'}    - <span class="kw">name</span>: <span class="str">Run Semgrep</span>{'\n'}      <span class="kw">run</span>: <span class="str">semgrep scan /tmp/gh-aw/aw.patch --config=auto</span></div>
+</div>
+</section>
+
+{/* ═══════════════════════════ 7. CONTENT SANITIZATION ═══════════════════════════ */}
+
+<section id="sanitization">
+<div class="section-label" style="color: var(--color-purple);">Input Protection</div>
+
+## Content Sanitization
+
+<p class="section-desc">Before any user-generated content reaches the agent, it passes through seven sanitization mechanisms at the activation stage boundary — ensuring the agent never processes raw, potentially adversarial input.</p>
+
+<div class="card" style="overflow-x: auto;">
+  <table class="san-table">
+    <thead>
+      <tr>
+        <th style="width: 24%;">Mechanism</th>
+        <th style="width: 30%;">Transformation</th>
+        <th>Protection</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="color: var(--color-blue);">①</span> @mention neutralization</td>
+        <td><code>@user</code> <span class="arrow-cell">→</span> <code>`@user`</code></td>
+        <td>Prevents unintended notifications and social engineering</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">②</span> Bot trigger protection</td>
+        <td><code>fixes #123</code> <span class="arrow-cell">→</span> <code>`fixes #123`</code></td>
+        <td>Prevents automatic issue linking and closure</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">③</span> XML/HTML tag conversion</td>
+        <td><code>&lt;script&gt;</code> <span class="arrow-cell">→</span> <code>(script)</code></td>
+        <td>Prevents injection via markup tags</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">④</span> URI filtering</td>
+        <td><code>http://evil.com</code> <span class="arrow-cell">→</span> <code>(redacted)</code></td>
+        <td>Restricts to HTTPS from trusted domains only</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">⑤</span> Content limits</td>
+        <td>Large payloads <span class="arrow-cell">→</span> truncated</td>
+        <td>0.5 MB max, 65k lines max to prevent denial-of-service</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">⑥</span> Control character removal</td>
+        <td>ANSI escapes <span class="arrow-cell">→</span> stripped</td>
+        <td>Removes terminal manipulation sequences</td>
+      </tr>
+      <tr>
+        <td><span style="color: var(--color-blue);">⑦</span> Unicode normalization</td>
+        <td>Special chars <span class="arrow-cell">→</span> normalized</td>
+        <td>Prevents homoglyph and confusable character attacks</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+{/* ═══════════════════════════ 8. JOB DAG STRUCTURE ═══════════════════════════ */}
+
+<section id="job-dag">
+<div class="section-label" style="color: var(--color-blue);">Execution Graph</div>
+
+## Job DAG Structure
+
+<p class="section-desc">The compiled <code>.lock.yml</code> decomposes into a strict Directed Acyclic Graph (DAG) of jobs. Each job boundary is a <strong>trust boundary</strong> — data flows only through Actions artifacts, never shared memory.</p>
+
+<div class="dag-container">
+  <div class="dag-node" style="border-color: var(--color-orange); border-left: 3px solid var(--color-orange);">
+    <span class="badge badge-orange">Gate</span>
+    <h4>Pre-Activation</h4>
+    <ul>
+      <li>Role &amp; permission checks</li>
+      <li>Deadline validation</li>
+      <li>Skip-if-match evaluation</li>
+      <li>Command position validation</li>
+    </ul>
+  </div>
+  <div class="dag-connector"><div class="dag-connector-line"></div></div>
+
+  <div class="dag-node" style="border-left: 3px solid var(--color-purple);">
+    <span class="badge badge-purple">Setup</span>
+    <h4>Activation</h4>
+    <ul>
+      <li>Prepare workflow context</li>
+      <li>Sanitize user input (7 mechanisms)</li>
+      <li>Validate lock file integrity</li>
+    </ul>
+  </div>
+  <div class="dag-connector"><div class="dag-connector-line"></div></div>
+
+  <div class="dag-node" style="border-left: 3px solid var(--color-blue); background: rgba(88,166,255,0.04);">
+    <span class="badge badge-blue">Core</span>
+    <h4>Agent Job</h4>
+    <ul>
+      <li>Repository checkout &amp; runtime setup</li>
+      <li>Cache restore &amp; MCP container start</li>
+      <li>Prompt generation &amp; AI engine execution</li>
+      <li>Secret redaction (<code>if: always()</code>)</li>
+      <li>Upload output artifacts</li>
+    </ul>
+  </div>
+  <div class="dag-connector"><div class="dag-connector-line"></div></div>
+
+  <div class="dag-node" style="border-left: 3px solid var(--color-red);">
+    <span class="badge badge-red">Security</span>
+    <h4>Detection Job</h4>
+    <ul>
+      <li>Download buffered artifacts</li>
+      <li>AI-powered threat analysis</li>
+      <li>Custom scanner steps (TruffleHog, Semgrep)</li>
+      <li>Emit pass/fail security verdict</li>
+    </ul>
+  </div>
+  <div class="dag-connector"><div class="dag-connector-line"></div></div>
+
+  <div class="dag-fork">
+    <div class="dag-node" style="border-left: 3px solid var(--color-green);">
+      <span class="badge badge-green">✓ Safe</span>
+      <h4>Safe Output Jobs</h4>
+      <ul>
+        <li>Scoped write permissions</li>
+        <li>Create issues, PRs, comments</li>
+        <li>Apply labels</li>
+      </ul>
+    </div>
+    <div class="dag-node" style="border-left: 3px solid var(--color-red); background: rgba(248,81,73,0.04);">
+      <span class="badge badge-red">✗ Threat</span>
+      <h4>Blocked</h4>
+      <ul>
+        <li>No writes externalized</li>
+        <li>Workflow fails</li>
+        <li>Artifacts preserved for audit</li>
+      </ul>
+    </div>
+  </div>
+  <div class="dag-connector"><div class="dag-connector-line"></div></div>
+
+  <div class="dag-node" style="border-left: 3px solid var(--color-text-muted);">
+    <span class="badge" style="background: rgba(139,148,158,0.15); color: var(--color-text-muted);">Final</span>
+    <h4>Conclusion</h4>
+    <ul>
+      <li>Aggregate results</li>
+      <li>Generate summary</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Trust boundary enforcement:</strong> Data flows between jobs only through Actions artifacts and outputs — never through shared memory or filesystem. A compromised agent job cannot influence detection or safe output jobs except through its declared artifacts. The DAG is expressed natively via Actions' <code>needs:</code> syntax.
+</div>
+</section>
+
+{/* ═══════════════════════════ 9. AGENT RUNTIME ENVIRONMENT ═══════════════════════════ */}
+
+<section id="runtime-env">
+<div class="section-label" style="color: var(--color-green);">Environment</div>
+
+## Agent Runtime Environment
+
+<p class="section-desc">The agent runs inside the AWF's containerized environment with controlled filesystem access, network isolation, and engine selection.</p>
+
+<div class="grid-2">
+  <div class="card">
+    <span class="badge badge-blue">Filesystem</span>
+    <h4 style="margin-bottom: 12px;">Chroot Mode</h4>
+    <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 16px;">Many coding agents expect full host access. The AWF provides a chroot mode that gives the agent access to host-installed tools while maintaining isolation:</p>
+    <ul class="container-card-list">
+      <li><span class="list-icon" style="color: var(--color-blue);">1</span> Mounts entire VM filesystem <strong>read-only</strong> at <code>/host</code></li>
+      <li><span class="list-icon" style="color: var(--color-blue);">2</span> Overlays sensitive directories with empty <code>tmpfs</code> layers</li>
+      <li><span class="list-icon" style="color: var(--color-blue);">3</span> Mounts <code>HOME</code> and <code>/tmp</code> <strong>read-write</strong></li>
+      <li><span class="list-icon" style="color: var(--color-blue);">4</span> Imports subset of host env vars (<code>USER</code>, <code>PATH</code>)</li>
+      <li><span class="list-icon" style="color: var(--color-blue);">5</span> Launches agent in a <code>/host</code> chroot jail</li>
+    </ul>
+    <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-top: 12px;">This lets the agent use Python, Node.js, Go at their normal paths while the AWF controls network and secrets.</p>
+  </div>
+
+  <div class="card">
+    <span class="badge badge-purple">Engines</span>
+    <h4 style="margin-bottom: 12px;">Supported AI Engines</h4>
+    <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 16px;">The <code>engine:</code> frontmatter field selects which AI agent runs inside the container:</p>
+    <div class="engine-grid">
+      <div class="engine-item">
+        <span class="mono">copilot</span>
+        <span class="provider">GitHub — Default</span>
+      </div>
+      <div class="engine-item">
+        <span class="mono">claude-code</span>
+        <span class="provider">Anthropic</span>
+      </div>
+      <div class="engine-item">
+        <span class="mono">codex</span>
+        <span class="provider">OpenAI</span>
+      </div>
+      <div class="engine-item">
+        <span class="mono">cai</span>
+        <span class="provider">GitHub (experimental)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+  <h4 style="margin-bottom: 12px;">Domain Allowlist Configuration</h4>
+  <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 16px;">The AWF enforces network rules from the workflow frontmatter. Ecosystem bundles provide pre-configured domain sets for common toolchains:</p>
+  <div class="code-block"><span class="kw">network</span>:{'\n'}  <span class="kw">firewall</span>: <span class="str">true</span>{'\n'}  <span class="kw">allowed</span>:{'\n'}    - <span class="str">defaults</span>     <span class="cmt"># Certificates, JSON schema</span>{'\n'}    - <span class="str">python</span>       <span class="cmt"># PyPI, Conda</span>{'\n'}    - <span class="str">node</span>         <span class="cmt"># npm, npmjs.com</span>{'\n'}    - <span class="str">"api.example.com"</span>  <span class="cmt"># Custom domain</span></div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+  <span class="badge badge-green">Observability</span>
+  <h4 style="margin-bottom: 12px;">Logging at Every Trust Boundary</h4>
+  <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 16px;">Every trust boundary doubles as a logging point — and every logging point is a potential mediation point for future information-flow controls.</p>
+  <div class="obs-grid">
+    <div class="obs-item">
+      <div class="obs-item-title">🛡️ Firewall (AWF)</div>
+      <div class="obs-item-desc">Network destinations, blocked requests, egress patterns</div>
+    </div>
+    <div class="obs-item">
+      <div class="obs-item-title">🔑 API Proxy</div>
+      <div class="obs-item-desc">Model request/response metadata, token usage</div>
+    </div>
+    <div class="obs-item">
+      <div class="obs-item-title">🔌 MCP Gateway</div>
+      <div class="obs-item-desc">Tool invocations, server lifecycle, tool filtering</div>
+    </div>
+    <div class="obs-item">
+      <div class="obs-item-title">🤖 Agent Container</div>
+      <div class="obs-item-desc">Env var accesses, internal instrumentation</div>
+    </div>
+    <div class="obs-item">
+      <div class="obs-item-title">✅ Safe Outputs</div>
+      <div class="obs-item-desc">Buffered operations, verdicts, applied writes</div>
+    </div>
+    <div class="obs-item">
+      <div class="obs-item-title">📋 Artifacts</div>
+      <div class="obs-item-desc">prompt.txt, agent_output.json, aw.patch, engine logs</div>
+    </div>
+  </div>
+</div>
+</section>
+
+{/* ═══════════════════════════ KEY DISTINCTION ═══════════════════════════ */}
+
+<section id="distinction">
+<div class="container" style="text-align: center; max-width: 800px; margin: 0 auto;">
+
+## The Critical Distinction
+
+<div class="card" style="border-color: var(--color-blue); background: rgba(88,166,255,0.04);">
+  <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 16px;">
+    <em>"By default, everything in an action runs in the same trust domain. Rogue agents can interfere with MCP servers, access authentication secrets, and make network requests to arbitrary hosts."</em>
+  </p>
+  <p style="font-size: 0.92rem; color: var(--color-text-muted);">
+    gh-aw constrains agent capabilities <strong style="color: var(--color-text);">through architecture</strong> rather than relying on procedural safeguards. The system makes it <strong style="color: var(--color-green);">structurally impossible</strong> for agents to access secrets, write directly to the repository, or communicate with unauthorized endpoints — even if the agent is fully compromised.
+  </p>
+</div>
+</div>
+</section>

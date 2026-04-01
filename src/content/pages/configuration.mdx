@@ -1,0 +1,689 @@
+---
+title: "Configuration — GitHub Agentic Workflows"
+description: "Complete YAML frontmatter reference — triggers, permissions, engine selection, tools, safe outputs, MCP servers, and network configuration."
+navLabel: "Configuration"
+navOrder: 3
+heroEmoji: "⚙️"
+heroSubtitle: "Complete frontmatter schema and field reference"
+accentColor: "blue"
+---
+
+<div class="quick-nav">
+  <a href="#prerequisites">Prerequisites</a>
+  <a href="#overview">Overview</a>
+  <a href="#auth">Authentication</a>
+  <a href="#schema">Schema</a>
+  <a href="#triggers">Triggers</a>
+  <a href="#permissions">Permissions</a>
+  <a href="#engines">Engines</a>
+  <a href="#tools">Tools</a>
+  <a href="#safe-outputs">Safe Outputs</a>
+  <a href="#network">Network</a>
+  <a href="#mcp">MCP Servers</a>
+  <a href="#advanced">Advanced</a>
+</div>
+
+<div class="section-hdr" id="prerequisites">
+  <h2>Prerequisites</h2>
+</div>
+
+Before creating agentic workflows, ensure you have the following:
+
+<div class="card-grid-2col">
+  <div class="card card-accent-green">
+    <h3>✅ Required</h3>
+    <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
+      <li><strong>GitHub Copilot subscription</strong> — Pro, Pro+, Business, or Enterprise plan</li>
+      <li><strong>GitHub CLI</strong> — <code>gh</code> v2.45.0 or above (<a href="https://cli.github.com" target="_blank" rel="noopener noreferrer">cli.github.com</a>)</li>
+      <li><strong>gh-aw extension</strong> — <code>gh extension install github/gh-aw</code></li>
+      <li><strong>Repository admin access</strong> — needed to manage secrets and enable workflows</li>
+    </ul>
+  </div>
+  <div class="card card-accent-blue">
+    <h3>🔑 Tokens & Secrets</h3>
+    <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
+      <li><strong><code>COPILOT_GITHUB_TOKEN</code></strong> — required repo secret; fine-grained PAT with <em>Copilot Requests</em> permission (see <a href="#auth">Authentication</a>)</li>
+      <li><strong><code>GH_AW_AGENT_TOKEN</code></strong> — optional repo secret; PAT for <code>assign-to-agent</code> safe output</li>
+      <li><strong>Custom PAT or GitHub App</strong> — optional, for safe-output writes under a different identity</li>
+    </ul>
+  </div>
+</div>
+
+### What `gh aw init` Does
+
+Running `gh aw init` in your repository:
+
+<div class="card card-accent-green" style={{marginBottom: '16px'}}>
+  <ul style={{margin: '8px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
+    <li>✅ Creates <code>.github/workflows/copilot-setup-steps.yml</code> — the environment setup file for the agentic workflow runner</li>
+    <li>✅ Walks you through selecting an AI engine (Copilot, Claude, Codex)</li>
+    <li>✅ Provides instructions for setting up required secrets</li>
+    <li>❌ Does <strong>not</strong> create the <code>COPILOT_GITHUB_TOKEN</code> secret — you must do this manually</li>
+  </ul>
+</div>
+
+```bash
+# Initialize the repo
+gh aw init --engine copilot
+
+# Then manually create the required secret
+gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
+# (paste your fine-grained PAT when prompted)
+```
+
+<div class="callout callout-orange">
+  <p>⚠️ Without <code>COPILOT_GITHUB_TOKEN</code>, the activation step will fail immediately. This is the first thing to check when troubleshooting a failed workflow run.</p>
+</div>
+
+<div class="section-hdr" id="overview">
+  <h2>How Configuration Works</h2>
+</div>
+
+Every agentic workflow is a `.md` file in `.github/workflows/` with two parts:
+
+<div class="card-grid-2col">
+  <div class="card card-accent-blue">
+    <h3>📋 YAML Frontmatter</h3>
+    <p class="desc">Structured config between <code>---</code> markers — triggers, permissions, tools, engine, and safe outputs. Validated at compile time.</p>
+  </div>
+  <div class="card card-accent-green">
+    <h3>📝 Markdown Body</h3>
+    <p class="desc">Natural-language instructions for the AI agent. Editable without recompilation — the agent interprets these contextually at runtime.</p>
+  </div>
+</div>
+
+```yaml
+# File: .github/workflows/triage-issues.md
+---
+on:
+  issues:
+    types: [opened]
+permissions: read-all
+safe-outputs:
+  add-labels:
+    allowed: [bug, feature, docs]
+  add-comment: {}
+---
+
+# Issue Triage Agent
+Analyze new issues and apply the appropriate label.
+Explain your reasoning in a comment.
+```
+
+<div class="callout callout-green">
+  <p>💡 Run <code>gh aw compile</code> to transform the <code>.md</code> file into a <code>.lock.yml</code> — a security-hardened GitHub Actions workflow. The lock file is what Actions executes.</p>
+</div>
+
+<div class="section-hdr" id="auth">
+  <h2>Authentication & Tokens</h2>
+</div>
+
+Agentic workflows use repository secrets for authentication. The compiled `.lock.yml` workflow references these secrets at runtime during the activation and safe-outputs steps.
+
+### `COPILOT_GITHUB_TOKEN` — The Core Requirement
+
+Every agentic workflow needs `COPILOT_GITHUB_TOKEN` — a **fine-grained PAT** from a user with an active Copilot license. The compiled workflow validates this secret during activation; without it, the run fails immediately.
+
+<div class="card card-accent-blue" style={{marginBottom: '24px'}}>
+  <h3>Creating the Token</h3>
+  <ol style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
+    <li>Go to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">github.com/settings/personal-access-tokens</a></li>
+    <li>Select <strong>Fine-grained token</strong> → choose your target repository or <em>Public Repositories</em></li>
+    <li>Under <strong>Account permissions</strong>, grant <strong>Copilot Requests: Read-only</strong></li>
+    <li>Copy the generated token and store it as a repo secret:</li>
+  </ol>
+</div>
+
+```bash
+gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
+# Paste your fine-grained PAT when prompted
+```
+
+<div class="callout callout-orange">
+  <p>⚠️ <code>COPILOT_GITHUB_TOKEN</code> is <strong>not</strong> the built-in <code>GITHUB_TOKEN</code>. It must be a PAT from a user whose Copilot subscription is consumed for premium requests. The token owner's account must have Copilot access.</p>
+</div>
+
+### Additional Secrets
+
+Depending on your workflow configuration, you may need additional repository secrets:
+
+| Secret | When Needed | Permission |
+|---|---|---|
+| `COPILOT_GITHUB_TOKEN` | **Always** — every agentic workflow | Copilot Requests: Read-only |
+| `GH_AW_AGENT_TOKEN` | Using `assign-to-agent` safe output | Issues: Read & Write |
+| `ANTHROPIC_API_KEY` | Using `engine: claude` | — |
+| `OPENAI_API_KEY` | Using `engine: codex` | — |
+| `GEMINI_API_KEY` | Using `engine: gemini` | — |
+| `GH_AW_SECURITY_ALERTS_TOKEN` | Security monitoring workflows | Dependabot, Code scanning, Secret scanning alerts |
+
+<div class="callout callout-blue">
+  <p>💡 All secrets are stored as <strong>regular repository secrets</strong> (Settings → Secrets and variables → Actions). MCP server secrets referenced in the workflow frontmatter also go here, using the <code>{'${{ secrets.NAME }}'}</code> syntax.</p>
+</div>
+
+### Custom Tokens for Safe Outputs
+
+By default, safe-output write operations use the built-in `GITHUB_TOKEN`. To use a **different identity** for writes (e.g., a bot account, a GitHub App), configure `github-token:` or `github-app:` in your safe-outputs.
+
+<div class="card-grid-2col">
+  <div class="card card-accent-blue">
+    <h3>🔑 Fine-Grained PAT</h3>
+    <p class="desc">Use a PAT for full control. Supports all safe-output types including <code>assign-to-agent</code>.</p>
+
+```yaml
+safe-outputs:
+  github-token:
+    secret: MY_BOT_PAT
+  create-pull-request:
+    draft: true
+  assign-to-agent:
+    allowed: [copilot]
+```
+
+  </div>
+  <div class="card card-accent-orange">
+    <h3>🤖 GitHub App</h3>
+    <p class="desc">Use a GitHub App for scoped, short-lived tokens. Better for orgs — no personal account needed.</p>
+
+```yaml
+safe-outputs:
+  github-app:
+    app-id: ${{ vars.APP_ID }}
+    private-key: ${{ secrets.APP_KEY }}
+  create-pull-request:
+    draft: true
+  add-comment: {}
+```
+
+  </div>
+</div>
+
+#### PAT Required Scopes
+
+| Scope | Required For |
+|---|---|
+| `contents: write` | Creating PRs, pushing code |
+| `issues: write` | Creating/updating issues, adding labels |
+| `pull-requests: write` | PR reviews, comments |
+| `actions: write` | Dispatching workflows |
+
+<div class="callout callout-orange">
+  <p>⚠️ <strong>GitHub App limitation:</strong> The <code>assign-to-agent</code> safe output requires a <strong>fine-grained PAT</strong> — GitHub App installation tokens are not supported by the Copilot assignment API. If you use <code>github-app:</code> for other safe outputs, set the <code>GH_AW_AGENT_TOKEN</code> repository secret (a PAT) as a fallback for agent assignment.</p>
+</div>
+
+### Token Summary
+
+| Scenario | Token Type | Where to Configure |
+|---|---|---|
+| Running any agentic workflow | Fine-grained PAT | `COPILOT_GITHUB_TOKEN` repo secret |
+| Third-party engine (Claude, Codex, Gemini) | API key | Engine-specific repo secret |
+| MCP server authentication | Secret | Repo secret, referenced via `${{ secrets.NAME }}` |
+| Safe-output writes (custom identity) | PAT or GitHub App | `github-token:` or `github-app:` in frontmatter |
+| Assign-to-agent | Fine-grained PAT only | `GH_AW_AGENT_TOKEN` repo secret |
+
+<div class="section-hdr" id="schema">
+  <h2>Complete Frontmatter Schema</h2>
+  <span class="count">35+ fields</span>
+</div>
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `name` | `string` | No | Filename | Display name in GitHub Actions UI |
+| `description` | `string` | No | — | Human-readable workflow description |
+| **`on`** | `string` / `object` | **Yes** | — | Trigger events and access controls |
+| `permissions` | `string` / `object` | No | `read-all` | GitHub token permission scopes |
+| `engine` | `string` / `object` | No | `copilot` | AI engine and model selection |
+| `tools` | `object` | No | — | Available tools for the agent |
+| `mcp-servers` | `object` | No | — | Custom Model Context Protocol servers |
+| `mcp-scripts` | `object` | No | — | Inline MCP tools via JS/shell scripts |
+| `safe-outputs` | `object` | No | — | Permitted write operations |
+| `network` | `string` / `object` | No | `defaults` | Network access control (AWF) |
+| `sandbox` | `string` / `object` | No | `awf` | Sandbox configuration (AWF + MCP gateway) |
+| `strict` | `boolean` | No | `true` | Enhanced security validation |
+| `imports` | `string[]` / `object[]` | No | — | Import shared config from other `.md` files |
+| `source` | `string` | No | — | Origin tracking (`owner/repo/path@ref`) |
+| `secrets` | `object` | No | — | Secret values for workflow execution |
+| `environment` | `string` / `object` | No | — | Deployment protection rules |
+| `container` | `string` / `object` | No | — | Container image for job steps |
+| `services` | `object` | No | — | Service containers (databases, caches) |
+| `steps` | `array` | No | — | Custom steps before agentic execution |
+| `post-steps` | `array` | No | — | Custom steps after agentic execution |
+| `jobs` | `object` | No | — | Custom jobs alongside agentic execution |
+| `env` | `object` | No | — | Workflow-level environment variables |
+| `cache` | `object` / `array` | No | — | GitHub Actions cache configuration |
+| `concurrency` | `string` / `object` | No | — | Workflow concurrency control |
+| `runs-on` | `string` / `array` | No | `ubuntu-latest` | Runner label for main job |
+| `timeout-minutes` | `integer` | No | `20` | Maximum execution time |
+| `if` | `string` | No | — | Conditional execution expression |
+| `run-name` | `string` | No | Workflow name | Custom run display name |
+| `private` | `boolean` | No | `false` | Prevent external installation |
+| `labels` | `string[]` | No | — | Workflow categorization tags |
+| `metadata` | `object` | No | — | Custom key-value pairs |
+| `resources` | `string[]` | No | — | Companion files for `gh aw add` |
+| `runtimes` | `object` | No | — | Override default runtime versions |
+| `features` | `object` | No | — | Experimental feature flags |
+
+<div class="section-hdr" id="triggers">
+  <h2>Trigger Events (<code>on:</code>)</h2>
+  <span class="count">30+ triggers</span>
+</div>
+
+The `on:` field uses standard GitHub Actions trigger syntax, extended with gh-aw-specific controls.
+
+### Standard Triggers
+
+| Trigger | Key | Common Types | Use Case |
+|---|---|---|---|
+| Issues | `issues` | `opened`, `edited`, `labeled` | React to issue lifecycle |
+| Pull Request | `pull_request` | `opened`, `synchronize` | React to PR events |
+| Issue Comment | `issue_comment` | `created` | ChatOps, respond to comments |
+| Push | `push` | — | React to code pushes |
+| Schedule | `schedule` | — | Recurring automation |
+| Workflow Dispatch | `workflow_dispatch` | — | Manual trigger with inputs |
+| Workflow Run | `workflow_run` | — | Chain after another workflow |
+| Discussion | `discussion` | `created`, `edited` | React to discussions |
+| Release | `release` | `published` | Auto-generate changelogs |
+
+### 🕐 Fuzzy Schedule Syntax
+
+Human-friendly schedules. The compiler assigns deterministic scattered times based on file path.
+
+```yaml
+on:
+  schedule: daily                              # Scattered daily
+  schedule: daily around 14:00                 # ±1 hour of 14:00
+  schedule: daily between 9:00 and 17:00       # Business hours
+  schedule: weekly on friday around 5pm        # Weekly on Fridays
+  schedule: hourly                             # Every hour
+  schedule: every 10 minutes                   # Minimum 5 minutes
+```
+
+### ⚡ Slash & Label Commands
+
+```yaml
+# Slash command — users type /review in comments
+on:
+  slash_command: "review"
+
+# Label command — fires when label is added
+on:
+  label_command: "deploy"
+```
+
+### 🔧 gh-aw Trigger Extensions
+
+| Field | Type | Description |
+|---|---|---|
+| `reaction` | `string` | Emoji reaction on trigger (`eyes`, `rocket`, `none`) |
+| `status-comment` | `boolean` | Post started/completed comments |
+| `stop-after` | `string` | Auto-disable deadline (`+90d`, `2024-12-31`) |
+| `manual-approval` | `string` | Environment name for human approval gate |
+| `roles` | `string[]` | Required repo roles (`admin`, `maintainer`, `write`) |
+| `skip-bots` | `string[]` | Skip for listed bot actors |
+| `lock-for-agent` | `boolean` | Lock issue during execution |
+| `skip-if-match` | `string` / `object` | Skip if GitHub search query matches |
+| `skip-if-check-failing` | `boolean` / `object` | Skip if CI checks are failing |
+
+<div class="section-hdr" id="permissions">
+  <h2>Permissions</h2>
+</div>
+
+<div class="callout callout-orange">
+  <p>⚠️ <strong>Read-only by default.</strong> In strict mode (enabled by default), write permissions are <strong>refused</strong> — you must use <code>safe-outputs</code> for all write operations.</p>
+</div>
+
+```yaml
+# Shorthand
+permissions: read-all
+
+# Granular
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  models: read        # Required for Copilot AI model access
+```
+
+| Scope | Values | Notes |
+|---|---|---|
+| `contents` | `read` / `write` / `none` | Repository file access |
+| `issues` | `read` / `write` / `none` | Issue API access |
+| `pull-requests` | `read` / `write` / `none` | PR API access |
+| `actions` | `read` / `write` / `none` | Workflow and run access |
+| `checks` | `read` / `write` / `none` | Check runs and suites |
+| `discussions` | `read` / `write` / `none` | Discussion API |
+| `models` | `read` / `none` | GitHub Copilot AI model access |
+| `security-events` | `read` / `write` / `none` | Code scanning, Dependabot |
+| `packages` | `read` / `write` / `none` | Package registry |
+| `statuses` | `read` / `write` / `none` | Commit status API |
+| `id-token` | `write` / `none` | OIDC JWT tokens |
+
+<div class="section-hdr" id="engines">
+  <h2>Engine Configuration</h2>
+  <span class="count">4 engines</span>
+</div>
+
+<div class="grid-4">
+  <div class="card card-accent-blue">
+    <h3>🤖 Copilot <span class="badge badge-green">default</span></h3>
+    <p class="desc">GitHub's own coding agent. Uses Copilot premium requests.</p>
+    <pre style={{marginTop: '12px', padding: '12px 16px'}}><code>engine: copilot</code></pre>
+  </div>
+  <div class="card card-accent-orange">
+    <h3>🧠 Claude</h3>
+    <p class="desc">Anthropic's coding agent. Requires <code>ANTHROPIC_API_KEY</code>.</p>
+    <pre style={{marginTop: '12px', padding: '12px 16px'}}><code>engine: claude</code></pre>
+  </div>
+  <div class="card card-accent-green">
+    <h3>💻 Codex</h3>
+    <p class="desc">OpenAI's coding agent. Requires <code>OPENAI_API_KEY</code>.</p>
+    <pre style={{marginTop: '12px', padding: '12px 16px'}}><code>engine: codex</code></pre>
+  </div>
+  <div class="card card-accent-cyan">
+    <h3>✨ Gemini</h3>
+    <p class="desc">Google's coding agent. Requires <code>GEMINI_API_KEY</code>.</p>
+    <pre style={{marginTop: '12px', padding: '12px 16px'}}><code>engine: gemini</code></pre>
+  </div>
+</div>
+
+### Extended Engine Configuration
+
+```yaml
+engine:
+  id: copilot
+  version: "0.0.422"            # Pin specific CLI version
+  model: gpt-5                  # Override default model
+  agent: technical-doc-writer   # Custom agent (.github/agents/<name>.agent.md)
+  max-continuations: 3          # Autopilot mode (Copilot only)
+  max-turns: 50                 # Max chat iterations (Claude only)
+  env:
+    DEBUG_MODE: "true"
+```
+
+<div class="section-hdr" id="tools">
+  <h2>Tools Configuration</h2>
+  <span class="count">12 built-in tools</span>
+</div>
+
+| Tool | Key | Description |
+|---|---|---|
+| GitHub | `github:` | GitHub API operations via MCP server |
+| Bash | `bash:` | Shell command execution (sandboxed) |
+| Edit | `edit:` | File editing in workspace |
+| Web Fetch | `web-fetch:` | Fetch web content |
+| Web Search | `web-search:` | Search the web |
+| Playwright | `playwright:` | Browser automation and testing |
+| Cache Memory | `cache-memory:` | Persistent memory across runs |
+| Repo Memory | `repo-memory:` | Git-based context storage |
+| Agentic Workflows | `agentic-workflows:` | Workflow introspection |
+| Serena | `serena:` | AI-powered code intelligence (LSP) |
+| QMD | `qmd:` | Documentation vector search |
+
+### GitHub Tool — Toolsets
+
+```yaml
+tools:
+  github:
+    toolsets: [repos, issues, pull_requests, labels, code_search]
+    read-only: true
+    lockdown: true
+```
+
+### Bash — Command Allowlisting
+
+```yaml
+tools:
+  bash:                              # Default safe commands only
+  bash: true                         # All commands
+  bash: ["echo", "git:*", "npm"]     # Specific commands
+```
+
+### Complete Example
+
+```yaml
+tools:
+  edit:
+  bash: ["gh", "git:*", "npm", "node"]
+  github:
+    toolsets: [issues, pull_requests, labels]
+  web-fetch:
+  web-search:
+  cache-memory:
+    key: "project-context"
+  playwright:
+  serena: ["typescript", "python"]
+  timeout: 120
+```
+
+<div class="section-hdr" id="safe-outputs">
+  <h2>Safe Outputs</h2>
+  <span class="count">30+ types</span>
+</div>
+
+Safe outputs are the security boundary between read-only AI execution and write operations. The agent produces structured output; separate permission-controlled jobs execute the writes.
+
+### Issues & Discussions
+
+| Type | Key | Max | Description |
+|---|---|---|---|
+| Create Issue | `create-issue` | 1 | Create GitHub issues with labels, assignees |
+| Update Issue | `update-issue` | 1 | Update issue status, title, body |
+| Close Issue | `close-issue` | 1 | Close issues with comment |
+| Create Discussion | `create-discussion` | 1 | Create GitHub discussions |
+
+### Pull Requests
+
+| Type | Key | Max | Description |
+|---|---|---|---|
+| Create PR | `create-pull-request` | 1 | Create PRs with code changes |
+| Push to PR | `push-to-pull-request-branch` | 1 | Push changes to existing PR branch |
+| Review Comments | `create-pull-request-review-comment` | 10 | Line-specific review comments |
+| Submit Review | `submit-pull-request-review` | 1 | APPROVE / REQUEST_CHANGES / COMMENT |
+
+### Labels, Assignments & Comments
+
+| Type | Key | Max | Description |
+|---|---|---|---|
+| Add Comment | `add-comment` | 1 | Post comments on issues/PRs/discussions |
+| Add Labels | `add-labels` | 3 | Add labels (with allowlist) |
+| Remove Labels | `remove-labels` | 3 | Remove labels |
+| Add Reviewer | `add-reviewer` | 3 | Add reviewers to PRs |
+| Assign to Agent | `assign-to-agent` | 1 | Assign Copilot to issues/PRs |
+
+### Workflows & Security
+
+| Type | Key | Max | Description |
+|---|---|---|---|
+| Dispatch Workflow | `dispatch-workflow` | 1 | Trigger other agentic workflows |
+| Call Workflow | `call-workflow` | 1 | Call reusable workflows (fan-out) |
+| Code Scanning | `create-code-scanning-alert` | ∞ | Generate SARIF security advisories |
+| Upload Asset | `upload-asset` | 10 | Publish files to orphaned git branch |
+
+### Examples
+
+```yaml
+safe-outputs:
+  create-issue:
+    title-prefix: "[ai] "
+    labels: [automation, agentic]
+    assignees: [copilot]
+    max: 5
+    expires: 7d
+
+  create-pull-request:
+    title-prefix: "[ai] "
+    draft: true
+    reviewers: [copilot]
+    auto-merge: true
+    protected-files: "blocked"
+
+  add-labels:
+    allowed: [bug, enhancement, docs]
+    max: 5
+
+  add-comment:
+    max: 3
+    hide-older-comments: true
+```
+
+<div class="section-hdr" id="mcp">
+  <h2>Custom MCP Servers</h2>
+</div>
+
+Three connection modes for external tools:
+
+### 📡 Process (stdio)
+
+```yaml
+mcp-servers:
+  slack:
+    command: "npx"
+    args: ["-y", "@slack/mcp-server"]
+    env:
+      SLACK_BOT_TOKEN: "${{ secrets.SLACK_TOKEN }}"
+```
+
+### 🐳 Container (Docker)
+
+```yaml
+mcp-servers:
+  custom-db:
+    container: "ghcr.io/org/db-mcp:latest"
+    env:
+      DATABASE_URL: "${{ secrets.DB_URL }}"
+```
+
+### 🌐 HTTP Endpoint
+
+```yaml
+mcp-servers:
+  remote-api:
+    url: "https://api.example.com/mcp"
+    headers:
+      Authorization: "Bearer ${{ secrets.TOKEN }}"
+```
+
+<div class="section-hdr" id="network">
+  <h2>Network Configuration</h2>
+</div>
+
+Controlled by the Agent Workflow Firewall (AWF). Only whitelisted domains are accessible.
+
+```yaml
+network: defaults                   # Basic infrastructure only
+
+network:
+  allowed:
+    - defaults                      # Basic infra
+    - python                        # PyPI ecosystem
+    - node                          # NPM ecosystem
+    - github                        # GitHub domains
+    - "api.example.com"             # Custom domain
+  blocked:
+    - "cdn.tracker.com"             # Block specific (takes precedence)
+```
+
+### Ecosystem Identifiers
+
+| ID | Covers |
+|---|---|
+| `defaults` | Certificates, JSON schema, Ubuntu mirrors |
+| `github` | GitHub and adjacent domains |
+| `python` | PyPI, pip |
+| `node` | npm, yarn, pnpm |
+| `go` | proxy.golang.org |
+| `rust` | crates.io |
+| `java` | Maven Central, Gradle |
+| `dotnet` | NuGet |
+| `containers` | Docker Hub, GHCR, Quay |
+| `terraform` | HashiCorp domains |
+| `playwright` | Browser downloads |
+| `linux-distros` | Debian, Alpine repos |
+
+<div class="section-hdr" id="advanced">
+  <h2>Advanced Configuration</h2>
+</div>
+
+### Imports — Shared Configuration
+
+```yaml
+imports:
+  - "./shared/base-config.md"                          # Local file
+  - "githubnext/agentics/shared/security.md@main"      # Remote
+```
+
+### Concurrency
+
+```yaml
+concurrency:
+  group: "gh-aw-${{ github.workflow }}"
+  cancel-in-progress: true
+```
+
+### Custom Steps
+
+```yaml
+steps:                             # Run BEFORE agent
+  - uses: actions/setup-node@v4
+    with:
+      node-version: "20"
+
+post-steps:                        # Run AFTER agent
+  - run: echo "Agent completed"
+```
+
+### Complete Workflow Example
+
+```yaml
+---
+name: "CI Failure Investigator"
+description: "Investigates CI failures and proposes fixes"
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  roles: [admin, maintainer]
+  stop-after: "+90d"
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+
+engine:
+  id: copilot
+  max-continuations: 3
+
+tools:
+  edit:
+  bash: ["gh", "git:*", "npm"]
+  github:
+    toolsets: [repos, issues, pull_requests]
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[ci-fix] "
+    labels: [ci-fix, automation]
+    draft: true
+  add-comment:
+    max: 2
+
+network:
+  allowed:
+    - defaults
+    - node
+    - github
+
+timeout-minutes: 15
+---
+
+# CI Failure Investigator
+
+When a CI workflow fails, investigate the failure:
+
+1. Read the failed workflow logs
+2. Identify the root cause
+3. Search the codebase for the relevant code
+4. Propose a fix as a pull request
+5. Comment on the triggering issue with your analysis
+```

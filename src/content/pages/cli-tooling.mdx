@@ -1,0 +1,921 @@
+---
+title: "CLI & Tooling — GitHub Agentic Workflows"
+description: "Complete reference for the gh aw CLI extension — installation, commands, compilation pipeline, IDE integration, and debugging."
+navLabel: "CLI & Tooling"
+navOrder: 7
+heroEmoji: "🛠️"
+heroSubtitle: "Complete gh aw CLI command reference and tooling guide"
+accentColor: "purple"
+---
+
+<div class="quote-callout orange" style="margin-bottom: 32px;">
+  <p><strong>⚠️ Note:</strong> <code>gh aw</code> is a separate Go-based extension for the GitHub CLI — not the Copilot CLI runtime. It handles workflow authoring and lifecycle management.</p>
+</div>
+
+## 🚀 Quick Start
+
+Get up and running in three commands.
+
+<div class="code-block-wrapper">
+  <div class="code-header">
+    <span class="code-dot" style="background: #ff5f57;"></span>
+    <span class="code-dot" style="background: #febc2e;"></span>
+    <span class="code-dot" style="background: #28c840;"></span>
+    <span class="code-filename">Terminal</span>
+  </div>
+  <pre>{`# 1. Install the GitHub CLI (if you don't have it)
+#    → https://cli.github.com/
+
+# 2. Install the gh-aw extension
+$ gh extension install github/gh-aw
+
+# 3. Initialize your repository
+$ gh aw init
+
+# That's it! Now create your first workflow:
+$ gh aw new my-first-workflow --engine copilot
+$ gh aw compile my-first-workflow
+$ gh aw run my-first-workflow --push`}</pre>
+</div>
+
+## 📦 Installation Methods
+
+Four ways to install, depending on your environment.
+
+<div class="grid-2">
+  <div class="card">
+    <h3>🔌 Extension Install <span class="badge badge-green">Recommended</span></h3>
+    <p>Standard installation via the GitHub CLI extension manager. Requires <code>gh</code> to be installed and authenticated.</p>
+    <pre>{`$ gh extension install github/gh-aw
+$ gh aw version`}</pre>
+  </div>
+
+  <div class="card">
+    <h3>📌 Pinned Version <span class="badge badge-blue">Production</span></h3>
+    <p>Lock to a specific release tag or commit SHA for reproducible environments and team consistency.</p>
+    <pre>{`$ gh extension install github/gh-aw@v0.57.0
+
+# Upgrade a pinned version
+$ gh extension remove gh-aw
+$ gh extension install github/gh-aw@v0.58.0`}</pre>
+  </div>
+
+  <div class="card">
+    <h3>📥 Standalone Installer <span class="badge badge-orange">Fallback</span></h3>
+    <p>For Codespaces, restricted networks, or when <code>gh extension install</code> fails. Supports Linux, macOS, FreeBSD, Windows (WSL), and Android.</p>
+    <pre>{`# Latest version
+$ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash
+
+# Pinned version
+$ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash -s v0.57.0`}</pre>
+  </div>
+
+  <div class="card">
+    <h3>⚙️ GitHub Actions Setup <span class="badge badge-purple">CI/CD</span></h3>
+    <p>For pipelines — includes automatic checksum verification and platform detection.</p>
+    <pre>{`# In your workflow YAML:
+- name: Install gh-aw CLI
+  uses: github/gh-aw/actions/setup-cli@main
+  with:
+    version: v0.57.0`}</pre>
+  </div>
+</div>
+
+<div class="quote-callout green" style="margin-top: 16px;">
+  <p><strong>💡 Global Flags:</strong> All commands support <code>-h</code> / <code>--help</code> for help and <code>-v</code> / <code>--verbose</code> for debug output. Use <code>gh aw help [command]</code> for command-specific docs.</p>
+</div>
+
+## 📖 Command Reference
+
+Complete reference for every `gh aw` command with syntax, options, and examples.
+
+### ⚡ Core Commands
+
+---
+
+#### `gh aw init`
+
+**Initialize a repository for agentic workflows**
+
+**What it creates:**
+`.gitattributes` (marks `.lock.yml` as generated), `.github/agents/agentic-workflows.agent.md` (dispatcher agent), `.gitignore` entries, and MCP server config.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--no-mcp` | Skip MCP server integration |
+| `--codespaces [repos]` | Configure devcontainer for current or specified repos |
+| `--completions` | Install shell completions |
+| `--create-pull-request` | Initialize via pull request instead of direct commit |
+
+**Examples:**
+
+```bash
+$ gh aw init                              # Interactive mode
+$ gh aw init --no-mcp                     # Skip MCP server
+$ gh aw init --codespaces repo1,repo2     # Configure devcontainer for repos
+$ gh aw init --create-pull-request         # Initialize via PR
+```
+
+---
+
+#### `gh aw compile`
+
+**Compile Markdown to GitHub Actions YAML (.lock.yml)** <span class="badge badge-green">Core</span>
+
+The **heart of gh-aw**. Transforms `.md` workflow files into security-hardened `.lock.yml` files with schema validation, action SHA pinning, and guardrail configuration.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--validate` | Validate the workflow schema before compiling |
+| `--strict` | Enforce security best practices (no write perms, explicit network, pinned Actions, no wildcards, no deprecated fields) |
+| `--fix` | Run codemods before compilation |
+| `--zizmor` | Run zizmor security scanner against generated YAML |
+| `--dependabot` | Generate Dependabot-compatible dependency manifests |
+| `--watch` | Watch for file changes and auto-recompile |
+| `--purge` | Remove orphaned `.lock.yml` files |
+| `--json` | Output results in JSON format |
+| `--stats` | Output compilation statistics |
+
+**Examples:**
+
+```bash
+$ gh aw compile                              # Compile all workflows
+$ gh aw compile my-workflow                  # Compile a specific workflow
+$ gh aw compile --watch                      # Auto-recompile on changes
+$ gh aw compile --validate --strict          # Schema + strict security
+$ gh aw compile --strict --zizmor            # Security scan (fail on findings)
+$ gh aw compile --dependabot --purge         # Dependabot + cleanup
+```
+
+---
+
+#### `gh aw validate`
+
+**Validate workflows with all linters enabled (no output generated)**
+
+Runs the compiler with **all linters always-on** — zizmor, actionlint, poutine — plus `--validate` and `--no-emit`. The go-to command for CI/CD gates.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--strict` | Enforce strict mode |
+| `--fail-fast` | Stop at first error |
+| `--dir <path>` | Validate from a custom directory |
+| `--engine <name>` | Override AI engine for validation |
+| `--json` | Output results in JSON |
+
+**Examples:**
+
+```bash
+$ gh aw validate                              # Validate all workflows
+$ gh aw validate my-workflow                  # Validate specific workflow
+$ gh aw validate --strict --fail-fast         # Strict + stop on first error
+$ gh aw validate --json                       # JSON output for CI
+```
+
+---
+
+#### `gh aw run`
+
+**Trigger workflow execution in GitHub Actions**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--push` | Auto-commit, push, then dispatch (combines compile → stage → commit → push → run) |
+| `--ref <branch>` | Push to specific branch |
+| `--repeat <n>` | Repeat execution n times |
+| `--dry-run` | Preview without executing |
+| `--enable-if-needed` | Enable disabled workflow before running |
+| `--auto-merge-prs` | Auto-merge PRs created by workflow |
+| `--engine <name>` | Override AI engine |
+| `--raw-field key=val` | Pass custom inputs |
+| `--repo owner/repo` | Run in a different repository |
+| `--json` | Output triggered results as JSON |
+
+**Examples:**
+
+```bash
+$ gh aw run workflow                          # Run a workflow
+$ gh aw run workflow --push                  # Compile → push → dispatch
+$ gh aw run workflow --repeat 3              # Run 3 times
+$ gh aw run workflow --dry-run               # Preview only
+$ gh aw run w1 w2 --push --ref main         # Run multiple, push to main
+```
+
+<div class="quote-callout green">
+  <p><strong>💡 Power move:</strong> <code>gh aw run --push</code> is the ultimate local-dev shortcut — it recompiles outdated lock files, stages imports, commits, pushes, and dispatches in one command.</p>
+</div>
+
+---
+
+#### `gh aw list`
+
+**List workflows (fast, no API queries)**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output in JSON |
+| `--label <name>` | Filter by label |
+| `--dir <path>` | List from a custom directory |
+
+**Examples:**
+
+```bash
+$ gh aw list                                  # List all workflows
+$ gh aw list ci-                               # Filter by pattern
+$ gh aw list --label automation --json          # Filter + JSON
+```
+
+---
+
+#### `gh aw status`
+
+**Detailed workflow status with run info**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--ref <branch>` | Include latest run info for the specified branch |
+| `--label <name>` | Filter by label |
+| `--repo owner/repo` | Check a different repository |
+
+**Examples:**
+
+```bash
+$ gh aw status                                # All workflows
+$ gh aw status --ref main                      # Include latest run for main
+$ gh aw status --repo owner/other-repo         # Different repo
+```
+
+---
+
+#### `gh aw version`
+
+**Show CLI version**
+
+```bash
+$ gh aw version
+gh-aw v0.57.0 (2026-03-15)
+```
+
+### 🔄 Workflow Lifecycle
+
+---
+
+#### `gh aw add`
+
+**Add workflows from The Agentics collection or any repository**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--dir/-d <path>` | Organize in a subdirectory |
+| `--repo/-r <repo>` | Source repository |
+| `--create-pull-request` | Add via pull request |
+| `--append` | Append to existing workflow |
+| `--engine/-e <name>` | Override engine |
+| `--force/-f` | Overwrite existing |
+| `--name/-n <name>` | Custom workflow name |
+| `--stop-after <min>` | Set max duration in minutes |
+| `--no-stop-after` | Remove duration limit |
+| `--disable-security-scanner` | Skip security scanner setup |
+| `--no-gitattributes` | Skip `.gitattributes` update |
+
+**Examples:**
+
+```bash
+$ gh aw add githubnext/agentics/ci-doctor           # Add from Agentics
+$ gh aw add "githubnext/agentics/ci-*"              # Wildcard match
+$ gh aw add ci-doctor --dir shared --force         # Into subdirectory
+$ gh aw add ci-doctor --create-pull-request        # Add via PR
+```
+
+---
+
+#### `gh aw add-wizard`
+
+**Interactive guided setup for adding workflows**
+
+Walks through engine selection, configuration, and compilation interactively.
+
+```bash
+$ gh aw add-wizard
+```
+
+---
+
+#### `gh aw new`
+
+**Create a new workflow template**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--force` | Overwrite existing workflow |
+| `--engine <name>` | Inject engine into frontmatter |
+
+**Examples:**
+
+```bash
+$ gh aw new                              # Interactive mode
+$ gh aw new my-workflow                   # Create named template
+$ gh aw new my-workflow --engine claude   # With engine preset
+```
+
+---
+
+#### `gh aw fix`
+
+**Auto-fix deprecated fields (dry-run by default)**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--write` | Apply fixes (without this, only previews changes) |
+| `--list-codemods` | List available codemods |
+
+**Examples:**
+
+```bash
+$ gh aw fix                              # Check all (dry-run)
+$ gh aw fix --write                       # Apply fixes
+$ gh aw fix my-workflow --write          # Fix specific workflow
+$ gh aw fix --list-codemods               # Show available codemods
+```
+
+---
+
+#### `gh aw update`
+
+**Update workflows from upstream (3-way merge by default)**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--no-merge` | Override local changes with upstream |
+| `--major --force` | Allow major version updates |
+| `--create-pull-request` | Update via PR |
+
+**Examples:**
+
+```bash
+$ gh aw update                              # Update all sourced workflows
+$ gh aw update ci-doctor                    # Update specific (3-way merge)
+$ gh aw update ci-doctor --no-merge         # Force upstream version
+$ gh aw update --create-pull-request        # Update via PR
+```
+
+---
+
+#### `gh aw upgrade`
+
+**Upgrade repository configuration and agent files**
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--no-fix` | Update agent files only, skip codemods |
+| `--no-actions` | Skip Actions updates |
+| `--no-compile` | Skip recompilation |
+| `--create-pull-request` | Upgrade via PR |
+| `--audit` | Run dependency health audit |
+| `--json` | Output in JSON |
+
+**Examples:**
+
+```bash
+$ gh aw upgrade                              # Full upgrade
+$ gh aw upgrade --no-fix --no-compile       # Agent files only
+$ gh aw upgrade --create-pull-request       # Upgrade via PR
+```
+
+---
+
+#### `gh aw remove`
+
+**Remove workflow and its compiled .lock.yml**
+
+```bash
+$ gh aw remove my-workflow
+```
+
+---
+
+#### `gh aw enable` / `gh aw disable`
+
+**Enable or disable workflows**
+
+`disable` also cancels any in-progress runs automatically.
+
+```bash
+$ gh aw enable ci-doctor                     # Enable one workflow
+$ gh aw disable ci-doctor                    # Disable + cancel active runs
+$ gh aw enable                               # Enable all workflows
+$ gh aw disable --repo owner/repo            # Disable in a specific repo
+```
+
+### 🔍 Monitoring & Debugging
+
+---
+
+#### `gh aw logs`
+
+**Download and analyze workflow run logs**
+
+Downloads and parses logs with tool usage, network patterns, errors, and warnings. Results are **cached** for 10–100× speedup on subsequent access. Accepts workflow IDs or display names (case-insensitive).
+
+**Examples:**
+
+```bash
+$ gh aw logs workflow                        # Download logs
+$ gh aw logs -c 10 --start-date -1w         # Last week, 10 results
+$ gh aw logs --ref main --parse --json      # Parsed JSON for a branch
+```
+
+---
+
+#### `gh aw audit`
+
+**Deep analysis of a specific workflow run**
+
+Detailed metrics, tool usage, MCP failures, firewall analysis, no-ops, and artifacts. Accepts run IDs, workflow URLs, job URLs, and step-level URLs. Logs saved to `logs/run-{id}/`.
+
+**Examples:**
+
+```bash
+$ gh aw audit 12345678                                      # By run ID
+$ gh aw audit https://github.com/owner/repo/actions/runs/123  # By URL
+$ gh aw audit 12345678 --parse                              # Parse to markdown
+$ gh aw audit 12345678 --repo owner/repo                    # Specify repo
+```
+
+---
+
+#### `gh aw health`
+
+**Workflow health metrics and trends**
+
+Displays success rates, trend indicators (`↑` improving, `→` stable, `↓` degrading), execution duration, token usage, costs, and alerts.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--days <n>` | Time range (default: 7 days) |
+| `--threshold <n>` | Alert if below n% success rate |
+| `--json` | Output in JSON |
+
+**Examples:**
+
+```bash
+$ gh aw health                       # Summary (last 7 days)
+$ gh aw health issue-monster         # Detailed for one workflow
+$ gh aw health --days 30             # Last 30 days
+$ gh aw health --threshold 90 --json # Alert below 90%
+```
+
+---
+
+#### `gh aw trial`
+
+**Test workflows in temporary repositories**
+
+Tests workflows in temporary private repos (default) or directly in a specified repo. Results saved to `trials/`.
+
+**Examples:**
+
+```bash
+$ gh aw trial githubnext/agentics/ci-doctor          # Test a remote workflow
+$ gh aw trial ./workflow.md --logical-repo owner/repo # Act as different repo
+$ gh aw trial ./workflow.md --dry-run                # Preview only
+```
+
+### 🔌 MCP, Secrets & Domains
+
+---
+
+#### `gh aw mcp`
+
+**Manage Model Context Protocol (MCP) servers**
+
+```bash
+$ gh aw mcp list workflow                    # List servers for a workflow
+$ gh aw mcp list-tools <mcp-server>          # List tools exposed by server
+$ gh aw mcp inspect workflow                 # Inspect and test servers
+$ gh aw mcp add                              # Add an MCP tool to workflow
+```
+
+---
+
+#### `gh aw mcp-server`
+
+**Run gh-aw as an MCP server for IDE integration** <span class="badge badge-purple">Bridge</span>
+
+Exposes gh-aw commands as MCP tools — the key bridge between CLI and IDEs. Configure as an MCP tool source in VS Code to give Copilot live access to workflow status, compilation, logs, and audit.
+
+**Exposed tools:** `status`, `compile`, `logs`, `audit`, `mcp-inspect`, `add`, `update`
+
+```bash
+$ gh aw mcp-server                      # stdio transport (default)
+$ gh aw mcp-server --port 8080          # HTTP server with SSE
+$ gh aw mcp-server --validate-actor     # Enable actor validation
+```
+
+---
+
+#### `gh aw secrets`
+
+**Manage repository secrets for AI engine authentication**
+
+```bash
+$ gh aw secrets set MY_SECRET                                    # From stdin
+$ gh aw secrets set MY_SECRET --repo myorg/myrepo                # Target repo
+$ gh aw secrets set MY_SECRET --value-from-env MY_TOKEN          # From env var
+
+$ gh aw secrets bootstrap                                        # Auto-detect missing
+$ gh aw secrets bootstrap --engine copilot                       # Check Copilot only
+$ gh aw secrets bootstrap --non-interactive                      # Display, don't prompt
+```
+
+---
+
+#### `gh aw domains`
+
+**List network domains referenced in workflows**
+
+Shows allowed/blocked domains including DNS expansions.
+
+```bash
+$ gh aw domains                              # List all domains
+$ gh aw domains --json                       # Output in JSON
+```
+
+### 🧰 Utilities
+
+<div class="grid-2">
+  <div class="card">
+    <h3><code>gh aw completion install</code></h3>
+    <p>Auto-detect shell and install tab completions for commands, workflow names, engines, and paths.</p>
+    <pre>{`$ gh aw completion install
+$ gh aw completion uninstall`}</pre>
+  </div>
+
+  <div class="card">
+    <h3><code>gh aw project new</code></h3>
+    <p>Create and manage GitHub Projects V2 boards for workflow organization.</p>
+  </div>
+
+  <div class="card">
+    <h3><code>gh aw pr transfer</code></h3>
+    <p>Transfer a pull request to another repository.</p>
+  </div>
+
+  <div class="card">
+    <h3><code>gh aw hash-frontmatter</code></h3>
+    <p>Compute deterministic SHA-256 hash of workflow frontmatter for change detection.</p>
+  </div>
+</div>
+
+## ⚙️ Compilation Pipeline
+
+How `gh aw compile` transforms Markdown into secure GitHub Actions YAML.
+
+<div style="display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; margin: 24px 0;">
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 1</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-blue);">📄 Parse</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Read <code>.md</code>, extract YAML frontmatter + body</div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 2</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-purple);">📦 Resolve</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Fetch remote imports, cache in <code>.github/aw/imports/</code></div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 3</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-orange);">✅ Validate</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Schema validation against AW spec</div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 4</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-red);">🔒 Harden</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Pin Actions to SHA, restrict permissions</div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 5</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-green);">🛡️ Guardrails</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Inject staged pipeline (sanitize → execute → detect)</div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 6</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-blue);">📝 Generate</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">Output <code>.lock.yml</code></div>
+  </div>
+  <div style="color: var(--color-border); font-size: 1.5rem; padding: 0 4px; flex-shrink: 0;">→</div>
+  <div class="card" style="padding: 16px 20px; text-align: center; min-width: 140px;">
+    <div style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Step 7</div>
+    <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-purple);">🔍 Post-Process</div>
+    <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 4px;">zizmor, actionlint, poutine, Dependabot</div>
+  </div>
+</div>
+
+### File Relationships
+
+<div class="code-block-wrapper">
+  <div class="code-header">
+    <span class="code-dot" style="background: #ff5f57;"></span>
+    <span class="code-dot" style="background: #febc2e;"></span>
+    <span class="code-dot" style="background: #28c840;"></span>
+    <span class="code-filename">Project Structure</span>
+  </div>
+  <pre>{`.github/
+├── workflows/
+│   ├── my-workflow.md          ← Source (authored by developer)
+│   └── my-workflow.lock.yml    ← Compiled output (generated)
+├── aw/
+│   └── imports/                  ← Cached remote imports
+├── agents/
+│   └── agentic-workflows.agent.md  ← Dispatcher agent
+└── dependabot.yml              ← Generated with --dependabot`}</pre>
+</div>
+
+### Strict Mode Enforcement
+
+When `--strict` is enabled, the compiler enforces these security requirements:
+
+<div class="grid-3">
+  <div class="card" style="border-left: 3px solid var(--color-red);">
+    <h3 style="color: var(--color-red);">🚫 No Write Permissions</h3>
+    <p>Workflows cannot have elevated write access to the repository.</p>
+  </div>
+  <div class="card" style="border-left: 3px solid var(--color-orange);">
+    <h3 style="color: var(--color-orange);">🌐 Explicit Network</h3>
+    <p>All network access must be declared — no implicit internet access.</p>
+  </div>
+  <div class="card" style="border-left: 3px solid var(--color-red);">
+    <h3 style="color: var(--color-red);">🚫 No Wildcards</h3>
+    <p><code>*.example.com</code> patterns are rejected — domains must be explicit.</p>
+  </div>
+  <div class="card" style="border-left: 3px solid var(--color-green);">
+    <h3 style="color: var(--color-green);">📌 Pinned Actions</h3>
+    <p>All action references must use full SHA hashes, not version tags.</p>
+  </div>
+  <div class="card" style="border-left: 3px solid var(--color-orange);">
+    <h3 style="color: var(--color-orange);">⚠️ No Deprecated Fields</h3>
+    <p>Deprecated frontmatter keys are rejected — use <code>gh aw fix</code> first.</p>
+  </div>
+  <div class="card" style="border-left: 3px solid var(--color-purple);">
+    <h3 style="color: var(--color-purple);">🔗 Shared Workflows</h3>
+    <p>Workflows without <code>on</code> are auto-detected as shared components with relaxed validation.</p>
+  </div>
+</div>
+
+## 💻 IDE Integration
+
+Use `gh aw` from your favorite editor.
+
+<div class="grid-3">
+  <div class="card" style="border-top: 3px solid var(--color-blue);">
+    <h3>🟦 VS Code Agent Mode <span class="badge badge-blue">Primary</span></h3>
+    <p>The <strong>primary IDE</strong> for authoring agentic workflows. Through GitHub Copilot Agent Mode, create, edit, and debug workflows conversationally.</p>
+    <ul>
+      <li>Open Copilot Chat → switch to <strong>Agent Mode</strong></li>
+      <li>Prompt: <em>"Create a workflow for GitHub Agentic Workflows..."</em></li>
+      <li>Agent creates the <code>.md</code> file, runs <code>gh aw compile</code>, and can commit</li>
+      <li>Use <code>/agent</code> command for <code>create</code>, <code>debug</code>, <code>update</code>, <code>upgrade</code></li>
+    </ul>
+    <div class="quote-callout green" style="margin-top: 12px; margin-bottom: 0;">
+      <p><strong>💡 MCP Bridge:</strong> Configure <code>gh aw mcp-server</code> as an MCP tool source in VS Code Chat to give Copilot live access to workflow status, compilation, logs, and audit — all within the editor.</p>
+    </div>
+  </div>
+
+  <div class="card" style="border-top: 3px solid var(--color-purple);">
+    <h3>🟪 JetBrains IDEs</h3>
+    <p>IntelliJ, WebStorm, and PyCharm support Copilot Chat and can invoke <code>gh aw</code> commands from the integrated terminal.</p>
+    <ul>
+      <li>Custom agents and sub-agents (GA)</li>
+      <li>Plan agent (GA)</li>
+      <li>Agent hooks (preview)</li>
+      <li>Auto-approve support for MCP</li>
+      <li>Expanded agent instruction files</li>
+    </ul>
+    <p style="margin-top: 8px;"><code>gh aw mcp-server</code> works as an MCP tool source in any IDE supporting MCP.</p>
+  </div>
+
+  <div class="card" style="border-top: 3px solid var(--color-green);">
+    <h3>🌐 Web UI & Any Terminal</h3>
+    <p><strong>GitHub.com:</strong> Author workflows directly via Copilot chat in the web UI. Great for quick prototyping without local tooling.</p>
+    <p style="margin-top: 12px;"><strong>Any IDE with terminal:</strong> The CLI is IDE-agnostic — if it has a terminal, you can use the full <code>gh aw</code> CLI for compilation, validation, and execution.</p>
+    <pre>{`# Works in any terminal
+$ gh aw compile --watch
+$ gh aw validate --strict
+$ gh aw run my-workflow --push`}</pre>
+  </div>
+</div>
+
+## 📊 The Agents Tab
+
+A centralized dashboard for managing Copilot coding agent sessions in your repository.
+
+<div class="card" style="padding: 28px;">
+  <div class="grid-4">
+    <div>
+      <h3>👁️ View Sessions</h3>
+      <p>See all active and archived agent sessions in one place. Track what your agents are doing across the repository.</p>
+    </div>
+    <div>
+      <h3>➕ Create Sessions</h3>
+      <p>Start new agent sessions or switch between active tasks directly from the repository interface.</p>
+    </div>
+    <div>
+      <h3>🔗 Jump to PRs</h3>
+      <p>One-click links to associated pull requests. See exactly what changes each agent session produced.</p>
+    </div>
+    <div>
+      <h3>📁 Archive Sessions</h3>
+      <p>Organize completed sessions by archiving them. Keep your workspace clean while preserving history.</p>
+    </div>
+  </div>
+  <div class="quote-callout green" style="margin-top: 20px; margin-bottom: 0;">
+    <p><strong>💡 Configuration:</strong> For policy and environment settings, navigate to <strong>Settings → Copilot → Coding agent</strong> within your repository. The Actions tab shows workflow run history, job logs, artifacts, and the staged pipeline execution stages.</p>
+  </div>
+</div>
+
+## 🔁 Local Development Workflow
+
+A typical end-to-end development cycle with `gh aw`.
+
+<div class="code-block-wrapper">
+  <div class="code-header">
+    <span class="code-dot" style="background: #ff5f57;"></span>
+    <span class="code-dot" style="background: #febc2e;"></span>
+    <span class="code-dot" style="background: #28c840;"></span>
+    <span class="code-filename">Development Cycle</span>
+  </div>
+  <pre>{`# 1. Initialize the repository (one-time setup)
+$ gh aw init
+
+# 2. Create a new workflow
+$ gh aw new my-workflow --engine copilot
+
+# 3. Edit the .md file in your editor of choice
+
+# 4. Validate without compiling
+$ gh aw validate my-workflow
+
+# 5. Compile to .lock.yml
+$ gh aw compile my-workflow
+
+# 6. Watch mode for rapid iteration
+$ gh aw compile --watch
+
+# 7. Commit both files
+$ git add .github/workflows/my-workflow.md .github/workflows/my-workflow.lock.yml
+$ git commit -m "Add my-workflow agentic workflow"
+$ git push
+
+# 8. Trigger a run
+$ gh aw run my-workflow
+
+# 9. Monitor health over time
+$ gh aw health my-workflow --days 7
+
+# 10. Analyze a specific run
+$ gh aw audit <run-id> --parse`}</pre>
+</div>
+
+<div class="quote-callout green">
+  <p><strong>⚡ Shortcut:</strong> <code>gh aw run --push</code> combines steps 5–8 into a single command: recompile → stage → commit → push → dispatch.</p>
+</div>
+
+## 🐛 Debugging & Troubleshooting
+
+Tips, the DEBUG environment variable, and common fixes.
+
+### Debug Environment Variable
+
+Enable detailed debugging output with namespace filtering:
+
+<div class="code-block-wrapper">
+  <div class="code-header">
+    <span class="code-dot" style="background: #ff5f57;"></span>
+    <span class="code-dot" style="background: #febc2e;"></span>
+    <span class="code-dot" style="background: #28c840;"></span>
+    <span class="code-filename">Debug Output</span>
+  </div>
+  <pre>{`$ DEBUG=* gh aw compile                # All debug logs
+$ DEBUG=cli:* gh aw compile            # CLI logs only
+$ DEBUG=*,-tests gh aw compile         # All except test logs`}</pre>
+</div>
+
+### Fuzzy Workflow Name Matching
+
+The CLI auto-suggests similar workflow names on typos using Levenshtein distance:
+
+```
+$ gh aw compile audti-workflows
+✗ workflow file not found
+Did you mean: audit-workflows?
+```
+
+### GitHub Enterprise Server
+
+```bash
+$ export GH_HOST="github.enterprise.com"
+$ gh auth login --hostname github.enterprise.com
+$ gh aw logs workflow --repo github.enterprise.com/owner/repo
+```
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| `command not found: gh` | Install the GitHub CLI from [cli.github.com](https://cli.github.com/) |
+| `extension not found: aw` | Run `gh extension install github/gh-aw` |
+| Compilation fails with YAML errors | Check indentation, colons, and array syntax in frontmatter. Error reports include file paths, line numbers, and contextual code snippets. |
+| Workflow not found | Check the fuzzy suggestion or run `gh aw status` to list available workflows |
+| Permission denied | Check file permissions or repository access. Ensure `gh auth status` shows correct authentication. |
+| Missing secrets at runtime | Run `gh aw secrets bootstrap` to auto-detect and configure missing secrets |
+| Trial creation fails | Check GitHub rate limits and authentication. Verify with `gh auth status`. |
+| Lock file outdated | Run `gh aw compile` to regenerate, or use `gh aw run --push` which auto-recompiles. |
+
+## 📋 Command Cheat Sheet
+
+Every command at a glance.
+
+<div class="grid-2">
+  <div class="card">
+    <h3 style="color: var(--color-blue);">⚡ Core</h3>
+
+| Command | Description |
+|---------|-------------|
+| `gh aw init` | Initialize repository |
+| `gh aw compile` | Compile `.md` → `.lock.yml` |
+| `gh aw validate` | Validate with all linters |
+| `gh aw run` | Trigger execution |
+| `gh aw list` | List workflows (no API) |
+| `gh aw status` | Detailed status + runs |
+| `gh aw version` | Show CLI version |
+
+  </div>
+
+  <div class="card">
+    <h3 style="color: var(--color-green);">🔄 Lifecycle</h3>
+
+| Command | Description |
+|---------|-------------|
+| `gh aw add` | Add from repos |
+| `gh aw add-wizard` | Interactive setup |
+| `gh aw new` | Create template |
+| `gh aw fix` | Auto-fix deprecated |
+| `gh aw update` | Update from upstream |
+| `gh aw upgrade` | Upgrade repo config |
+| `gh aw remove` | Remove workflow |
+| `gh aw enable/disable` | Toggle workflows |
+
+  </div>
+
+  <div class="card">
+    <h3 style="color: var(--color-purple);">🔍 Monitoring</h3>
+
+| Command | Description |
+|---------|-------------|
+| `gh aw logs` | Download & analyze logs |
+| `gh aw audit` | Deep run analysis |
+| `gh aw health` | Metrics & trends |
+| `gh aw trial` | Test in temp repos |
+
+  </div>
+
+  <div class="card">
+    <h3 style="color: var(--color-orange);">🔌 MCP & Secrets</h3>
+
+| Command | Description |
+|---------|-------------|
+| `gh aw mcp` | Manage MCP servers |
+| `gh aw mcp-server` | Run as MCP server |
+| `gh aw secrets` | Manage secrets |
+| `gh aw domains` | List network domains |
+
+  </div>
+</div>
