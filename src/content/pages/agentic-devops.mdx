@@ -1,0 +1,137 @@
+---
+title: "Agentic DevOps — GitHub Agentic Workflows"
+description: "The evolution of DevOps into Continuous AI — how GitHub Agentic Workflows represents a new branch of DevOps with structural governance, sandbox isolation, and autonomous loops."
+navLabel: "Agentic DevOps"
+navOrder: 11
+heroEmoji: "🔄"
+heroSubtitle: "DevOps was built for humans. Agents need something new."
+accentColor: "green"
+---
+
+import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
+
+<section id="evolution">
+<div class="section-label">The Evolution</div>
+
+## How We Got Here
+
+<p class="section-desc">Every era of software delivery follows the same pattern: compress the feedback loop. The tighter the loop, the faster you learn, the lower the risk, the more you ship. GitHub Agentic Workflows isn't just a technical implementation — it's the foundation of a new branch of DevOps.</p>
+
+<div class="evolution-timeline">
+  <div class="evo-phase">
+    <div class="evo-marker" style="background: var(--color-text-muted);"></div>
+    <div class="evo-content">
+      <div class="evo-label">Phase 1</div>
+      <h3>The Linear Pipeline</h3>
+      <p>Before DevOps, teams planned for months, built in isolation, tested at the end, and deployed infrequently. Feedback arrived after the fact — and the cost of fixing issues grew the further right they were discovered.</p>
+      <EvolutionDiagrams phase="linear" />
+    </div>
+  </div>
+  <div class="evo-phase">
+    <div class="evo-marker" style="background: var(--color-blue);"></div>
+    <div class="evo-content">
+      <div class="evo-label">Phase 2</div>
+      <h3>The Continuous Loop</h3>
+      <p>DevOps turned the line into a loop. Test quicker, deliver quicker, run security checks quicker. Everything shifted left. Feedback became continuous.</p>
+      <EvolutionDiagrams phase="loop" />
+    </div>
+  </div>
+  <div class="evo-phase">
+    <div class="evo-marker" style="background: var(--color-purple);"></div>
+    <div class="evo-content">
+      <div class="evo-label">Phase 3</div>
+      <h3>The Collapsed Loop</h3>
+      <p>What a high-performing developer does in 6 hours, an agentic workflow does in 30 minutes. The DevOps loop collapses into a tight core. Ideas flow in, tested artifacts flow out. Testing, security, and validation happen <em>inside</em> the agent's loop — not as separate stages.</p>
+      <EvolutionDiagrams phase="collapsed" />
+    </div>
+  </div>
+  <div class="evo-phase evo-phase-highlight">
+    <div class="evo-marker" style="background: var(--color-green);"></div>
+    <div class="evo-content">
+      <div class="evo-label" style="color: var(--color-green);">Phase 4 — We Are Here</div>
+      <h3>Continuous AI</h3>
+      <p>A separate autonomous loop that monitors your repository, reasons about what needs attention, and generates ideas that feed the agentic core. Not replacing CI — expanding automation into judgment-heavy work CI was never designed for. <strong>GitHub Agentic Workflows is the first production implementation of this phase.</strong></p>
+      <EvolutionDiagrams phase="continuous-ai" />
+    </div>
+  </div>
+</div>
+<EvolutionDiagrams phase="summary" />
+</section>
+
+<section id="layer-zero">
+<div class="section-label">What Makes It Work</div>
+
+## Layer 0 — The Sandbox
+
+<p class="section-desc">Other agent frameworks give you hooks and guidelines. GitHub Agentic Workflows gives you a <strong style="color: var(--color-text);">kernel-level execution boundary</strong> beneath everything else. Without isolation, governance is advisory. With it, governance is structural. This is what makes agentic workflows shine.</p>
+
+<div class="sandbox-grid">
+  <div class="sandbox-card">
+    <div class="sandbox-icon">📦</div>
+    <h3>Agent Sandboxes</h3>
+    <p>Policy-governed isolation environments where agents execute safely — filesystem, network, and process boundaries enforced at the kernel level, not application level.</p>
+  </div>
+  <div class="sandbox-card">
+    <div class="sandbox-icon">🔒</div>
+    <h3>Network Gating</h3>
+    <p>Deny-by-default outbound access. Agents can only reach explicitly whitelisted endpoints — declared in YAML, enforced by proxy. No phoning home, no data exfiltration.</p>
+  </div>
+  <div class="sandbox-card">
+    <div class="sandbox-icon">🛡️</div>
+    <h3>Credential Isolation</h3>
+    <p>API keys injected at runtime, never on disk. Inference routing strips agent credentials and injects backend keys — context never leaks to the model.</p>
+  </div>
+</div>
+<div class="sandbox-callout">
+  <p>💡 <strong>Why Layer 0 matters:</strong> Hooks and instructions are speed bumps — agents can misinterpret or ignore them. A sandbox is a wall. When the execution boundary is structural, every layer above it — deterministic gates, enablement context, CI/CD pipelines — can trust that the agent <em>cannot</em> escape its constraints, not just that it <em>shouldn't</em>.</p>
+</div>
+</section>
+
+<section id="pillars">
+<div class="section-label">The Vision</div>
+
+## The Six Pillars of Continuous AI
+
+<p class="section-desc">Continuous AI is the systematic, automated application of AI to software collaboration — natural-language rules combined with agentic reasoning, executed continuously inside your repository. It augments CI/CD for judgment-heavy, context-dependent tasks.</p>
+
+<div class="pillars-grid">
+  <div class="pillar-card">
+    <div class="pillar-icon">🏷️</div>
+    <h3>Continuous Triage</h3>
+    <p>Automatically summarize, label, and route new issues. The agent understands context and intent — far beyond keyword matching.</p>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-icon">📝</div>
+    <h3>Continuous Documentation</h3>
+    <p>Keep READMEs and docs aligned with code changes. Detect mismatches between docstrings and implementations, then open PRs to fix them.</p>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-icon">🧹</div>
+    <h3>Continuous Code Simplification</h3>
+    <p>Identify refactoring opportunities — dead code, complex conditionals, repeated patterns — and propose targeted improvements via PRs.</p>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-icon">🧪</div>
+    <h3>Continuous Test Improvement</h3>
+    <p>Assess test coverage and add high-value tests. One experiment: 5% → near 100% coverage, 1,400+ tests written over 45 days for ~$80.</p>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-icon">🔧</div>
+    <h3>Continuous Quality Hygiene</h3>
+    <p>Proactively investigate CI failures and propose targeted fixes — flaky tests, dependency conflicts, and configuration issues.</p>
+  </div>
+  <div class="pillar-card">
+    <div class="pillar-icon">📊</div>
+    <h3>Continuous Reporting</h3>
+    <p>Generate regular reports on repository health, synthesizing data from issues, PRs, commits, and CI into actionable insights.</p>
+  </div>
+</div>
+</section>
+
+<section id="deep-dive">
+  <div class="sandbox-callout" style="text-align: center;">
+    <p style="font-size: 16px; margin-bottom: 12px;"><strong>Want the full picture?</strong></p>
+    <p style="margin-bottom: 16px;">This page covers how Continuous AI connects to GitHub Agentic Workflows. For the complete Agentic DevOps philosophy — the five governance layers, three core principles, and the tooling ecosystem — read the full deep-dive.</p>
+    <a href="https://htek.dev/agentic-devops" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-flex; gap: 8px;">Read the Full Agentic DevOps Guide →</a>
+  </div>
+</section>
