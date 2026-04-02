@@ -1346,6 +1346,20 @@ accentColor: "blue"
     background: var(--color-red-dim);
     color: var(--color-red);
   }
+  .new-badge {
+    background: var(--color-green-dim);
+    color: var(--color-green);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    animation: new-pulse 2s ease-in-out infinite;
+  }
+  @keyframes new-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
   .watch-btn {
     font-size: 13px;
     color: var(--color-blue);
