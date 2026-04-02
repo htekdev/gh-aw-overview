@@ -18,3 +18,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Personal speaker notes and scripts
+webinar-speaking-script.md
+continuous-ai-speaker-notes.md
+webinar-handoff-runsheet.md

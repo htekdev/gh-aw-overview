@@ -1,6 +1,6 @@
 ---
 title: "Continuous AI — GitHub Agentic Workflows"
-description: "Deep-dive into seven Continuous AI patterns: Documentation, Code Improvement, Triage, Summarization, Fault Analysis, Quality, and Team Motivation."
+description: "Deep-dive into seven Continuous AI patterns: Documentation, Code Improvement, Triage, Summarization, Fault Analysis, Quality, and Team Motivation — with workflow examples, flow diagrams, and best practices."
 navLabel: "Continuous AI"
 navOrder: 10
 heroEmoji: "🔄"
@@ -25,7 +25,7 @@ Continuous AI patterns are agentic workflows that run autonomously — triggered
     <h3>📚 Documentation</h3>
     <p class="desc">Continually populate and update documentation, offering suggestions for improvements.</p>
   </div>
-  <div class="card card-accent-red">
+  <div class="card card-accent-cyan">
     <h3>✨ Code Improvement</h3>
     <p class="desc">Incrementally improve code comments, tests, and ensure comments are up-to-date and relevant.</p>
   </div>
@@ -41,11 +41,11 @@ Continuous AI patterns are agentic workflows that run autonomously — triggered
     <h3>🔥 Fault Analysis</h3>
     <p class="desc">Watch for failed CI runs and offer explanations of them with contextual insights.</p>
   </div>
-  <div class="card card-accent-cyan">
+  <div class="card card-accent-green">
     <h3>✅ Quality</h3>
     <p class="desc">Using LLMs to automatically analyze code quality, suggest improvements, and ensure adherence to coding standards.</p>
   </div>
-  <div class="card card-accent-yellow">
+  <div class="card card-accent-purple">
     <h3>🎉 Team Motivation</h3>
     <p class="desc">Turn PRs and team activity into poetry, zines, podcasts; provide nudges, or celebrate achievements.</p>
   </div>
@@ -57,7 +57,7 @@ Continuous AI patterns are agentic workflows that run autonomously — triggered
   <h2>📚 Continuous Documentation</h2>
 </div>
 
-Documentation is often the first thing to fall behind in a fast-moving project. Continuous Documentation uses an AI agent to continually populate and update documentation, offering suggestions for improvements based on the actual codebase evolution.
+Documentation is often the first thing to fall behind in a fast-moving project. Continuous Documentation uses an AI agent to continually populate and update documentation, offering suggestions for improvements based on the actual codebase evolution. When code changes, the agent detects drift between the source and the docs — and proposes updates before anyone has to ask.
 
 <div class="card-grid-2col">
   <div class="card card-accent-purple">
@@ -68,19 +68,87 @@ Documentation is often the first thing to fall behind in a fast-moving project. 
     <h3>📖 Glossary Maintenance</h3>
     <p class="desc">Automatically maintains project terminology and definitions based on how terms are actually used in the codebase.</p>
   </div>
+  <div class="card card-accent-green">
+    <h3>📝 README Refresh</h3>
+    <p class="desc">Detects when setup instructions, API examples, or configuration docs no longer match the current code and proposes corrections.</p>
+  </div>
+  <div class="card card-accent-orange">
+    <h3>🗺️ Architecture Diagrams</h3>
+    <p class="desc">Suggests updates to architecture docs when new modules, services, or dependencies are introduced in the codebase.</p>
+  </div>
 </div>
 
 ### How It Works
 
 <div class="flow-diagram">
-  <div class="flow-step"><span class="step-icon">📝</span><span class="step-label">Code Push</span><span class="step-desc">Trigger fires</span></div>
+  <div class="flow-step"><span class="step-icon">📝</span><span class="step-label">Code Push</span><span class="step-desc">Trigger fires on main</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">🤖</span><span class="step-label">Agent Reads</span><span class="step-desc">Compares code to docs</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🔍</span><span class="step-label">Detect Drift</span><span class="step-desc">Finds stale sections</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">✏️</span><span class="step-label">Update</span><span class="step-desc">Drafts documentation changes</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">🔀</span><span class="step-label">Draft PR</span><span class="step-desc">Human review required</span></div>
 </div>
+
+### Example Workflow
+
+```yaml
+# File: .github/workflows/continuous-docs.md
+---
+name: Continuous Documentation
+description: Keep docs in sync with code changes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "lib/**"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[docs] "
+    labels: [documentation, automated]
+    max: 1
+    draft: true
+
+tools:
+  github:
+  edit:
+---
+
+# Continuous Documentation
+
+You are a technical writer. When code changes are pushed:
+
+1. Compare the changed source files against existing documentation
+2. Identify any docs that are now outdated or incomplete
+3. Update README sections, API docs, or inline comments
+4. If a new module was added without docs, create a stub
+
+Rules: Only update docs that are actually affected by the code change.
+Never remove documentation without clear justification.
+```
+
+<div class="callout callout-green">
+  <p>💡 <strong>Why this works:</strong> The <code>paths</code> filter ensures the agent only runs when source code changes — not on doc-only commits (which would create a loop). <code>draft: true</code> ensures a human reviews every doc update before it goes live.</p>
+</div>
+
+### Before & After
+
+| Dimension | Manual Doc Updates | Continuous Documentation |
+|---|---|---|
+| Update frequency | Sprint retrospectives | Every push |
+| Drift detection | "Someone noticed" | Automatic |
+| Coverage | High-traffic docs only | All changed code |
+| Maintenance cost | Developer time | Markdown file |
+| Consistency | Varies by author | Consistent voice |
 
 ---
 
@@ -88,16 +156,24 @@ Documentation is often the first thing to fall behind in a fast-moving project. 
   <h2>✨ Continuous Code Improvement</h2>
 </div>
 
-Beyond just catching bugs, Continuous Code Improvement incrementally improves code comments, tests, and other aspects of code. It ensures that code comments are up-to-date, relevant, and that test coverage expands meaningfully over time.
+Beyond just catching bugs, Continuous Code Improvement incrementally improves code comments, tests, and other aspects of code. It ensures that code comments are up-to-date and relevant, and that test coverage expands meaningfully over time. Think of it as a tireless teammate whose only job is to make the codebase a little better every day.
 
 <div class="card-grid-2col">
-  <div class="card card-accent-red">
+  <div class="card card-accent-cyan">
     <h3>💬 Comment Relevance</h3>
     <p class="desc">Detects when comments no longer match the underlying logic and rewrites them for accuracy.</p>
   </div>
   <div class="card card-accent-green">
     <h3>🧪 Test Expansion</h3>
     <p class="desc">Identifies untested edge cases in recently modified code and proposes new test fixtures.</p>
+  </div>
+  <div class="card card-accent-blue">
+    <h3>🧹 Dead Code Removal</h3>
+    <p class="desc">Finds unused imports, unreachable branches, and deprecated functions — removes them with full context.</p>
+  </div>
+  <div class="card card-accent-orange">
+    <h3>🔧 Type Safety</h3>
+    <p class="desc">Adds missing type annotations, strengthens loose types, and improves interface definitions across the codebase.</p>
   </div>
 </div>
 
@@ -108,10 +184,69 @@ Beyond just catching bugs, Continuous Code Improvement incrementally improves co
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">📂</span><span class="step-label">Scan Code</span><span class="step-desc">Finds stale comments/tests</span></div>
   <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🧠</span><span class="step-label">Analyze</span><span class="step-desc">Semantic understanding</span></div>
+  <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">✏️</span><span class="step-label">Improve</span><span class="step-desc">Writes new comments/tests</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">🔀</span><span class="step-label">Draft PR</span><span class="step-desc">Human review required</span></div>
 </div>
+
+### Example Workflow
+
+```yaml
+# File: .github/workflows/continuous-improvement.md
+---
+name: Continuous Code Improvement
+description: Daily incremental code quality improvements
+
+on:
+  schedule:
+    - cron: "0 7 * * 1-5"   # Weekdays 7am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[improve] "
+    labels: [code-improvement, automated]
+    max: 1
+    draft: true
+
+tools:
+  github:
+  edit:
+---
+
+# Continuous Code Improvement
+
+You are a meticulous code improver. Each day, pick ONE area:
+
+1. Find comments that no longer match the code they describe
+2. Identify recently changed functions with no test coverage
+3. Look for unused imports, dead code, or deprecated patterns
+4. Find functions missing type annotations
+
+Make ONE focused improvement. Create a draft PR explaining
+what changed and why. Never break existing tests.
+```
+
+<div class="callout callout-green">
+  <p>💡 <strong>The compound effect:</strong> One small improvement per day = ~20 focused upgrades per month. Stale comments rewritten, edge cases tested, dead code removed — all reviewed and approved by humans. The codebase gets measurably better every week without anyone planning a "tech debt sprint."</p>
+</div>
+
+### Before & After
+
+| Dimension | Periodic Tech Debt Sprints | Continuous Code Improvement |
+|---|---|---|
+| Frequency | Quarterly (if lucky) | Daily |
+| Scope | Large, disruptive refactors | Small, focused changes |
+| Review burden | Massive PRs | One-change PRs |
+| Risk | High (big changes) | Low (incremental) |
+| Developer time | Dedicated sprints | Zero (agent handles it) |
+| Test coverage trend | Flat | Steadily increasing |
 
 ---
 
@@ -340,7 +475,7 @@ CI failures are one of the biggest productivity drains in software engineering. 
   </div>
   <div class="card card-accent-cyan">
     <h3>🔧 Suggested Fix PRs</h3>
-    <p class="desc">For common patterns (missing imports, type errors, config issues), optionally opens a draft PR with the proposed fix.</p>
+    <p class="desc">For common patterns (missing imports, type mismatches, config issues), optionally opens a draft PR with the proposed fix.</p>
   </div>
 </div>
 
@@ -405,6 +540,11 @@ relevant code changes, and suggested fix. If the run succeeded, do nothing.
 
 <div class="callout callout-green">
   <p>💡 <strong>Security:</strong> The <code>workflow_run</code> trigger fires <em>after</em> CI completes — the agent never interferes with the build. <code>actions: read</code> allows log download but not re-triggering runs.</p>
+</div>
+
+<div class="info-box orange">
+  <h4>📌 Production Case Study: Next Insurance</h4>
+  <p>Next Insurance implemented AI-powered CI fault analysis and reported a <strong>75% reduction in build debugging time</strong>. Engineers went from spending 45 minutes scrolling through logs to getting root cause explanations delivered directly in Slack within seconds of a failure. The system cross-references logs with recent commits to pinpoint exactly which change broke the build.</p>
 </div>
 
 ### Advanced: Auto-Fix PRs
@@ -520,6 +660,11 @@ Preserve functionality. Follow the project's existing style.
   <p>💡 <strong>The compound effect:</strong> One small refactor per day = ~20 focused quality improvements per month. Dead code removed, naming clarified, error handling standardized — all reviewed and approved by humans. Like having a developer whose only job is to clean up the codebase, one PR at a time.</p>
 </div>
 
+<div class="info-box green">
+  <h4>📌 Production Case Study: dotnet/runtime — 10 Months of AI PRs</h4>
+  <p>The .NET runtime team ran Copilot Coding Agent for 10 months on one of the world's most complex codebases. The results: <strong>878 AI-generated PRs</strong>, over <strong>95,000 lines added</strong>, and a revert rate of just <strong>0.6%</strong> — lower than the human revert rate of 0.8%. The agent handled test fixes, API updates, and code modernization while human reviewers maintained full control over what shipped.</p>
+</div>
+
 ### Continuous Quality vs. Traditional Tools
 
 | Capability | Linters / Static Analysis | Continuous Quality (Agentic) |
@@ -551,16 +696,24 @@ Preserve functionality. Follow the project's existing style.
   <h2>🎉 Continuous Team Motivation</h2>
 </div>
 
-Software development is a human endeavor, and maintaining team morale is crucial. Continuous Team Motivation uses AI to turn PRs and other team activity into poetry, zines, podcasts, provide nudges, or celebrate team achievements.
+Software development is a human endeavor, and the best teams celebrate their wins. Continuous Team Motivation uses AI to turn PRs and other team activity into poetry, zines, podcasts — providing nudges and celebrating team achievements. It is the most creative pattern in the Continuous AI family, and a powerful reminder that agentic workflows are not just about efficiency — they are about making work more human.
 
 <div class="card-grid-2col">
-  <div class="card card-accent-yellow">
+  <div class="card card-accent-purple">
     <h3>🏆 Milestone Celebrations</h3>
     <p class="desc">Automatically generates celebratory messages or creative content when the team hits a major milestone or merges a massive PR.</p>
   </div>
-  <div class="card card-accent-purple">
+  <div class="card card-accent-blue">
     <h3>🎨 Creative Summaries</h3>
     <p class="desc">Turns dry weekly changelogs into engaging formats like short poems, team zines, or even scripts for internal podcasts.</p>
+  </div>
+  <div class="card card-accent-green">
+    <h3>🌟 Contributor Spotlights</h3>
+    <p class="desc">Highlights first-time contributors, top reviewers, and unsung heroes who quietly keep the project running.</p>
+  </div>
+  <div class="card card-accent-orange">
+    <h3>📣 Gentle Nudges</h3>
+    <p class="desc">Friendly reminders for stale PRs, unreviewed code, or approaching deadlines — framed positively, never as blame.</p>
   </div>
 </div>
 
@@ -569,9 +722,71 @@ Software development is a human endeavor, and maintaining team morale is crucial
 <div class="flow-diagram">
   <div class="flow-step"><span class="step-icon">🎉</span><span class="step-label">Event</span><span class="step-desc">PR merged / Milestone</span></div>
   <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">📥</span><span class="step-label">Gather</span><span class="step-desc">Activity & contributors</span></div>
+  <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">🧠</span><span class="step-label">Analyze</span><span class="step-desc">Extracts key achievements</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">🎨</span><span class="step-label">Create</span><span class="step-desc">Generates creative content</span></div>
   <span class="flow-arrow">→</span>
   <div class="flow-step"><span class="step-icon">💬</span><span class="step-label">Share</span><span class="step-desc">Posts to issue or discussion</span></div>
 </div>
+
+### Example Workflow
+
+```yaml
+# File: .github/workflows/team-motivation.md
+---
+name: Team Motivation
+description: Celebrate team achievements and milestones
+
+on:
+  milestone:
+    types: [closed]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+safe-outputs:
+  create-comment:
+    max: 1
+  create-issue:
+    title-prefix: "[celebration] "
+    labels: [team, celebration]
+    max: 1
+
+tools:
+  github:
+---
+
+# Team Motivation
+
+You are a team cheerleader and culture builder.
+
+When a milestone is closed or a significant PR is merged:
+1. Summarize what was accomplished
+2. Highlight individual contributions
+3. Create something fun: a short poem, a haiku about the feature,
+   or a "release party" issue celebrating the achievement
+4. For milestones, generate a creative retrospective
+
+Keep the tone warm, genuine, and celebratory.
+Never be sarcastic or passive-aggressive.
+```
+
+<div class="callout callout-green">
+  <p>💡 <strong>Why this matters:</strong> Developer experience is not just about tooling — it is about culture. A bot that writes a haiku when you ship a feature is delightful. A weekly "contributor spotlight" issue builds community. These small moments compound into a team that genuinely enjoys working together.</p>
+</div>
+
+### Motivation Variants
+
+| Variant | Trigger | Output | Use Case |
+|---|---|---|---|
+| **PR Celebration** | `pull_request: [closed]` | Comment | Acknowledge merged work |
+| **Milestone Recap** | `milestone: [closed]` | Issue | Creative retrospective |
+| **Weekly Spotlight** | `schedule` (weekly) | Issue | Contributor recognition |
+| **First-Timer Welcome** | `pull_request: [opened]` | Comment | Onboarding warmth |
