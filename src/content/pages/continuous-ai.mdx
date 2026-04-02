@@ -1,39 +1,116 @@
 ---
 title: "Continuous AI — GitHub Agentic Workflows"
-description: "Deep-dive into four Continuous AI patterns: Triage, Summarization, Fault Analysis, and Quality — with workflow examples, flow diagrams, and best practices."
+description: "Deep-dive into seven Continuous AI patterns: Documentation, Code Improvement, Triage, Summarization, Fault Analysis, Quality, and Team Motivation."
 navLabel: "Continuous AI"
 navOrder: 10
 heroEmoji: "🔄"
-heroSubtitle: "Deep-dive into four always-on AI patterns for repository automation"
+heroSubtitle: "Deep-dive into seven always-on AI patterns for repository automation"
 accentColor: "blue"
 ---
 
 <div class="quick-nav">
+  <a href="#documentation">Documentation</a>
+  <a href="#code-improvement">Code Improvement</a>
   <a href="#triage">Triage</a>
   <a href="#summarization">Summarization</a>
   <a href="#fault-analysis">Fault Analysis</a>
   <a href="#quality">Quality</a>
+  <a href="#team-motivation">Team Motivation</a>
 </div>
 
 Continuous AI patterns are agentic workflows that run autonomously — triggered by events or schedules — to handle routine repository tasks. Each pattern follows the same principle: **define intent in Markdown, let the AI handle execution, constrain output with safe-outputs.**
 
 <div class="card-grid-2col">
+  <div class="card card-accent-purple">
+    <h3>📚 Documentation</h3>
+    <p class="desc">Continually populate and update documentation, offering suggestions for improvements.</p>
+  </div>
+  <div class="card card-accent-red">
+    <h3>✨ Code Improvement</h3>
+    <p class="desc">Incrementally improve code comments, tests, and ensure comments are up-to-date and relevant.</p>
+  </div>
   <div class="card card-accent-green">
     <h3>🏷️ Triage</h3>
-    <p class="desc">Label, deduplicate, and respond to issues in &lt;30 seconds. The "hello world" of agentic workflows.</p>
+    <p class="desc">Label, summarize, and respond to issues using natural language.</p>
   </div>
   <div class="card card-accent-blue">
     <h3>📊 Summarization</h3>
-    <p class="desc">Auto-generate daily digests, weekly rollups, and release notes from repository activity.</p>
+    <p class="desc">Provide up-to-date summarization of content and recent events in the software projects.</p>
   </div>
   <div class="card card-accent-orange">
     <h3>🔥 Fault Analysis</h3>
-    <p class="desc">When CI fails, the agent reads logs, correlates with the diff, and explains the root cause.</p>
+    <p class="desc">Watch for failed CI runs and offer explanations of them with contextual insights.</p>
   </div>
   <div class="card card-accent-cyan">
     <h3>✅ Quality</h3>
-    <p class="desc">Scheduled code reviews that catch what linters can't — naming, complexity, architecture drift.</p>
+    <p class="desc">Using LLMs to automatically analyze code quality, suggest improvements, and ensure adherence to coding standards.</p>
   </div>
+  <div class="card card-accent-yellow">
+    <h3>🎉 Team Motivation</h3>
+    <p class="desc">Turn PRs and team activity into poetry, zines, podcasts; provide nudges, or celebrate achievements.</p>
+  </div>
+</div>
+
+---
+
+<div class="section-hdr" id="documentation">
+  <h2>📚 Continuous Documentation</h2>
+</div>
+
+Documentation is often the first thing to fall behind in a fast-moving project. Continuous Documentation uses an AI agent to continually populate and update documentation, offering suggestions for improvements based on the actual codebase evolution.
+
+<div class="card-grid-2col">
+  <div class="card card-accent-purple">
+    <h3>🔄 Auto-Syncing Docs</h3>
+    <p class="desc">When code changes, the agent detects outdated documentation and proposes updates to keep everything in sync.</p>
+  </div>
+  <div class="card card-accent-blue">
+    <h3>📖 Glossary Maintenance</h3>
+    <p class="desc">Automatically maintains project terminology and definitions based on how terms are actually used in the codebase.</p>
+  </div>
+</div>
+
+### How It Works
+
+<div class="flow-diagram">
+  <div class="flow-step"><span class="step-icon">📝</span><span class="step-label">Code Push</span><span class="step-desc">Trigger fires</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🤖</span><span class="step-label">Agent Reads</span><span class="step-desc">Compares code to docs</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">✏️</span><span class="step-label">Update</span><span class="step-desc">Drafts documentation changes</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🔀</span><span class="step-label">Draft PR</span><span class="step-desc">Human review required</span></div>
+</div>
+
+---
+
+<div class="section-hdr" id="code-improvement">
+  <h2>✨ Continuous Code Improvement</h2>
+</div>
+
+Beyond just catching bugs, Continuous Code Improvement incrementally improves code comments, tests, and other aspects of code. It ensures that code comments are up-to-date, relevant, and that test coverage expands meaningfully over time.
+
+<div class="card-grid-2col">
+  <div class="card card-accent-red">
+    <h3>💬 Comment Relevance</h3>
+    <p class="desc">Detects when comments no longer match the underlying logic and rewrites them for accuracy.</p>
+  </div>
+  <div class="card card-accent-green">
+    <h3>🧪 Test Expansion</h3>
+    <p class="desc">Identifies untested edge cases in recently modified code and proposes new test fixtures.</p>
+  </div>
+</div>
+
+### How It Works
+
+<div class="flow-diagram">
+  <div class="flow-step"><span class="step-icon">⏰</span><span class="step-label">Schedule</span><span class="step-desc">Daily cron</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">📂</span><span class="step-label">Scan Code</span><span class="step-desc">Finds stale comments/tests</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">✏️</span><span class="step-label">Improve</span><span class="step-desc">Writes new comments/tests</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🔀</span><span class="step-label">Draft PR</span><span class="step-desc">Human review required</span></div>
 </div>
 
 ---
@@ -118,6 +195,11 @@ When a new issue is opened:
 
 <div class="callout callout-green">
   <p>💡 <strong>Why this works:</strong> <code>on: issues: types: [opened]</code> fires only on new issues. Labels are constrained to the <code>allowed</code> list — the agent cannot invent new ones. <code>max: 1</code> prevents comment spam. The agent runs with read-only permissions in a sandboxed container.</p>
+</div>
+
+<div class="info-box purple">
+  <h4>📌 Production Case Study: GitHub Accessibility Team</h4>
+  <p>GitHub's own Accessibility team uses Continuous Triage in production. With 90% of their feedback flowing through a single channel, they built an event-driven pipeline where Copilot analyzes every new issue instantly. The agent automatically populates over <strong>40 data points</strong> (issue type, user segment, affected components, WCAG criteria) and handles <strong>80% of the metadata</strong> automatically. It turns a chaotic backlog into continuous, rapid resolutions.</p>
 </div>
 
 ### Before & After
@@ -214,6 +296,16 @@ Use tables and lists. Keep it concise and actionable.
 
 <div class="callout callout-green">
   <p>💡 <strong>Key design decisions:</strong> <code>close-older-issues: true</code> auto-closes yesterday's report. The <code>[daily-summary]</code> prefix makes reports easy to filter. <code>workflow_dispatch</code> allows on-demand runs.</p>
+</div>
+
+<div class="info-box blue">
+  <h4>📌 Real-World Examples: The Agentics Pack</h4>
+  <p>The official <a href="https://github.com/githubnext/agentics">githubnext/agentics</a> sample pack contains several production-ready summarization workflows you can use today:</p>
+  <ul>
+    <li><strong>Agentic Wiki Writer:</strong> Automatically generates and maintains GitHub wiki pages directly from source code changes.</li>
+    <li><strong>Glossary Maintainer:</strong> Keeps your project terminology and definitions up to date based on codebase evolution.</li>
+    <li><strong>Daily Documentation Updater:</strong> Updates docs based on recent merged PRs.</li>
+  </ul>
 </div>
 
 ### Summarization Variants
@@ -451,4 +543,35 @@ Preserve functionality. Follow the project's existing style.
     <h3>Week 2: Draft PRs</h3>
     <p class="desc">Switch to <code>create-pull-request</code> with <code>draft: true</code>. Review every PR. Merge the good ones, close the bad ones.</p>
   </div>
+</div>
+
+---
+
+<div class="section-hdr" id="team-motivation">
+  <h2>🎉 Continuous Team Motivation</h2>
+</div>
+
+Software development is a human endeavor, and maintaining team morale is crucial. Continuous Team Motivation uses AI to turn PRs and other team activity into poetry, zines, podcasts, provide nudges, or celebrate team achievements.
+
+<div class="card-grid-2col">
+  <div class="card card-accent-yellow">
+    <h3>🏆 Milestone Celebrations</h3>
+    <p class="desc">Automatically generates celebratory messages or creative content when the team hits a major milestone or merges a massive PR.</p>
+  </div>
+  <div class="card card-accent-purple">
+    <h3>🎨 Creative Summaries</h3>
+    <p class="desc">Turns dry weekly changelogs into engaging formats like short poems, team zines, or even scripts for internal podcasts.</p>
+  </div>
+</div>
+
+### How It Works
+
+<div class="flow-diagram">
+  <div class="flow-step"><span class="step-icon">🎉</span><span class="step-label">Event</span><span class="step-desc">PR merged / Milestone</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🧠</span><span class="step-label">Analyze</span><span class="step-desc">Extracts key achievements</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">🎨</span><span class="step-label">Create</span><span class="step-desc">Generates creative content</span></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><span class="step-icon">💬</span><span class="step-label">Share</span><span class="step-desc">Posts to issue or discussion</span></div>
 </div>
