@@ -1,0 +1,119 @@
+---
+/**
+ * Tabbed workflow gallery component.
+ * Reads examples from src/data/workflow-examples.json and renders
+ * them in category tabs with cards showing name, description,
+ * wizard command, and source link.
+ */
+import examples from '../data/workflow-examples.json';
+
+const categories = [
+  'Triage',
+  'Code Quality',
+  'Documentation',
+  'Testing',
+  'Fault Investigation',
+  'Security',
+  'Issue & PR Management',
+  'Reporting & Analytics',
+];
+
+const grouped = categories.map(cat => ({
+  name: cat,
+  items: examples.filter(e => e.category === cat),
+}));
+---
+
+<div class="gallery-toolbar">
+  <div class="gallery-tabs">
+    {grouped.map((group, i) => (
+      <button
+        class={`gallery-tab${i === 0 ? ' active' : ''}`}
+        data-category={group.name}
+      >
+        {group.name}
+        <span class="gallery-category-count">{group.items.length}</span>
+      </button>
+    ))}
+  </div>
+  <div class="gallery-view-toggle">
+    <button class="gallery-view-btn active" data-show="wizard">CLI</button>
+    <button class="gallery-view-btn" data-show="prompt">Prompt</button>
+  </div>
+</div>
+
+{grouped.map((group, i) => (
+  <div
+    class={`gallery-panel${i === 0 ? ' active' : ''}`}
+    data-category={group.name}
+  >
+    {group.items.map(item => (
+      <div class="example-card">
+        <h4>{item.name}</h4>
+        <p class="example-desc">{item.description}</p>
+        <div class="example-block active" data-type="wizard">
+          <div class="code-snippet">
+            <div class="code-snippet-header">
+              <span class="code-snippet-lang">bash</span>
+              <button class="code-copy-btn" aria-label="Copy to clipboard">Copy</button>
+            </div>
+            <pre><code set:html={
+              item.wizardCommand
+                .replace(/^(gh)(\s)/, '<span class="hl-cmd">$1</span>$2')
+                .replace(/(\saw\s)/, '<span class="hl-sub"> aw </span>')
+                .replace(/(add-wizard)/, '<span class="hl-flag">$1</span>')
+                .replace(/(https?:\/\/\S+)/, '<span class="hl-str">$1</span>')
+            } /></code></pre>
+          </div>
+        </div>
+        <div class="example-block" data-type="prompt">
+          <div class="code-snippet">
+            <div class="code-snippet-header">
+              <span class="code-snippet-lang">prompt</span>
+              <button class="code-copy-btn" aria-label="Copy to clipboard">Copy</button>
+            </div>
+            <pre class="code-prompt"><code>{item.prompt}</code></pre>
+          </div>
+        </div>
+        <div class="example-links">
+          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">View source →</a>
+        </div>
+      </div>
+    ))}
+  </div>
+))}
+
+<script>
+  document.querySelectorAll('.gallery-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.getAttribute('data-category');
+      document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.gallery-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.gallery-panel[data-category="${category}"]`)?.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.gallery-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const show = btn.getAttribute('data-show');
+      document.querySelectorAll('.gallery-view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.example-block').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-type') === show);
+      });
+    });
+  });
+
+  document.querySelectorAll('.code-copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const snippet = btn.closest('.code-snippet');
+      const code = snippet.querySelector('code');
+      const text = code.textContent || '';
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    });
+  });
+</script>

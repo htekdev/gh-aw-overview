@@ -1,0 +1,363 @@
+---
+title: "Get Started — GitHub Agentic Workflows"
+description: "Step-by-step guide to setting up GitHub Agentic Workflows — install the CLI, configure secrets, and deploy your first workflow."
+navLabel: "Get Started"
+navOrder: 0
+heroEmoji: "🚀"
+heroSubtitle: "From zero to your first agentic workflow in minutes"
+accentColor: "green"
+---
+
+import WorkflowGallery from '../../components/WorkflowGallery.astro';
+
+<style>{`
+  .card-grid-2col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+  .info-card {
+    background: var(--color-surface, #161b22);
+    border: 1px solid var(--color-border, #30363d);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .info-card h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: var(--color-text, #e6edf3);
+  }
+  .info-card ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--color-text-muted, #8b949e);
+    line-height: 1.8;
+  }
+  .info-card code {
+    font-size: 13px;
+    background: rgba(110,118,129,0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .step-grid {
+    display: grid;
+    gap: 24px;
+    margin: 24px 0;
+  }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--color-surface, #161b22);
+    border: 1px solid var(--color-border, #30363d);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-green, #3fb950);
+    color: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .step-body h4 {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
+  .step-body p {
+    margin: 0;
+    color: var(--color-text-muted, #8b949e);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .step-body code {
+    font-size: 13px;
+    background: rgba(110,118,129,0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .styled-table th,
+  .styled-table td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border, #30363d);
+  }
+  .styled-table th {
+    background: var(--color-surface, #161b22);
+    color: var(--color-text, #e6edf3);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .styled-table td {
+    color: var(--color-text-muted, #8b949e);
+  }
+  .styled-table td code {
+    font-size: 13px;
+    background: rgba(110,118,129,0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--color-text, #e6edf3);
+  }
+  .styled-table tr:hover td {
+    background: rgba(88,166,255,0.04);
+  }
+  .code-block {
+    background: var(--color-bg, #0d1117);
+    border: 1px solid var(--color-border, #30363d);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--color-surface, #161b22);
+    border-bottom: 1px solid var(--color-border, #30363d);
+    font-size: 13px;
+    color: var(--color-text-muted, #8b949e);
+  }
+  .code-block pre {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--color-text, #e6edf3);
+    white-space: pre;
+    margin: 0;
+  }
+  .callout {
+    background: rgba(63,185,80,0.08);
+    border: 1px solid rgba(63,185,80,0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted, #8b949e);
+  }
+  .callout strong {
+    color: var(--color-green, #3fb950);
+  }
+`}</style>
+
+<section id="prerequisites">
+<div class="section-label">Before You Begin</div>
+
+## Prerequisites
+
+<div class="card-grid-2col">
+  <div class="info-card">
+    <h3>✅ Required</h3>
+    <ul>
+      <li>A <strong>GitHub Copilot</strong> subscription (Individual, Business, or Enterprise)</li>
+      <li><strong>GitHub CLI</strong> v2.45.0 or later</li>
+      <li>The <code>gh-aw</code> CLI extension</li>
+      <li><strong>Admin access</strong> to the target repository</li>
+    </ul>
+  </div>
+  <div class="info-card">
+    <h3>🔑 Tokens &amp; Secrets</h3>
+    <ul>
+      <li><code>COPILOT_GITHUB_TOKEN</code> — <strong>required</strong> for every workflow</li>
+      <li><code>GH_AW_AGENT_TOKEN</code> — optional, needed for <code>assign-to-agent</code></li>
+      <li>Custom <strong>PAT or GitHub App</strong> — optional, for cross-repo or elevated access</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="install">
+<div class="section-label">Setup</div>
+
+## Install &amp; Initialize
+
+<p class="section-desc">Three commands to go from zero to a fully initialized repository. The CLI handles scaffolding, engine selection, and configuration.</p>
+
+<div class="step-grid">
+  <div class="step-item">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Install the gh-aw CLI extension</h4>
+      <p>Adds the <code>gh aw</code> command to your GitHub CLI. Requires GitHub CLI v2.45.0 or later.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Initialize your repository</h4>
+      <p>Run <code>gh aw init --engine copilot</code> to scaffold your repo. This creates <code>copilot-setup-steps.yml</code>, walks you through engine selection, and configures the necessary directory structure.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>Create the required secret</h4>
+      <p>Store your Copilot token as a repository secret so workflows can authenticate with the Copilot API.</p>
+    </div>
+  </div>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span>Terminal</span></div>
+  <pre>{`# 1. Install the gh-aw CLI extension
+gh extension install github/gh-aw
+
+# 2. Initialize your repository
+gh aw init --engine copilot
+
+# 3. Create the required secret
+gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
+</div>
+
+<div class="callout">
+  <strong>💡 What does <code>gh aw init</code> do?</strong> It creates the <code>copilot-setup-steps.yml</code> file that defines your agent's runtime environment, walks you through engine selection (Copilot, Claude, or Codex), and sets up the <code>.github/workflows/</code> directory for your first workflow.
+</div>
+</section>
+
+<section id="token">
+<div class="section-label">Authentication</div>
+
+## Create the COPILOT_GITHUB_TOKEN
+
+<p class="section-desc">Every agentic workflow needs a <code>COPILOT_GITHUB_TOKEN</code> to authenticate API calls. Here's how to create one:</p>
+
+<div class="step-grid">
+  <div class="step-item">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Generate a fine-grained token</h4>
+      <p>Go to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">github.com/settings/personal-access-tokens/new</a> and select <strong>Fine-grained personal access token</strong>.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Grant Copilot permission</h4>
+      <p>Under <strong>Account permissions</strong>, set <strong>Copilot Requests</strong> to <strong>Read-only</strong>. No other permissions are required for the base token.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>Store as a repository secret</h4>
+      <p>Run <code>gh secret set COPILOT_GITHUB_TOKEN -R owner/repo</code> and paste the token when prompted — or add it via the repository Settings → Secrets → Actions page.</p>
+    </div>
+  </div>
+</div>
+
+### Secrets Reference
+
+<table class="styled-table">
+  <thead>
+    <tr>
+      <th>Secret</th>
+      <th>When Needed</th>
+      <th>Permission</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>COPILOT_GITHUB_TOKEN</code></td>
+      <td>Always — every workflow</td>
+      <td>Copilot Requests: Read-only</td>
+    </tr>
+    <tr>
+      <td><code>GH_AW_AGENT_TOKEN</code></td>
+      <td>Using <code>assign-to-agent</code></td>
+      <td>Issues: Read &amp; Write</td>
+    </tr>
+    <tr>
+      <td><code>ANTHROPIC_API_KEY</code></td>
+      <td>Using <code>engine: claude</code></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><code>OPENAI_API_KEY</code></td>
+      <td>Using <code>engine: codex</code></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><code>GEMINI_API_KEY</code></td>
+      <td>Using <code>engine: gemini</code></td>
+      <td>—</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+<section id="first-workflow">
+<div class="section-label">Build</div>
+
+## Your First Workflow
+
+<p class="section-desc">Use the CLI to add a pre-built workflow template, compile it into a hardened GitHub Actions file, and push it to your repo.</p>
+
+<div class="step-grid">
+  <div class="step-item">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Add a workflow from the gallery</h4>
+      <p>The <code>add-wizard</code> command pulls a workflow template and saves it as a Markdown source file in <code>.github/workflows/</code>.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Compile to a hardened Actions workflow</h4>
+      <p>The <code>compile</code> command transforms your Markdown source into a <code>.lock.yml</code> file with pinned actions, sandboxed permissions, and safe outputs.</p>
+    </div>
+  </div>
+  <div class="step-item">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>Push to your repository</h4>
+      <p>Commit both the <code>.md</code> source and the <code>.lock.yml</code> compiled file. GitHub Actions picks up the lock file automatically on the next trigger.</p>
+    </div>
+  </div>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span>Terminal</span></div>
+  <pre>{`# 1. Create a workflow from a template
+gh aw add-wizard githubnext/agentics/daily-repo-status
+
+# 2. Compile to a hardened Actions workflow
+gh aw compile .github/workflows/daily-repo-status.md
+
+# 3. Push both files to your repo
+git add .github/workflows/
+git commit -m "Add daily status report workflow"
+git push`}</pre>
+</div>
+
+<div class="callout">
+  <strong>🎉 That's it!</strong> Your workflow will now trigger automatically based on its configured events (schedule, issue creation, etc.). Check the Actions tab in your repository to see it run.
+</div>
+</section>
+
+<section id="gallery">
+<div class="section-label">Examples</div>
+
+## Workflow Gallery
+
+<p class="section-desc">Browse real-world workflow examples from Peli's Agent Factory — over 100 workflows battle-tested in the github/gh-aw repository. Add any workflow to your repo with a single command.</p>
+
+<WorkflowGallery />
+</section>

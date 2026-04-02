@@ -1,0 +1,416 @@
+[
+  {
+    "id": "issue-triage-agent",
+    "name": "Issue Triage Agent",
+    "description": "Analyzes new issues, applies labels, and posts helpful comments explaining the classification.",
+    "category": "Triage",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-triage-agent.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-triage-agent.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to triage new issues: label them by type and priority (bug, feature, enhancement, documentation, question, help-wanted, good-first-issue), identify duplicates, ask clarifying questions when the description is unclear, and post a helpful comment explaining the classification."
+  },
+  {
+    "id": "code-simplifier",
+    "name": "Code Simplifier",
+    "description": "Identifies complex code and proposes simpler, more maintainable alternatives via PRs.",
+    "category": "Code Quality",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/code-simplifier.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/code-simplifier.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to continuously simplify code: scan the codebase for complex functions with high cyclomatic complexity, deep nesting, and long methods. Propose simpler, more maintainable alternatives and open a draft PR with the refactored code."
+  },
+  {
+    "id": "duplicate-code-detector",
+    "name": "Duplicate Code Detector",
+    "description": "Finds duplicated code patterns across the codebase and suggests consolidation.",
+    "category": "Code Quality",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/duplicate-code-detector.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/duplicate-code-detector.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to detect duplicated code: find duplicated code patterns across the repository, group similar blocks, suggest how to consolidate them into shared utilities, and open a PR with the proposed changes."
+  },
+  {
+    "id": "daily-doc-updater",
+    "name": "Daily Doc Updater",
+    "description": "Keeps documentation aligned with code changes by detecting and fixing mismatches.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-doc-updater.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-doc-updater.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to update documentation daily: compare code changes from the last 24 hours against existing documentation, identify mismatches between docstrings, READMEs, and actual implementations, then open a PR to fix them."
+  },
+  {
+    "id": "glossary-maintainer",
+    "name": "Glossary Maintainer",
+    "description": "Maintains and updates the project glossary based on codebase terminology.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/glossary-maintainer.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/glossary-maintainer.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to maintain the project glossary: scan the codebase for domain-specific terms, acronyms, and concepts, then update the project glossary with any new or changed terminology and clear definitions."
+  },
+  {
+    "id": "daily-test-improver",
+    "name": "Daily Test Improver",
+    "description": "Assesses test coverage gaps and writes high-value tests to improve coverage.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard githubnext/agentics/daily-test-improver",
+    "sourceUrl": "https://github.com/githubnext/agentics/blob/main/workflows/daily-test-improver.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to improve test coverage daily: analyze test coverage reports, identify the most impactful uncovered code paths, write high-value unit tests for those paths, and open a PR with the new tests."
+  },
+  {
+    "id": "daily-testify-expert",
+    "name": "Daily Testify Expert",
+    "description": "Advanced test generation with deep analysis of uncovered code paths.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-testify-uber-super-expert.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-testify-uber-super-expert.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to perform advanced test generation: do deep analysis of uncovered code paths, edge cases, and error handling, then generate comprehensive tests including boundary conditions and failure scenarios."
+  },
+  {
+    "id": "compiler-quality-checker",
+    "name": "Compiler Quality Checker",
+    "description": "Validates compilation quality and catches compiler warnings before they become issues.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-compiler-quality.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-compiler-quality.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to check compilation quality: run a full compilation analysis, identify all warnings, deprecation notices, and potential issues, then create an issue summarizing findings with severity assessments and fix suggestions."
+  },
+  {
+    "id": "ci-doctor",
+    "name": "CI Doctor",
+    "description": "Investigates failed CI workflows, analyzes logs, and opens diagnostic issues with fix suggestions.",
+    "category": "Fault Investigation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/ci-doctor.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/ci-doctor.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to investigate CI failures: when a CI workflow fails, analyze the logs, correlate with the triggering diff, search for similar past failures, and open an issue with root cause analysis and a suggested fix."
+  },
+  {
+    "id": "schema-consistency-checker",
+    "name": "Schema Consistency Checker",
+    "description": "Detects when schemas, code, and documentation drift apart.",
+    "category": "Fault Investigation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/schema-consistency-checker.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/schema-consistency-checker.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to check schema consistency: compare JSON schemas, type definitions, structs, and documentation to detect any drift between them, then create a report of inconsistencies that need alignment."
+  },
+  {
+    "id": "breaking-change-checker",
+    "name": "Breaking Change Checker",
+    "description": "Monitors for backward-incompatible changes and creates alert issues.",
+    "category": "Fault Investigation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/breaking-change-checker.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/breaking-change-checker.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to detect breaking changes: analyze recent commits for backward-incompatible changes to public APIs, configuration formats, or CLI interfaces, then create an alert issue for any breaking changes found."
+  },
+  {
+    "id": "issue-arborist",
+    "name": "Issue Arborist",
+    "description": "Links related issues as sub-issues to keep the issue tracker organized.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-arborist.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-arborist.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to organize issues: analyze all open issues, identify related ones that should be linked as sub-issues, create parent issues to group related work, and link sub-issues under them."
+  },
+  {
+    "id": "issue-monster",
+    "name": "Issue Monster",
+    "description": "Assigns issues to the Copilot coding agent one at a time for automated resolution.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-monster.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/issue-monster.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to dispatch issues to the Copilot coding agent: find the next unassigned issue suitable for automated resolution and assign it to the Copilot coding agent, one at a time to prevent parallel conflicts."
+  },
+  {
+    "id": "mergefest",
+    "name": "Mergefest",
+    "description": "Automatically merges main branch into PR branches to keep them up to date.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/mergefest.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/mergefest.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to keep PRs up to date: check all open pull requests and merge the main branch into any that are behind, skipping PRs with merge conflicts and reporting them for manual resolution."
+  },
+  {
+    "id": "sub-issue-closer",
+    "name": "Sub Issue Closer",
+    "description": "Automatically closes completed sub-issues when parent issues are resolved.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/sub-issue-closer.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/sub-issue-closer.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to close completed sub-issues: scan for parent issues where all sub-issues are completed, automatically close the parent issue, and add a summary comment listing the resolved sub-issues."
+  },
+  {
+    "id": "metrics-collector",
+    "name": "Metrics Collector",
+    "description": "Tracks daily performance metrics across the entire agent ecosystem.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/metrics-collector.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/metrics-collector.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to collect daily metrics: gather performance metrics from all agentic workflow runs in the last 24 hours and create a daily report covering success rates, token usage, costs, and execution times."
+  },
+  {
+    "id": "portfolio-analyst",
+    "name": "Portfolio Analyst",
+    "description": "Analyzes cost and performance across workflows to identify optimization opportunities.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/portfolio-analyst.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/portfolio-analyst.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to analyze workflow portfolio: review cost and performance trends across all workflows for the past week, identify workflows with high cost-to-value ratios, and suggest optimization opportunities."
+  },
+  {
+    "id": "audit-workflows",
+    "name": "Audit Workflows",
+    "description": "Meta-agent that audits all other agents' runs for errors, costs, and quality patterns.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/audit-workflows.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/audit-workflows.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to audit agentic workflows: audit the last 10 runs of every agentic workflow, check for errors, excessive costs, quality degradation, and unusual patterns, then create a summary report with actionable findings."
+  },
+  {
+    "id": "daily-issues-report",
+    "name": "Daily Issues Report",
+    "description": "Creates a daily upbeat status report as a GitHub issue covering recent activity.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard githubnext/agentics/daily-repo-status",
+    "sourceUrl": "https://github.com/githubnext/agentics/blob/main/workflows/daily-repo-status.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to create a daily activity report: summarize recent repository activity including new issues, PR activity, CI health, key metrics, and actionable next steps for maintainers. Deliver it as a GitHub issue."
+  },
+  {
+    "id": "unbloat-docs",
+    "name": "Documentation Unbloat",
+    "description": "Reviews and simplifies documentation by reducing verbosity while preserving accuracy — 85% merge rate.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/unbloat-docs.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/unbloat-docs.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to simplify documentation: review all docs for verbosity, redundant phrasing, and unnecessary complexity, then open PRs that preserve accuracy while making content more concise and scannable."
+  },
+  {
+    "id": "docs-noob-tester",
+    "name": "Documentation Noob Tester",
+    "description": "Tests documentation from a new user's perspective, identifying confusing steps and unclear instructions.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/docs-noob-tester.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/docs-noob-tester.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to test documentation as a new user: follow every getting-started guide and tutorial step by step, identify confusing instructions, missing prerequisites, and unclear terminology, then create issues for each problem found."
+  },
+  {
+    "id": "slide-deck-maintainer",
+    "name": "Slide Deck Maintainer",
+    "description": "Maintains presentation slide decks by updating them when code or features change.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/slide-deck-maintainer.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/slide-deck-maintainer.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to maintain slide decks: review presentation files against the latest codebase state, update outdated screenshots, code examples, and feature descriptions, then open a PR with the refreshed slides."
+  },
+  {
+    "id": "blog-auditor",
+    "name": "Blog Auditor",
+    "description": "Verifies blog posts are accessible, accurate, and contain expected content as the codebase evolves.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/blog-auditor.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/blog-auditor.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to audit blog posts: scan all blog posts for outdated code examples, broken links, deprecated feature references, and inaccurate statements, then create an issue listing all findings with suggested corrections."
+  },
+  {
+    "id": "changeset",
+    "name": "Changeset Generator",
+    "description": "Automates version bumps and changelog generation by analyzing commits since the last release — 78% merge rate.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/changeset.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/changeset.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to generate changelogs: analyze all commits since the last release, categorize them (features, fixes, breaking changes), determine the appropriate semantic version bump, update the changelog, and open a release PR."
+  },
+  {
+    "id": "daily-workflow-updater",
+    "name": "Daily Workflow Updater",
+    "description": "Keeps GitHub Actions and dependencies current by checking for updates and applying patches.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-workflow-updater.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-workflow-updater.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to update workflow dependencies daily: check all GitHub Actions workflow files for outdated action versions, deprecated features, and available security patches, then open a PR updating them to the latest stable versions."
+  },
+  {
+    "id": "cli-consistency-checker",
+    "name": "CLI Consistency Checker",
+    "description": "Inspects the CLI for inconsistencies, typos, and documentation gaps — 78% merge rate across 102 PRs.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/cli-consistency-checker.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/cli-consistency-checker.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to check CLI consistency: inspect all CLI commands, flags, help text, and documentation for inconsistencies, typos, undocumented options, and deprecated commands, then open a PR fixing each issue found."
+  },
+  {
+    "id": "ci-coach",
+    "name": "CI Coach",
+    "description": "Analyzes CI pipelines and suggests optimizations for speed, reliability, and cost — 100% merge rate.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/ci-coach.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/ci-coach.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to optimize CI pipelines: analyze all CI/CD workflow configurations for inefficiencies including redundant steps, missing caching, unnecessary dependencies, slow test suites, and suboptimal parallelization, then open a PR with targeted improvements."
+  },
+  {
+    "id": "workflow-health-manager",
+    "name": "Workflow Health Manager",
+    "description": "Meta-orchestrator that monitors the health of all agentic workflows and flags degradations.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/workflow-health-manager.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/workflow-health-manager.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to monitor workflow health: analyze run histories of all agentic workflows, detect patterns of failure, increasing costs, or declining merge rates, and create issues for workflows that need attention."
+  },
+  {
+    "id": "multi-device-docs-tester",
+    "name": "Multi-Device Docs Tester",
+    "description": "Tests documentation site across mobile, tablet, and desktop using Playwright browser automation.",
+    "category": "Testing",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-multi-device-docs-tester.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-multi-device-docs-tester.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to test docs across devices: use Playwright to load the documentation site on mobile (375px), tablet (768px), and desktop (1440px) viewports, check for layout issues, broken responsive designs, and accessibility problems, then open a PR fixing any issues found."
+  },
+  {
+    "id": "security-compliance",
+    "name": "Security Compliance",
+    "description": "Runs vulnerability remediation campaigns with deadline tracking and SLA enforcement.",
+    "category": "Security",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/security-compliance.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/security-compliance.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to enforce security compliance: scan for known vulnerabilities, track remediation deadlines against SLAs, create issues for overdue items, and generate a compliance dashboard as a GitHub issue."
+  },
+  {
+    "id": "firewall-tester",
+    "name": "Firewall Tester",
+    "description": "Tests network security rules and validates that agents cannot access unauthorized resources.",
+    "category": "Security",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/firewall.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/firewall.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to test firewall rules: validate that the agent network firewall correctly blocks unauthorized outbound traffic, test the domain allowlist, and create a daily report of any anomalies or policy violations."
+  },
+  {
+    "id": "daily-secrets-analysis",
+    "name": "Daily Secrets Analysis",
+    "description": "Scans commits and discussions for accidentally exposed credentials and API keys.",
+    "category": "Security",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-secrets-analysis.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-secrets-analysis.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to scan for exposed secrets: analyze recent commits, pull request diffs, and discussion content for accidentally committed API keys, tokens, passwords, and other credentials, then create urgent issues for any findings."
+  },
+  {
+    "id": "malicious-code-scan",
+    "name": "Malicious Code Scanner",
+    "description": "Reviews recent code changes for suspicious patterns and potential supply chain attacks.",
+    "category": "Security",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-malicious-code-scan.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/daily-malicious-code-scan.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to scan for malicious code: review all code changes from the last 24 hours for suspicious patterns including obfuscated code, unexpected network calls, data exfiltration attempts, and backdoor indicators, then create an alert issue for any findings."
+  },
+  {
+    "id": "static-analysis-report",
+    "name": "Static Analysis Report",
+    "description": "Runs daily security scans using zizmor, poutine, and actionlint for comprehensive static analysis.",
+    "category": "Security",
+    "wizardCommand": "gh aw add-wizard https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/static-analysis-report.md",
+    "sourceUrl": "https://github.com/github/gh-aw/blob/v0.45.5/.github/workflows/static-analysis-report.md",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to generate a static analysis report: run comprehensive security scans on all workflow files and code using industry-standard tools, analyze the findings for severity and impact, and create a detailed report as a GitHub discussion."
+  },
+  {
+    "id": "performance-regression-detector",
+    "name": "Performance Regression Detector",
+    "description": "Monitors CI benchmark results for performance regressions and creates alerts when metrics degrade.",
+    "category": "Fault Investigation",
+    "wizardCommand": "gh aw new perf-regression-detector --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to detect performance regressions: after CI completes, compare benchmark results against baseline metrics, identify any statistically significant performance degradations in execution time, memory usage, or throughput, and create an alert issue with before/after comparisons."
+  },
+  {
+    "id": "migration-assistant",
+    "name": "Migration Assistant",
+    "description": "Identifies deprecated API usage and assists with incremental migration to newer patterns.",
+    "category": "Code Quality",
+    "wizardCommand": "gh aw new migration-assistant --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to assist with code migrations: scan the codebase for deprecated API usage, legacy patterns, and outdated library calls, then open incremental PRs that migrate each instance to the recommended modern alternative with tests."
+  },
+  {
+    "id": "accessibility-checker",
+    "name": "Accessibility Checker",
+    "description": "Audits web UI components for WCAG 2.1 AA compliance and creates issues for violations.",
+    "category": "Testing",
+    "wizardCommand": "gh aw new accessibility-checker --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to check accessibility compliance: audit all web UI components and pages for WCAG 2.1 AA violations including missing alt text, insufficient color contrast, keyboard navigation issues, and missing ARIA labels, then create issues for each violation with remediation guidance."
+  },
+  {
+    "id": "incident-postmortem",
+    "name": "Incident Postmortem Writer",
+    "description": "Generates structured incident postmortems by analyzing CI failures, deployments, and related issues.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw new incident-postmortem --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to write incident postmortems: when a production incident label is applied to an issue, gather all related CI failures, deployment logs, commits, and PRs, then generate a structured postmortem issue covering timeline, root cause, impact, resolution, and action items."
+  },
+  {
+    "id": "tech-debt-tracker",
+    "name": "Tech Debt Tracker",
+    "description": "Scans for TODO/FIXME/HACK comments, quantifies tech debt, and creates a prioritized remediation plan.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw new tech-debt-tracker --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to track technical debt: scan the entire codebase for TODO, FIXME, HACK, and XXX comments, categorize them by severity and area, estimate remediation effort, and create a weekly tech debt report as a GitHub issue with a prioritized action plan."
+  },
+  {
+    "id": "contributor-welcome-bot",
+    "name": "Contributor Welcome Bot",
+    "description": "Welcomes first-time contributors with personalized guidance, relevant docs links, and mentorship offers.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw new contributor-welcome-bot --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to welcome new contributors: when a first-time contributor opens a PR or issue, post a warm welcome comment with links to the contributing guide, code of conduct, relevant documentation for their change area, and offer to connect them with a mentor."
+  },
+  {
+    "id": "pr-review-assistant",
+    "name": "PR Review Assistant",
+    "description": "Reviews pull requests for code quality, security issues, and style consistency, posting inline review comments.",
+    "category": "Code Quality",
+    "wizardCommand": "gh aw new pr-review-assistant --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to review pull requests: when a PR is opened, analyze the diff for code quality issues, potential bugs, security vulnerabilities, and style inconsistencies, then post inline review comments with specific suggestions and approve or request changes."
+  },
+  {
+    "id": "dependency-auditor",
+    "name": "Dependency Auditor",
+    "description": "Audits project dependencies for known vulnerabilities, license conflicts, and outdated packages weekly.",
+    "category": "Security",
+    "wizardCommand": "gh aw new dependency-auditor --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to audit dependencies weekly: scan all project dependencies for known CVEs, license compatibility issues, and severely outdated packages, then create an issue with a prioritized remediation plan and open PRs for safe automatic updates."
+  },
+  {
+    "id": "onboarding-guide",
+    "name": "Onboarding Guide Generator",
+    "description": "Generates and maintains a new contributor onboarding guide based on the actual codebase structure.",
+    "category": "Documentation",
+    "wizardCommand": "gh aw new onboarding-guide --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to generate an onboarding guide: analyze the repository structure, key modules, development setup, testing approach, and contribution workflow, then create or update a CONTRIBUTING.md and onboarding guide that helps new developers get productive quickly."
+  },
+  {
+    "id": "api-contract-checker",
+    "name": "API Contract Checker",
+    "description": "Validates API endpoints against their OpenAPI/Swagger specs and detects contract drift.",
+    "category": "Fault Investigation",
+    "wizardCommand": "gh aw new api-contract-checker --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to validate API contracts: compare actual API endpoint implementations against OpenAPI or Swagger specifications, detect any drift in request/response schemas, missing endpoints, or undocumented parameters, and create an issue detailing all contract violations."
+  },
+  {
+    "id": "stale-issue-gardener",
+    "name": "Stale Issue Gardener",
+    "description": "Identifies stale issues, pings authors for updates, and closes abandoned ones with a summary comment.",
+    "category": "Issue & PR Management",
+    "wizardCommand": "gh aw new stale-issue-gardener --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to garden stale issues: identify issues with no activity for 30+ days, post a polite comment asking for updates, and if there is no response after 14 more days, close the issue with a summary comment explaining it can be reopened."
+  },
+  {
+    "id": "release-notes-generator",
+    "name": "Release Notes Generator",
+    "description": "Generates human-readable release notes from merged PRs and closed issues for each release.",
+    "category": "Reporting & Analytics",
+    "wizardCommand": "gh aw new release-notes-generator --engine copilot",
+    "sourceUrl": "https://github.github.com/gh-aw/setup/creating-workflows/",
+    "prompt": "Create a workflow for GitHub Agentic Workflows using https://raw.githubusercontent.com/github/gh-aw/main/create.md\nThe purpose of the workflow is to generate release notes: when a new release is tagged, analyze all merged PRs and closed issues since the previous release, categorize changes into features, bug fixes, breaking changes, and improvements, then create polished release notes as a GitHub release."
+  }
+]

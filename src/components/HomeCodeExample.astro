@@ -26,13 +26,11 @@
 <span class="hl-key">tools</span>:
   <span class="hl-section">github</span>:  <span class="hl-comment"># Access to repo data</span>
 
-<span class="hl-key">safeOutputs</span>:
-  <span class="hl-key">issues</span>:
-    <span class="hl-key">create</span>: <span class="hl-bool">true</span>
-    <span class="hl-key">maxCount</span>: <span class="hl-val">1</span>
-    <span class="hl-key">addLabels</span>:
-      - <span class="hl-str">daily-report</span>
-      - <span class="hl-str">automated</span>
+<span class="hl-key">safe-outputs</span>:
+  <span class="hl-key">create-issue</span>:
+    <span class="hl-key">title-prefix</span>: <span class="hl-str">"[daily] "</span>
+    <span class="hl-key">labels</span>: [<span class="hl-str">daily-report</span>, <span class="hl-str">automated</span>]
+    <span class="hl-key">max</span>: <span class="hl-val">1</span>
 <span class="hl-comment">---</span>
 
 <span class="hl-comment"># Daily Repository Status Report</span>
@@ -64,7 +62,7 @@ Keep it concise — highlight what matters.`} />
     <ul>
       <li><strong>Schedule trigger</strong> — runs every weekday at 9 AM UTC</li>
       <li><strong>GitHub tools</strong> — gives the agent read access to issues, PRs, commits, and CI data</li>
-      <li><strong>Safe outputs</strong> — can only create one issue with specific labels; no other write access</li>
+      <li><strong>Safe outputs</strong> — can only create one issue with a title prefix and specific labels; no other write access</li>
       <li><strong>Natural language body</strong> — the agent interprets these instructions with contextual reasoning</li>
       <li><strong>Read-only by default</strong> — writes only happen through the declared safe outputs</li>
       <li><strong>Human review</strong> — the created issue is visible for the team to inspect and act on</li>
