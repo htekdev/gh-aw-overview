@@ -24,7 +24,7 @@ From simple triage to multi-repo orchestration — find the right automation for
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td><strong>Issue Triage & Labeling</strong></td><td><span class="trigger-tag">on: issue</span></td><td>Labels, comments</td><td><span class="badge badge-green">Low</span></td></tr>
+<tr><td>1</td><td><strong>Issue Triage & Labeling</strong></td><td><span class="trigger-tag">on: issues</span></td><td>Labels, comments</td><td><span class="badge badge-green">Low</span></td></tr>
 <tr><td>2</td><td><strong>Documentation Maintenance</strong></td><td><span class="trigger-tag">on: schedule</span> <span class="trigger-tag">on: push</span></td><td>Pull requests, issues</td><td><span class="badge badge-orange">Medium</span></td></tr>
 <tr><td>3</td><td><strong>CI Failure Analysis</strong></td><td><span class="trigger-tag">on: workflow_run</span></td><td>Issues, PRs with fixes</td><td><span class="badge badge-orange">Medium</span></td></tr>
 <tr><td>4</td><td><strong>Test Coverage Improvement</strong></td><td><span class="trigger-tag">on: schedule</span></td><td>Pull requests</td><td><span class="badge badge-orange">Medium</span></td></tr>
@@ -52,7 +52,7 @@ The "hello world" of agentic workflows — practical, immediately useful, and si
 ---
 timeout-minutes: 5
 on:
-  issue:
+  issues:
     types: [opened, reopened]
 
 permissions:
