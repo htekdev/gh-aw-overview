@@ -20,10 +20,9 @@ tools:
   timeout: 300
 safe-outputs:
   upload-asset:
-  create-discussion:
-    category: "audits"
+  create-issue:
     max: 1
-    close-older-discussions: true
+    close-older-issues: true
 timeout-minutes: 30
 imports:
   - shared/mood.md
@@ -53,7 +52,7 @@ Generate 2 charts from past 30 days workflow data:
 2. **Token & Cost**: Daily tokens (bar/area) + cost line + 7-day moving average
 
 Save to: `/tmp/gh-aw/python/charts/{workflow_health,token_cost}_trends.png`
-Upload charts, embed in discussion with 2-3 sentence analysis each.
+Upload charts, embed in issue with 2-3 sentence analysis each.
 
 ---
 
@@ -85,7 +84,7 @@ Output is saved to: /tmp/gh-aw/aw-mcp/logs
 
 **Progressive Disclosure**: The template already uses appropriate `<details>` tags - maintain this pattern for any additional long sections.
 
-**Create Discussion**: Always create report with audit findings including summary, statistics, missing tools, errors, affected workflows, recommendations, and historical context.
+**Create Issue**: Always create report with audit findings including summary, statistics, missing tools, errors, affected workflows, recommendations, and historical context.
 ```markdown
 # 🔍 Agentic Workflow Audit Report - [DATE]
 
@@ -172,4 +171,4 @@ Output is saved to: /tmp/gh-aw/aw-mcp/logs
 
 Memory structure: `/tmp/gh-aw/repo-memory/default/{audits,patterns,metrics}/*.json`
 
-Always create discussion with findings and update repo memory.
+Always create issue with findings and update repo memory.
