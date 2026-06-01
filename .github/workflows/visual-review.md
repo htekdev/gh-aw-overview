@@ -19,6 +19,7 @@ tools:
   edit:
 
 safe-outputs:
+  report-failure-as-issue: false
   add-comment:
     max: 1
     hide-older-comments: true
