@@ -65,6 +65,12 @@ Based on your analysis, suggest:
 - Issues that should be prioritized
 - Any maintenance tasks that would improve the site
 
+## Safe Output Requirement
+
+Before finishing, you must call exactly one safe output tool:
+- Call `create_issue` with the report content in the `body` field when a report can be generated.
+- Call `noop` only when you cannot generate a report because required data, access, or tooling is unavailable.
+
 ## Report Format
 
 Use clear markdown formatting with:
