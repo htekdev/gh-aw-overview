@@ -86,6 +86,10 @@ Scan all HTML files in the repository for broken or problematic links:
 ## Guidelines
 
 - Only create an issue if you find actual broken links — don't create noise
+- You **must** call a safe output tool on every run
+- If you find one or more actionable broken links, use `create_issue`
+- If you do **not** create an issue, use `noop` with a short summary of what you checked and why no issue was needed
+- Never finish silently — a successful run without findings should still emit `noop`
 - Test at least 20-30 URLs per run (prioritize documentation and official links)
 - Don't test internal/relative links (those are covered by other checks)
 - If a URL returns a temporary error (503, timeout), note it but don't flag it as broken
