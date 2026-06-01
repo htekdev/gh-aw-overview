@@ -558,7 +558,7 @@ accentColor: "blue"
       <div class="pipeline-num">4</div>
       <div class="pipeline-name">Detect</div>
       <div class="pipeline-artifact">Threat Analysis</div>
-      <div class="pipeline-desc">AI-powered detection reviews buffered artifacts for secrets, threats, and policy violations.</div>
+      <div class="pipeline-desc">AI-powered detection reviews buffered artifacts for secrets, threats, policy violations, and failed-job fault investigation signals.</div>
     </div>
   </div>
   <div class="pipeline-arrow"></div>
@@ -574,6 +574,14 @@ accentColor: "blue"
 
 <div class="callout">
   <strong>Key insight:</strong> The Markdown file you edit is <em>not</em> what GitHub Actions executes. gh-aw compiles your declarative intent into a deterministic <code>.lock.yml</code> execution plan. Editing the Markdown without recompiling changes nothing at runtime.
+</div>
+
+<div class="callout callout-orange" style="margin-top: 24px;">
+  <strong>Two-file authoring pattern:</strong> You can keep the long-form prompt in <code>.github/agentics/&lt;id&gt;.md</code> and a thinner frontmatter wrapper in <code>.github/workflows/&lt;id&gt;.md</code>. The workflow file owns triggers and compilation, while the prompt file keeps reusable instructions easier to edit and share.
+</div>
+
+<div class="callout" style="margin-top: 24px;">
+  <strong>Automatic failed-run analysis:</strong> Starting in v0.64.0, gh-aw can automatically trigger fault-investigation analysis when a job fails, surfacing likely root causes before a follow-up remediation workflow comments, opens an issue, or proposes a PR.
 </div>
 
 <div class="card" style="margin-top: 32px; overflow-x: auto;">

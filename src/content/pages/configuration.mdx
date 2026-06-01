@@ -390,7 +390,7 @@ permissions:
 ```yaml
 engine:
   id: copilot
-  version: "0.0.422"            # Pin specific CLI version
+  version: "0.0.394"            # Pin specific CLI version
   model: gpt-5                  # Override default model
   agent: technical-doc-writer   # Custom agent (.github/agents/<name>.agent.md)
   max-continuations: 3          # Autopilot mode (Copilot only)
@@ -398,6 +398,8 @@ engine:
   env:
     DEBUG_MODE: "true"
 ```
+
+Use a pinned version when you need reproducible runs. This example uses Copilot CLI <code>0.0.394</code>, a known bundled version that makes the pinning example concrete. Check upstream gh-aw release notes or the engines reference when choosing another valid version to pin.
 
 <div class="section-hdr" id="tools">
   <h2>Tools Configuration</h2>
@@ -609,6 +611,18 @@ network:
 imports:
   - "./shared/base-config.md"                          # Local file
   - "githubnext/agentics/shared/security.md@main"      # Remote
+```
+
+The <code>imports</code> field also supports an object form that separates workflow imports from APM package setup. The older <code>dependencies</code> key is deprecated.
+
+```yaml
+imports:
+  aw:
+    - "./shared/base-config.md"
+    - "githubnext/agentics/shared/security.md@main"
+  apm-packages:
+    - "@modelcontextprotocol/server-github"
+    - "@modelcontextprotocol/server-filesystem"
 ```
 
 ### Concurrency
