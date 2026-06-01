@@ -368,6 +368,8 @@ safe-outputs:
   add-comment:
     max: 3
     target: "*"
+  noop:
+    report-as-issue: false
   messages:
     footer: "> 🍪 *Om nom nom by [{workflow_name}]({run_url})*"
     run-started: "🍪 ISSUE! ISSUE! [{workflow_name}]({run_url}) hungry for issues on this {event_type}! Om nom nom..."

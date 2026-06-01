@@ -41,6 +41,8 @@ safe-outputs:
     title-prefix: "[docs-review] "
     labels: [documentation, content-request]
     max: 1
+  noop:
+    report-as-issue: false
 
 network:
   allowed:
