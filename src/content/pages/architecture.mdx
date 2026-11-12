@@ -573,7 +573,7 @@ accentColor: "blue"
 </div>
 
 <div class="callout">
-  <strong>Key insight:</strong> The Markdown file you edit is <em>not</em> what GitHub Actions executes. gh-aw compiles your declarative intent into a deterministic <code>.lock.yml</code> execution plan. Editing the Markdown without recompiling changes nothing at runtime.
+  <strong>Key insight:</strong> GitHub Actions executes the generated <code>.lock.yml</code>. Frontmatter changes require recompilation; the Markdown body is loaded at runtime, so body-only instruction edits do not. Review both artifacts and every instruction change. A fixed execution graph does not make agent reasoning deterministic. See the <a href="https://github.github.com/gh-aw/reference/compilation-process/">compilation reference</a>.
 </div>
 
 <div class="card" style="margin-top: 32px; overflow-x: auto;">

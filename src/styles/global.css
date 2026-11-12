@@ -1320,6 +1320,13 @@ footer a:hover {
   color: var(--color-text-muted);
 }
 
+/* Inline references must not rely on color alone to identify links. */
+.mdx-content p a,
+.mdx-content li a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .mdx-content strong {
   color: var(--color-text);
 }

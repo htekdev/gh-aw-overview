@@ -15,7 +15,7 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
 
 ## How We Got Here
 
-<p class="section-desc">Every era of software delivery follows the same pattern: compress the feedback loop. The tighter the loop, the faster you learn, the lower the risk, the more you ship. GitHub Agentic Workflows isn't just a technical implementation — it's the foundation of a new branch of DevOps.</p>
+<p class="section-desc">A pedagogical framing: phased delivery → shorter DevOps feedback loops → an agent-assisted engineering inner loop → a Continuous AI outer loop that detects and proposes work. DevOps already includes continuous planning and iteration; AI did not invent either. Outcomes depend on the task, evidence, and review.</p>
 
 <div class="evolution-timeline">
   <div class="evo-phase">
@@ -23,7 +23,7 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
     <div class="evo-content">
       <div class="evo-label">Phase 1</div>
       <h3>The Linear Pipeline</h3>
-      <p>Before DevOps, teams planned for months, built in isolation, tested at the end, and deployed infrequently. Feedback arrived after the fact — and the cost of fixing issues grew the further right they were discovered.</p>
+      <p>A simplified phased model separates planning, building, testing, and releasing. Long handoffs can delay feedback. This is a teaching contrast, not a description of every team before DevOps.</p>
       <EvolutionDiagrams phase="linear" />
     </div>
   </div>
@@ -41,7 +41,7 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
     <div class="evo-content">
       <div class="evo-label">Phase 3</div>
       <h3>The Collapsed Loop</h3>
-      <p>What a high-performing developer does in 6 hours, an agentic workflow does in 30 minutes. The DevOps loop collapses into a tight core. Ideas flow in, tested artifacts flow out. Testing, security, and validation happen <em>inside</em> the agent's loop — not as separate stages.</p>
+      <p>Agents can assist planning, implementation, testing, and delivery in a tighter inner loop. Expanded agency can also identify and help prioritize candidate work. Keep tests, security checks, and human decisions in that loop; no fixed productivity multiplier is implied.</p>
       <EvolutionDiagrams phase="collapsed" />
     </div>
   </div>
@@ -50,7 +50,7 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
     <div class="evo-content">
       <div class="evo-label" style="color: var(--color-green);">Phase 4 — We Are Here</div>
       <h3>Continuous AI</h3>
-      <p>A separate autonomous loop that monitors your repository, reasons about what needs attention, and generates ideas that feed the agentic core. Not replacing CI — expanding automation into judgment-heavy work CI was never designed for. <strong>GitHub Agentic Workflows is the first production implementation of this phase.</strong></p>
+      <p>A configurable outer loop detects maintenance opportunities and proposes evidence-backed work. People decide priorities and accepted work enters the engineering inner loop. GHAW can implement these recurring analyses atop Actions; it does not guarantee a reliable autonomous maintainer or replace CI/CD.</p>
       <EvolutionDiagrams phase="continuous-ai" />
     </div>
   </div>
@@ -63,7 +63,7 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
 
 ## Layer 0 — The Sandbox
 
-<p class="section-desc">Other agent frameworks give you hooks and guidelines. GitHub Agentic Workflows gives you a <strong style="color: var(--color-text);">kernel-level execution boundary</strong> beneath everything else. Without isolation, governance is advisory. With it, governance is structural. This is what makes agentic workflows shine.</p>
+<p class="section-desc">GHAW combines execution isolation, scoped tools, network controls, and output validation. The precise isolation mode depends on the configured runner and sandbox. Review the <a href="https://github.github.com/gh-aw/introduction/architecture/">current architecture reference</a>; do not assume every mode provides identical boundaries.</p>
 
 <div class="sandbox-grid">
   <div class="sandbox-card">
@@ -74,16 +74,16 @@ import EvolutionDiagrams from '../../components/EvolutionDiagrams.astro';
   <div class="sandbox-card">
     <div class="sandbox-icon">🔒</div>
     <h3>Network Gating</h3>
-    <p>Deny-by-default outbound access. Agents can only reach explicitly whitelisted endpoints — declared in YAML, enforced by proxy. No phoning home, no data exfiltration.</p>
+    <p>Network allowlists and the Agent Workflow Firewall constrain outbound access. Allowed destinations and tool results still need review; network policy is not proof that data cannot leak.</p>
   </div>
   <div class="sandbox-card">
     <div class="sandbox-icon">🛡️</div>
     <h3>Credential Isolation</h3>
-    <p>API keys injected at runtime, never on disk. Inference routing strips agent credentials and injects backend keys — context never leaks to the model.</p>
+    <p>Credential handling reduces direct agent access to secrets. Authorized inference still sends context to the configured model provider; assess that data boundary and avoid exposing sensitive input.</p>
   </div>
 </div>
 <div class="sandbox-callout">
-  <p>💡 <strong>Why Layer 0 matters:</strong> Hooks and instructions are speed bumps — agents can misinterpret or ignore them. A sandbox is a wall. When the execution boundary is structural, every layer above it — deterministic gates, enablement context, CI/CD pipelines — can trust that the agent <em>cannot</em> escape its constraints, not just that it <em>shouldn't</em>.</p>
+  <p>💡 <strong>Why isolation matters:</strong> deterministic restrictions are stronger than a request in a prompt, but no sandbox or detector eliminates all risk. Combine least privilege, output validation, independent tests, and explicit human approval for consequential changes.</p>
 </div>
 </section>
 

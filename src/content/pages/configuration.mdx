@@ -33,7 +33,7 @@ Before creating agentic workflows, ensure you have the following:
   <div class="card card-accent-green">
     <h3>✅ Required</h3>
     <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
-      <li><strong>GitHub Copilot subscription</strong> — Pro, Pro+, Business, or Enterprise plan</li>
+      <li><strong>Inference access for your chosen engine</strong> — Copilot access and billing for Copilot, or the provider's documented authentication for another engine</li>
       <li><strong>GitHub CLI</strong> — <code>gh</code> v2.45.0 or above (<a href="https://cli.github.com" target="_blank" rel="noopener noreferrer">cli.github.com</a>)</li>
       <li><strong>gh-aw extension</strong> — <code>gh extension install github/gh-aw</code></li>
       <li><strong>Repository admin access</strong> — needed to manage secrets and enable workflows</li>
@@ -42,7 +42,7 @@ Before creating agentic workflows, ensure you have the following:
   <div class="card card-accent-blue">
     <h3>🔑 Tokens & Secrets</h3>
     <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
-      <li><strong><code>COPILOT_GITHUB_TOKEN</code></strong> — required repo secret; fine-grained PAT with <em>Copilot Requests</em> permission (see <a href="#auth">Authentication</a>)</li>
+      <li><strong>Copilot inference</strong> — prefer <code>permissions: copilot-requests: write</code> with supported organization billing; <code>COPILOT_GITHUB_TOKEN</code> is an alternative, not a universal requirement (see <a href="#auth">Authentication</a>)</li>
       <li><strong><code>GH_AW_AGENT_TOKEN</code></strong> — optional repo secret; PAT for <code>assign-to-agent</code> safe output</li>
       <li><strong>Custom PAT or GitHub App</strong> — optional, for safe-output writes under a different identity</li>
     </ul>
@@ -56,9 +56,9 @@ Running `gh aw init` in your repository:
 <div class="card card-accent-green" style={{marginBottom: '16px'}}>
   <ul style={{margin: '8px 0 0', paddingLeft: '20px', lineHeight: '2'}}>
     <li>✅ Creates <code>.github/workflows/copilot-setup-steps.yml</code> — the environment setup file for the agentic workflow runner</li>
-    <li>✅ Walks you through selecting an AI engine (Copilot, Claude, Codex)</li>
-    <li>✅ Provides instructions for setting up required secrets</li>
-    <li>❌ Does <strong>not</strong> create the <code>COPILOT_GITHUB_TOKEN</code> secret — you must do this manually</li>
+    <li>✅ Configures the selected engine with <code>--engine</code>; current initialization is noninteractive, not an engine-selection wizard</li>
+    <li>✅ Creates dispatcher skill and repository configuration; the exact files depend on the flags</li>
+    <li>❌ Does <strong>not</strong> establish inference entitlement or choose an authentication policy for you</li>
   </ul>
 </div>
 
@@ -66,13 +66,13 @@ Running `gh aw init` in your repository:
 # Initialize the repo
 gh aw init --engine copilot
 
-# Then manually create the required secret
+# Only for the Copilot PAT alternative (not required with copilot-requests: write)
 gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
 # (paste your fine-grained PAT when prompted)
 ```
 
 <div class="callout callout-orange">
-  <p>⚠️ Without <code>COPILOT_GITHUB_TOKEN</code>, the activation step will fail immediately. This is the first thing to check when troubleshooting a failed workflow run.</p>
+  <p>Authentication and billing are engine-specific. Current Copilot inference supports the Actions token through <code>copilot-requests: write</code>; when configured, it ignores <code>COPILOT_GITHUB_TOKEN</code> for inference. Check organization policy and the <a href="https://github.github.com/gh-aw/reference/auth/">official authentication reference</a> before selecting the PAT alternative.</p>
 </div>
 
 <div class="section-hdr" id="overview">
@@ -88,7 +88,7 @@ Every agentic workflow is a `.md` file in `.github/workflows/` with two parts:
   </div>
   <div class="card card-accent-green">
     <h3>📝 Markdown Body</h3>
-    <p class="desc">Natural-language instructions for the AI agent. Editable without recompilation — the agent interprets these contextually at runtime.</p>
+    <p class="desc">Natural-language instructions loaded at runtime. Body-only edits do not require recompilation; frontmatter edits do. Review and commit instruction changes as code regardless.</p>
   </div>
 </div>
 
@@ -98,7 +98,10 @@ Every agentic workflow is a `.md` file in `.github/workflows/` with two parts:
 on:
   issues:
     types: [opened]
-permissions: read-all
+permissions:
+  contents: read
+  issues: read
+  copilot-requests: write
 safe-outputs:
   add-labels:
     allowed: [bug, feature, docs]
@@ -118,11 +121,17 @@ Explain your reasoning in a comment.
   <h2>Authentication & Tokens</h2>
 </div>
 
-Agentic workflows use repository secrets for authentication. The compiled `.lock.yml` workflow references these secrets at runtime during the activation and safe-outputs steps.
+Authentication can use the built-in Actions token, configured repository secrets,
+or supported identity federation. Inference and GitHub API/write operations are
+separate authentication boundaries; choose each path deliberately.
 
-### `COPILOT_GITHUB_TOKEN` — The Core Requirement
+### Copilot inference — choose the appropriate authentication path
 
-Every agentic workflow needs `COPILOT_GITHUB_TOKEN` — a **fine-grained PAT** from a user with an active Copilot license. The compiled workflow validates this secret during activation; without it, the run fails immediately.
+For Copilot, the recommended organization path is `permissions: copilot-requests: write`,
+using the built-in Actions token and organization billing. The alternative is
+`COPILOT_GITHUB_TOKEN`, a fine-grained PAT from a user with Copilot inference
+access. It is not required for every workflow or every engine. The PAT setup
+below applies only when you choose that alternative.
 
 <div class="card card-accent-blue" style={{marginBottom: '24px'}}>
   <h3>Creating the Token</h3>
@@ -140,7 +149,7 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
 ```
 
 <div class="callout callout-orange">
-  <p>⚠️ <code>COPILOT_GITHUB_TOKEN</code> is <strong>not</strong> the built-in <code>GITHUB_TOKEN</code>. It must be a PAT from a user whose Copilot subscription is consumed for premium requests. The token owner's account must have Copilot access.</p>
+  <p><code>COPILOT_GITHUB_TOKEN</code> is a PAT alternative, distinct from the built-in Actions token. With <code>copilot-requests: write</code>, that PAT is ignored for inference. Other engines use their own documented credentials or federation. Do not mix inference authentication with GitHub API/write credentials.</p>
 </div>
 
 ### Additional Secrets
@@ -149,7 +158,7 @@ Depending on your workflow configuration, you may need additional repository sec
 
 | Secret | When Needed | Permission |
 |---|---|---|
-| `COPILOT_GITHUB_TOKEN` | **Always** — every agentic workflow | Copilot Requests: Read-only |
+| `COPILOT_GITHUB_TOKEN` | Alternative Copilot inference authentication; not needed with `copilot-requests: write` | Copilot Requests: Read |
 | `GH_AW_AGENT_TOKEN` | Using `assign-to-agent` safe output | Issues: Read & Write |
 | `ANTHROPIC_API_KEY` | Using `engine: claude` | — |
 | `OPENAI_API_KEY` | Using `engine: codex` | — |
@@ -214,7 +223,7 @@ safe-outputs:
 
 | Scenario | Token Type | Where to Configure |
 |---|---|---|
-| Running any agentic workflow | Fine-grained PAT | `COPILOT_GITHUB_TOKEN` repo secret |
+| Copilot inference | Actions token with `copilot-requests: write`, or fine-grained PAT alternative | Organization policy/billing or `COPILOT_GITHUB_TOKEN` |
 | Third-party engine (Claude, Codex, Gemini) | API key | Engine-specific repo secret |
 | MCP server authentication | Secret | Repo secret, referenced via `${{ secrets.NAME }}` |
 | Safe-output writes (custom identity) | PAT or GitHub App | `github-token:` or `github-app:` in frontmatter |

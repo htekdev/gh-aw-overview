@@ -166,7 +166,7 @@ import WorkflowGallery from '../../components/WorkflowGallery.astro';
   <div class="info-card">
     <h3>✅ Required</h3>
     <ul>
-      <li>A <strong>GitHub Copilot</strong> subscription (Individual, Business, or Enterprise)</li>
+      <li><strong>Inference access</strong> for the selected engine; Copilot access/billing for this guide's Copilot example</li>
       <li><strong>GitHub CLI</strong> v2.45.0 or later</li>
       <li>The <code>gh-aw</code> CLI extension</li>
       <li><strong>Admin access</strong> to the target repository</li>
@@ -175,7 +175,7 @@ import WorkflowGallery from '../../components/WorkflowGallery.astro';
   <div class="info-card">
     <h3>🔑 Tokens &amp; Secrets</h3>
     <ul>
-      <li><code>COPILOT_GITHUB_TOKEN</code> — <strong>required</strong> for every workflow</li>
+      <li>Copilot: <code>copilot-requests: write</code> for supported organization billing, or the <code>COPILOT_GITHUB_TOKEN</code> PAT alternative</li>
       <li><code>GH_AW_AGENT_TOKEN</code> — optional, needed for <code>assign-to-agent</code></li>
       <li>Custom <strong>PAT or GitHub App</strong> — optional, for cross-repo or elevated access</li>
     </ul>
@@ -202,14 +202,14 @@ import WorkflowGallery from '../../components/WorkflowGallery.astro';
     <div class="step-num">2</div>
     <div class="step-body">
       <h4>Initialize your repository</h4>
-      <p>Run <code>gh aw init --engine copilot</code> to scaffold your repo. This creates <code>copilot-setup-steps.yml</code>, walks you through engine selection, and configures the necessary directory structure.</p>
+      <p>Run <code>gh aw init --engine copilot</code> in a disposable repository. Current initialization is noninteractive; the engine flag selects Copilot and sets up its integration files.</p>
     </div>
   </div>
   <div class="step-item">
     <div class="step-num">3</div>
     <div class="step-body">
-      <h4>Create the required secret</h4>
-      <p>Store your Copilot token as a repository secret so workflows can authenticate with the Copilot API.</p>
+      <h4>Select the inference authentication path</h4>
+      <p>Use <code>copilot-requests: write</code> where organization policy and billing support it. Otherwise configure the documented Copilot PAT alternative; do not assume every engine needs that token.</p>
     </div>
   </div>
 </div>
@@ -222,21 +222,21 @@ gh extension install github/gh-aw
 # 2. Initialize your repository
 gh aw init --engine copilot
 
-# 3. Create the required secret
+# 3. Only for the Copilot PAT alternative:
 gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
 </div>
 
 <div class="callout">
-  <strong>💡 What does <code>gh aw init</code> do?</strong> It creates the <code>copilot-setup-steps.yml</code> file that defines your agent's runtime environment, walks you through engine selection (Copilot, Claude, or Codex), and sets up the <code>.github/workflows/</code> directory for your first workflow.
+  <strong>💡 What does <code>gh aw init</code> do?</strong> It configures repository files, the dispatcher skill, and optional engine/MCP integrations. It does not prompt for engine selection or configure inference secrets. Check <code>gh aw init --help</code> for your installed release.
 </div>
 </section>
 
 <section id="token">
 <div class="section-label">Authentication</div>
 
-## Create the COPILOT_GITHUB_TOKEN
+## Choose authentication — not every workflow needs a PAT
 
-<p class="section-desc">Every agentic workflow needs a <code>COPILOT_GITHUB_TOKEN</code> to authenticate API calls. Here's how to create one:</p>
+<p class="section-desc">Current Copilot workflows can use <code>permissions: copilot-requests: write</code> with supported organization billing, without a PAT. The steps below apply only to the alternative user-token path. With that permission configured, the PAT is ignored for inference. See the <a href="https://github.github.com/gh-aw/reference/auth/">official authentication reference</a>.</p>
 
 <div class="step-grid">
   <div class="step-item">
@@ -275,7 +275,7 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
   <tbody>
     <tr>
       <td><code>COPILOT_GITHUB_TOKEN</code></td>
-      <td>Always — every workflow</td>
+      <td>Copilot PAT alternative only; not with <code>copilot-requests: write</code></td>
       <td>Copilot Requests: Read-only</td>
     </tr>
     <tr>
@@ -307,14 +307,14 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
 
 ## Your First Workflow
 
-<p class="section-desc">Use the CLI to add a pre-built workflow template, compile it into a hardened GitHub Actions file, and push it to your repo.</p>
+<p class="section-desc">Start with the staged, manual-dispatch backlog briefing shown on Home. Compile and review it in a disposable repository. Compilation checks syntax and generated configuration, not the truth of future agent findings.</p>
 
 <div class="step-grid">
   <div class="step-item">
     <div class="step-num">1</div>
     <div class="step-body">
-      <h4>Add a workflow from the gallery</h4>
-      <p>The <code>add-wizard</code> command pulls a workflow template and saves it as a Markdown source file in <code>.github/workflows/</code>.</p>
+      <h4>Copy the bounded example</h4>
+      <p>Copy <code>examples/backlog-briefing.md</code> from this overview into a disposable repository's <code>.github/workflows/</code>. Keep <code>staged: true</code> and the manual trigger for the first demonstration.</p>
     </div>
   </div>
   <div class="step-item">
@@ -335,20 +335,19 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
 
 <div class="code-block">
   <div class="code-header"><span>Terminal</span></div>
-  <pre>{`# 1. Create a workflow from a template
-gh aw add-wizard githubnext/agentics/daily-repo-status
+  <pre>{`# 1. Copy examples/backlog-briefing.md into .github/workflows/
+#    in a disposable repository, then inspect its permissions.
 
 # 2. Compile to a hardened Actions workflow
-gh aw compile .github/workflows/daily-repo-status.md
+gh aw compile .github/workflows/backlog-briefing.md
 
-# 3. Push both files to your repo
-git add .github/workflows/
-git commit -m "Add daily status report workflow"
-git push`}</pre>
+# 3. Review the .md and generated .lock.yml together.
+#    Commit through your normal reviewed development process.
+#    Cloud dispatch is a separate, deliberate action.`}</pre>
 </div>
 
 <div class="callout">
-  <strong>🎉 That's it!</strong> Your workflow will now trigger automatically based on its configured events (schedule, issue creation, etc.). Check the Actions tab in your repository to see it run.
+  <strong>Review before running.</strong> The example is compiler-checked with v1.2.2, not cloud-executed. Manual dispatch still consumes inference/Actions resources. Staged outputs preview a proposed write, not a durable approval queue. To demonstrate, review the run output and explain the human decision; do not enable publishing merely to finish the demo.
 </div>
 </section>
 
@@ -357,7 +356,7 @@ git push`}</pre>
 
 ## Workflow Gallery
 
-<p class="section-desc">Browse real-world workflow examples from Peli's Agent Factory — over 100 workflows battle-tested in the github/gh-aw repository. Add any workflow to your repo with a single command.</p>
+<p class="section-desc">The existing gallery remains a set of teaching patterns from the preview-era overview. Its individual templates were not all re-executed in this refresh. Check upstream availability, current syntax, permissions, and cost before importing one; the Home backlog briefing is the compiler-checked starting point.</p>
 
 <WorkflowGallery />
 </section>
