@@ -13,6 +13,56 @@ permissions:
   contents: read
   pull-requests: read
 
+# Temporary, presence-only boundary diagnostics. Never execute repository code
+# with the inference credential or print its value, size, or fingerprint.
+steps:
+  - name: Check inference credential boundary (presence only)
+    shell: bash
+    working-directory: /tmp
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      NODE_OPTIONS: ""
+    run: |
+      set -euo pipefail
+      printf 'auth_presence_v1\n'
+      node -e 'console.log("runner_copilot_present=" + Boolean(process.env.COPILOT_GITHUB_TOKEN))'
+      sudo -E "$(command -v node)" -e 'console.log("sudo_copilot_present=" + Boolean(process.env.COPILOT_GITHUB_TOKEN))'
+
+# Deterministic validation has read-only repository access and no inference
+# credential. It gates the agent independently of probabilistic review.
+jobs:
+  test_coverage:
+    name: Test and coverage
+    runs-on: ubuntu-latest
+    needs: activation
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24.22.1"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Install browser test runtime
+        run: npx playwright install --with-deps chromium
+      - name: Run complete suite with coverage thresholds
+        run: npm run test:all
+      - name: Upload coverage and browser results
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        with:
+          name: test-coverage
+          path: |
+            coverage/
+            playwright-report/
+            test-results/
+          retention-days: 7
+
 tools:
   playwright:
   bash: ["npm", "npx", "node", "cat", "ls", "find", "grep", "head", "tail", "wc", "curl", "sleep", "kill", "echo"]
