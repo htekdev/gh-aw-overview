@@ -7,6 +7,8 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  # Organization billing only: remove this permission before compiling
+  # when using the COPILOT_GITHUB_TOKEN PAT alternative.
   copilot-requests: write
 engine: copilot
 tools:
