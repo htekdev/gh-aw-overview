@@ -12,6 +12,15 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  copilot-requests: write
+
+# Compile with v1.2.2's supported rootless Docker runtime. AWF receives the
+# inference environment directly; isolation and its API proxy remain enabled.
+# Do not use an internal command override or disable strict validation.
+# Inference uses the per-run Actions token, not a stored personal access token.
+sandbox:
+  agent:
+    runtime: docker
 
 # Temporary, presence-only boundary diagnostics. Never execute repository code
 # with the inference credential or print its value, size, or fingerprint.
@@ -20,11 +29,11 @@ steps:
     shell: bash
     working-directory: /tmp
     env:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      COPILOT_GITHUB_TOKEN: ${{ github.token }}
       NODE_OPTIONS: ""
     run: |
       set -euo pipefail
-      printf 'auth_presence_v1\n'
+      printf 'auth_presence_v2_actions_token\n'
       node -e 'console.log("runner_copilot_present=" + Boolean(process.env.COPILOT_GITHUB_TOKEN))'
       sudo -E "$(command -v node)" -e 'console.log("sudo_copilot_present=" + Boolean(process.env.COPILOT_GITHUB_TOKEN))'
 

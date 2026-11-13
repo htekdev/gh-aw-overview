@@ -175,7 +175,7 @@ import WorkflowGallery from '../../components/WorkflowGallery.astro';
   <div class="info-card">
     <h3>🔑 Tokens &amp; Secrets</h3>
     <ul>
-      <li>Copilot: <code>copilot-requests: write</code> for supported organization billing, or the <code>COPILOT_GITHUB_TOKEN</code> PAT alternative</li>
+      <li>Copilot: <code>copilot-requests: write</code> for supported owner-seat or organization billing, or the <code>COPILOT_GITHUB_TOKEN</code> PAT alternative</li>
       <li><code>GH_AW_AGENT_TOKEN</code> — optional, needed for <code>assign-to-agent</code></li>
       <li>Custom <strong>PAT or GitHub App</strong> — optional, for cross-repo or elevated access</li>
     </ul>
@@ -209,7 +209,7 @@ import WorkflowGallery from '../../components/WorkflowGallery.astro';
     <div class="step-num">3</div>
     <div class="step-body">
       <h4>Select the inference authentication path</h4>
-      <p>Use <code>copilot-requests: write</code> where organization policy and billing support it. Otherwise configure the documented Copilot PAT alternative; do not assume every engine needs that token.</p>
+      <p>Use <code>copilot-requests: write</code> with supported billing and inference access; organization repositories also require the applicable policy. Otherwise configure the documented Copilot PAT alternative; do not assume every engine needs that token.</p>
     </div>
   </div>
 </div>
@@ -236,7 +236,7 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo`}</pre>
 
 ## Choose authentication — not every workflow needs a PAT
 
-<p class="section-desc">Current Copilot workflows can use <code>permissions: copilot-requests: write</code> with supported organization billing, without a PAT. The steps below apply only to the alternative user-token path. With that permission configured, the PAT is ignored for inference. See the <a href="https://github.github.com/gh-aw/reference/auth/">official authentication reference</a>.</p>
+<p class="section-desc">Current Copilot workflows can use <code>permissions: copilot-requests: write</code> without a PAT. <a href="https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/copilot-cli-in-github-actions">GitHub documents</a> owner-seat billing for personal repositories and organization billing for organization repositories. The steps below apply only to the alternative user-token path; that PAT is ignored when the Actions-token permission is selected. Verify inference access on the actual workflow run.</p>
 
 <div class="step-grid">
   <div class="step-item">

@@ -12,7 +12,8 @@ test('boundary probe uses only inline boolean diagnostics, not repository code',
   assert.ok(diagnostic);
   assert.match(diagnostic, /working-directory: \/tmp/);
   assert.match(diagnostic, /NODE_OPTIONS: ""/);
-  assert.match(diagnostic, /COPILOT_GITHUB_TOKEN: \$\{\{ secrets\.COPILOT_GITHUB_TOKEN \}\}/);
+  assert.match(diagnostic, /COPILOT_GITHUB_TOKEN: \$\{\{ github\.token \}\}/);
+  assert.doesNotMatch(source, /secrets\.COPILOT_GITHUB_TOKEN/);
   assert.match(diagnostic, /sudo -E "\$\(command -v node\)" -e/);
   assert.doesNotMatch(diagnostic, /printenv|console\.log\(process\.env\)|JSON\.stringify|\.length|createHash|require\(|import |npm |curl |tee|\n\s+GITHUB_TOKEN:/);
 });
@@ -34,7 +35,7 @@ test('runner and sudo probes never print dummy credentials, including missing an
     for (const { env, present } of cases) {
       const result = spawnSync(process.execPath, ['-e', script], { env, encoding: 'utf8' });
       assert.equal(result.status, 0, result.stderr);
-      const label = index === 0 ? 'runner' : 'sudo';
+      const label = ['runner', 'sudo'][index];
       assert.equal(result.stdout.trim(), `${label}_copilot_present=${present}`);
       assert.equal(result.stderr, '');
       assert.ok(!result.stdout.includes(sentinel));
@@ -44,13 +45,20 @@ test('runner and sudo probes never print dummy credentials, including missing an
 
 test('generated diagnostic preserves secret naming and existing isolation', () => {
   assert.match(lock, /name: Check inference credential boundary \(presence only\)/);
-  assert.match(lock, /auth_presence_v1/);
+  assert.match(lock, /auth_presence_v2_actions_token/);
   assert.match(lock, /runner_copilot_present=/);
   assert.match(lock, /sudo_copilot_present=/);
-  assert.match(lock, /--enable-api-proxy/);
-  assert.match(lock, /--image-tag 0\.25\.1/);
-  assert.match(lock, /GH_AW_VERSION: v0\.64\.2/);
-  assert.doesNotMatch(source, /copilot-requests: write|continue-on-error: true/);
+  assert.match(source, /sandbox:\s*\n\s*agent:\s*\n\s*runtime: docker/);
+  assert.doesNotMatch(source, /sandbox:\s*\n\s*agent:\s*false|command:|strict: false|sudoers|env_keep/);
+  assert.match(lock, /GH_AW_VERSION: v1\.2\.2/);
+  assert.match(lock, /install_awf_binary\.sh" v0\.29\.11 --rootless/);
+  assert.match(lock, /awf --config "\$\{RUNNER_TEMP\}\/gh-aw\/awf-config\.json"/);
+  assert.match(lock, /--exclude-env COPILOT_GITHUB_TOKEN/);
+  assert.match(lock, /ghcr\.io\/github\/gh-aw-firewall\/api-proxy:0\.29\.11@sha256:/);
+  assert.doesNotMatch(lock, /sudo -E awf|--legacy-security|--enable-host-access/);
+  assert.match(source, /permissions:\n  contents: read\n  pull-requests: read\n  copilot-requests: write/);
+  assert.match(lock, /COPILOT_GITHUB_TOKEN: \$\{\{ github\.token \}\}/);
+  assert.doesNotMatch(source, /continue-on-error: true/);
 });
 
 test('full-suite coverage gate is read-only and receives no inference secrets', () => {
@@ -63,5 +71,19 @@ test('full-suite coverage gate is read-only and receives no inference secrets', 
   assert.match(job, /npm run test:all/);
   assert.match(job, /retention-days: 7/);
   assert.doesNotMatch(job, /secrets\.|continue-on-error|contents: write|pull-requests: write/);
-  assert.match(lock, /\n  agent:\n\s+needs:\n\s+- activation\n\s+- test_coverage\n/);
+  const agentJob = lock.match(/\n  agent:\n([\s\S]*?)(?=\n  [a-z_]+:)/)?.[1];
+  assert.ok(agentJob);
+  assert.match(agentJob, /\n\s+needs:\n\s+- activation\n\s+- test_coverage\n/);
+  assert.match(agentJob, /copilot-requests: write/);
+  assert.doesNotMatch(agentJob, /COPILOT_GITHUB_TOKEN: \$\{\{ secrets\.COPILOT_GITHUB_TOKEN/);
+});
+
+test('authentication guidance includes documented personal-repository Actions billing', () => {
+  for (const page of ['configuration', 'get-started']) {
+    const content = read(`src/content/pages/${page}.mdx`);
+    assert.match(content, /copilot-requests: write/);
+    assert.match(content, /owner.{0,6}seat|owner's Copilot seat/);
+    assert.match(content, /personal(?:ly-owned)? repositories/);
+    assert.match(content, /docs\.github\.com\/en\/copilot\/concepts\/agent-capabilities\/agent-powered-workflows-and-operations\/copilot-cli-in-github-actions/);
+  }
 });

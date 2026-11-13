@@ -42,7 +42,7 @@ Before creating agentic workflows, ensure you have the following:
   <div class="card card-accent-blue">
     <h3>🔑 Tokens & Secrets</h3>
     <ul style={{margin: '12px 0 0', paddingLeft: '20px', lineHeight: '1.8'}}>
-      <li><strong>Copilot inference</strong> — prefer <code>permissions: copilot-requests: write</code> with supported organization billing; <code>COPILOT_GITHUB_TOKEN</code> is an alternative, not a universal requirement (see <a href="#auth">Authentication</a>)</li>
+      <li><strong>Copilot inference</strong> — use <code>permissions: copilot-requests: write</code> with supported owner-seat or organization billing; <code>COPILOT_GITHUB_TOKEN</code> is an alternative, not a universal requirement (see <a href="#auth">Authentication</a>)</li>
       <li><strong><code>GH_AW_AGENT_TOKEN</code></strong> — optional repo secret; PAT for <code>assign-to-agent</code> safe output</li>
       <li><strong>Custom PAT or GitHub App</strong> — optional, for safe-output writes under a different identity</li>
     </ul>
@@ -72,7 +72,7 @@ gh secret set COPILOT_GITHUB_TOKEN -R owner/repo
 ```
 
 <div class="callout callout-orange">
-  <p>Authentication and billing are engine-specific. Current Copilot inference supports the Actions token through <code>copilot-requests: write</code>; when configured, it ignores <code>COPILOT_GITHUB_TOKEN</code> for inference. Check organization policy and the <a href="https://github.github.com/gh-aw/reference/auth/">official authentication reference</a> before selecting the PAT alternative.</p>
+  <p>Authentication and billing are engine-specific. Current Copilot inference supports the Actions token through <code>copilot-requests: write</code>; when configured, it ignores <code>COPILOT_GITHUB_TOKEN</code> for inference. Check applicable billing and organization policy, plus the <a href="https://github.github.com/gh-aw/reference/auth/">official authentication reference</a>, before selecting the PAT alternative.</p>
 </div>
 
 <div class="section-hdr" id="overview">
@@ -127,8 +127,12 @@ separate authentication boundaries; choose each path deliberately.
 
 ### Copilot inference — choose the appropriate authentication path
 
-For Copilot, the recommended organization path is `permissions: copilot-requests: write`,
-using the built-in Actions token and organization billing. The alternative is
+For Copilot, `permissions: copilot-requests: write` selects the built-in Actions
+token. Current [GitHub documentation](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/copilot-cli-in-github-actions)
+also supports personally-owned repositories, billed to the owner's Copilot seat.
+Organization repositories use organization billing and require the applicable
+Copilot CLI policy. Verify actual inference access rather than assuming the
+permission alone grants an entitlement. The alternative is
 `COPILOT_GITHUB_TOKEN`, a fine-grained PAT from a user with Copilot inference
 access. It is not required for every workflow or every engine. The PAT setup
 below applies only when you choose that alternative.
@@ -223,7 +227,7 @@ safe-outputs:
 
 | Scenario | Token Type | Where to Configure |
 |---|---|---|
-| Copilot inference | Actions token with `copilot-requests: write`, or fine-grained PAT alternative | Organization policy/billing or `COPILOT_GITHUB_TOKEN` |
+| Copilot inference | Actions token with `copilot-requests: write`, or fine-grained PAT alternative | Owner-seat/organization billing and policy, or `COPILOT_GITHUB_TOKEN` |
 | Third-party engine (Claude, Codex, Gemini) | API key | Engine-specific repo secret |
 | MCP server authentication | Secret | Repo secret, referenced via `${{ secrets.NAME }}` |
 | Safe-output writes (custom identity) | PAT or GitHub App | `github-token:` or `github-app:` in frontmatter |
