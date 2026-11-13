@@ -96,3 +96,20 @@ test('authentication guidance includes documented personal-repository Actions bi
     assert.match(content, /docs\.github\.com\/en\/copilot\/concepts\/agent-capabilities\/agent-powered-workflows-and-operations\/copilot-cli-in-github-actions/);
   }
 });
+
+test('locked tarballs use the allowlisted public registry without disabling TLS', () => {
+  const packages = JSON.parse(read('package-lock.json')).packages;
+  let tarballs = 0;
+  for (const [path, entry] of Object.entries(packages)) {
+    if (!entry.resolved) continue;
+    const url = new URL(entry.resolved);
+    assert.equal(url.protocol, 'https:', path);
+    assert.equal(url.hostname, 'registry.npmjs.org', path);
+    assert.ok(entry.integrity, path);
+    tarballs++;
+  }
+  assert.ok(tarballs > 400);
+  assert.equal((source.match(/npm ci --registry=https:\/\/registry\.npmjs\.org\/ --strict-ssl=true/g) || []).length, 2);
+  assert.match(source, /Never disable certificate\s+verification/);
+  assert.doesNotMatch(source, /NODE_TLS_REJECT_UNAUTHORIZED:\s*["']?0|strict-ssl=false/);
+});

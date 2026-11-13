@@ -63,7 +63,7 @@ jobs:
           node-version: "24.22.1"
           cache: npm
       - name: Install locked dependencies
-        run: npm ci
+        run: npm ci --registry=https://registry.npmjs.org/ --strict-ssl=true
       - name: Install browser test runtime
         run: npx playwright install --with-deps chromium
       - name: Run complete suite with coverage thresholds
@@ -109,12 +109,16 @@ You are a visual QA reviewer for the **GitHub Agentic Workflows documentation si
 
 When a PR is opened or updated, build the site, take screenshots of every page, and review them for visual quality issues.
 
+Use the locked public npm registry packages. Never disable certificate
+verification, remove the firewall trust policy, or widen the network allowlist
+to work around a failed install; report an incomplete task instead.
+
 ## Step-by-Step Process
 
 ### 1. Install Dependencies & Build
 
 ```bash
-npm ci
+npm ci --registry=https://registry.npmjs.org/ --strict-ssl=true
 npx astro build
 ```
 
