@@ -13,6 +13,11 @@ A comprehensive documentation site covering GitHub Agentic Workflows (gh-aw) —
 
 ## Development
 
+The November 12, 2026 refresh preserves this original guide's tabs, layout,
+and GitHub Pages deployment. It adds **Dynamic Workflows** beside **CLI &
+Tooling**; it does not introduce a second site or a new hosting service.
+See [refresh scope and verification](docs/2026-11-12-refresh.md).
+
 ```bash
 # Install dependencies
 npm install
@@ -25,6 +30,13 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Focused source/content checks and coverage (Node 24.22.1 used for refresh)
+npm run test:coverage
+
+# Install a browser once, then run desktop/mobile E2E and automated accessibility
+npx playwright install chromium
+npm run test:e2e
 ```
 
 ## Project Structure
@@ -75,7 +87,12 @@ This repository uses **GitHub Agentic Workflows** for automated maintenance:
 
 ## Content
 
-The site covers 10 topic areas:
+The guide retains its original topics and adds:
+
+- **Dynamic Workflows** — Copilot's public-preview code-defined orchestration,
+  permissions, limits, local-vs-cloud comparison, and a bounded demo runbook.
+
+Existing topic areas include:
 
 1. **Home** — Overview, Six Pillars, project stats
 2. **Core Concepts** — Philosophy, Continuous AI, markdown-first authoring

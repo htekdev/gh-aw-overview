@@ -8,6 +8,50 @@ heroSubtitle: "Defense-in-depth security architecture and governance"
 accentColor: "red"
 ---
 
+<section id="current-review-boundaries">
+
+## Review boundaries: safeguards are not approvals
+
+The [GA announcement](https://github.blog/changelog/2026-10-28-github-agentic-workflows-generally-available/)
+describes layered safeguards: read-only defaults, integrity filtering, isolated
+execution, the Agent Workflow Firewall, validated outputs, and threat detection.
+These reduce risk; they do not prove that generated findings are correct or that
+prompt injection and data exfiltration are impossible.
+
+<div class="grid-2">
+  <div class="card">
+    <h3>GHAW output boundary</h3>
+    <p>Restrict output types and counts. Use <code>safe-outputs.staged: true</code>
+    to preview writes while evaluating a workflow. Staging is not a durable
+    approval queue, and permitted non-staged outputs can be applied without
+    a human reviewing each one.</p>
+  </div>
+  <div class="card">
+    <h3>Repository and Actions boundaries</h3>
+    <p>Required reviews, branch protection/rulesets, status checks, and configured
+    Actions environment approvals are separate controls. An issue or PR being
+    visible is not the same as an enforced approval requirement.</p>
+  </div>
+</div>
+
+Treat issue bodies, PR descriptions, logs, fetched pages, and MCP responses as
+untrusted input. Scope toolsets, credentials, repositories, network destinations,
+and runner access independently. Cross-repository work adds a separate data
+boundary. Review the actual sandbox mode: advanced isolation and enclaves can
+have their own preview status even though GHAW itself is GA.
+
+Start report-only → evaluate false positives and cost → permit bounded proposals
+→ allow narrowly reviewed implementation. Track useful accepted findings,
+rejected proposals, output failures, spend, and operator time; assign an owner
+and an off switch before broad rollout.
+
+Sources:
+[Safe outputs](https://github.github.com/gh-aw/reference/safe-outputs/),
+[architecture and trust assumptions](https://github.github.com/gh-aw/introduction/architecture/),
+[Actions environment protection](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
+
+</section>
+
 <style>{`
   /* ── Layer Diagram ── */
   .layer-stack { max-width: 820px; margin: 0 auto; }

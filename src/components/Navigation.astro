@@ -1,25 +1,11 @@
 ---
+import { navItems, navigationHref } from '../data/navigation.js';
+
 interface Props {
   currentPage?: string;
 }
 
 const { currentPage = '' } = Astro.props;
-
-const navItems = [
-  { href: '/', label: 'Home', id: 'home' },
-  { href: '/get-started/', label: 'Get Started', id: 'get-started' },
-  { href: '/agentic-devops/', label: 'Agentic DevOps', id: 'agentic-devops' },
-  { href: '/core-concepts/', label: 'Core Concepts', id: 'core-concepts' },
-  { href: '/architecture/', label: 'Architecture', id: 'architecture' },
-  { href: '/configuration/', label: 'Configuration', id: 'configuration' },
-  { href: '/security/', label: 'Security', id: 'security' },
-  { href: '/ecosystem/', label: 'Ecosystem', id: 'ecosystem' },
-  { href: '/use-cases/', label: 'Use Cases', id: 'use-cases' },
-  { href: '/continuous-ai/', label: 'Continuous AI', id: 'continuous-ai' },
-  { href: '/cli-tooling/', label: 'CLI & Tooling', id: 'cli-tooling' },
-  { href: '/videos/', label: 'Videos', id: 'videos' },
-  { href: '/resources/', label: 'Resources', id: 'resources' },
-];
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
@@ -27,15 +13,16 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 <nav aria-label="Main navigation">
   <div class="nav-inner">
     <a href={base} class="nav-brand">⚡ GH Agentic Workflows</a>
-    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="guide-navigation">
       <span></span>
       <span></span>
       <span></span>
     </button>
-    <div class="nav-links" role="navigation">
+    <div class="nav-links" id="guide-navigation">
       {navItems.map((item) => (
         <a
-          href={`${base}${item.id === 'home' ? '' : item.id + '/'}`}
+          href={navigationHref(base, item.id)}
+          aria-current={currentPage === item.id ? 'page' : undefined}
           class:list={[{ active: currentPage === item.id }]}
         >
           {item.label}
@@ -138,6 +125,8 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
     .nav-links.open {
       display: flex;
+      max-height: 65vh;
+      overflow-y: auto;
     }
   }
 </style>
@@ -150,6 +139,13 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
       const expanded = toggle.getAttribute('aria-expanded') === 'true';
       toggle.setAttribute('aria-expanded', String(!expanded));
       links.classList.toggle('open');
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && links.classList.contains('open')) {
+        toggle.setAttribute('aria-expanded', 'false');
+        links.classList.remove('open');
+        (toggle as HTMLButtonElement).focus();
+      }
     });
   }
 </script>

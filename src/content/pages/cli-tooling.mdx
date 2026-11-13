@@ -14,7 +14,12 @@ accentColor: "purple"
 
 ## 🚀 Quick Start
 
-Get up and running in three commands.
+The cloud authoring CLI is `gh aw`; the local Copilot runtime is `copilot`.
+For code-defined local orchestration, use the separate
+[Dynamic Workflows tab](../dynamic-workflows/). GHAW is GA; Dynamic Workflows
+remain public preview. This refresh uses the **v1.2.2 (November 10, 2026)**
+compiler. Check `gh aw COMMAND --help` against your installed version before
+using an extended example below; those examples are not cloud-execution evidence.
 
 <div class="code-block-wrapper">
   <div class="code-header">
@@ -35,7 +40,8 @@ $ gh aw init
 # That's it! Now create your first workflow:
 $ gh aw new my-first-workflow --engine copilot
 $ gh aw compile my-first-workflow
-$ gh aw run my-first-workflow --push`}</pre>
+# Review source, compiled lock, permissions, and billing before dispatch.
+# Prefer the staged manual example on Home for a first demonstration.`}</pre>
 </div>
 
 ## 📦 Installation Methods
@@ -53,11 +59,9 @@ $ gh aw version`}</pre>
   <div class="card">
     <h3>📌 Pinned Version <span class="badge badge-blue">Production</span></h3>
     <p>Lock to a specific release tag or commit SHA for reproducible environments and team consistency.</p>
-    <pre>{`$ gh extension install github/gh-aw@v0.57.0
+    <pre>{`$ gh extension install github/gh-aw --pin v1.2.2
 
-# Upgrade a pinned version
-$ gh extension remove gh-aw
-$ gh extension install github/gh-aw@v0.58.0`}</pre>
+# Review subsequent release notes before changing the pin.`}</pre>
   </div>
 
   <div class="card">
@@ -67,7 +71,7 @@ $ gh extension install github/gh-aw@v0.58.0`}</pre>
 $ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash
 
 # Pinned version
-$ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash -s v0.57.0`}</pre>
+$ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash -s v1.2.2`}</pre>
   </div>
 
   <div class="card">
@@ -75,9 +79,9 @@ $ curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh 
     <p>For pipelines — includes automatic checksum verification and platform detection.</p>
     <pre>{`# In your workflow YAML:
 - name: Install gh-aw CLI
-  uses: github/gh-aw/actions/setup-cli@main
+  uses: github/gh-aw/actions/setup-cli@399a445fe2d8926c616b54b1b82a16b5b2be4445
   with:
-    version: v0.57.0`}</pre>
+    version: v1.2.2`}</pre>
   </div>
 </div>
 
@@ -98,7 +102,11 @@ Complete reference for every `gh aw` command with syntax, options, and examples.
 **Initialize a repository for agentic workflows**
 
 **What it creates:**
-`.gitattributes` (marks `.lock.yml` as generated), `.github/agents/agentic-workflows.agent.md` (dispatcher agent), `.gitignore` entries, and MCP server config.
+`.gitattributes` (marks `.lock.yml` as generated), a dispatcher skill, and
+repository configuration. With `--engine copilot`, it adds the Copilot agent
+and, unless `--no-mcp` is used, setup steps and MCP configuration.
+Initialization is noninteractive in v1.2.2; it does not select authentication
+or establish inference entitlement for you. See `gh aw init --help`.
 
 **Options:**
 
@@ -265,7 +273,7 @@ $ gh aw status --repo owner/other-repo         # Different repo
 
 ```bash
 $ gh aw version
-gh-aw v0.57.0 (2026-03-15)
+gh-aw v1.2.2 (2026-11-10)
 ```
 
 ### 🔄 Workflow Lifecycle

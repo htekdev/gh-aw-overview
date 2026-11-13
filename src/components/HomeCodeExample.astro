@@ -1,9 +1,5 @@
 ---
-/**
- * Code example block for the homepage showing a sample agentic workflow.
- * Extracted as a component because the <pre> content with blank lines
- * and markdown-like syntax conflicts with MDX parsing.
- */
+import example from '../../examples/backlog-briefing.md?raw';
 ---
 
 <div class="code-section-layout">
@@ -12,64 +8,31 @@
       <span class="code-dot" style="background:#ff5f56;"></span>
       <span class="code-dot" style="background:#ffbd2e;"></span>
       <span class="code-dot" style="background:#27c93f;"></span>
-      <span class="code-filename">daily-status-report.md</span>
+      <span class="code-filename">backlog-briefing.md</span>
     </div>
-    <pre set:html={`<span class="hl-comment">---</span>
-<span class="hl-key">name</span>: <span class="hl-str">Daily Repo Status Report</span>
-<span class="hl-key">description</span>: <span class="hl-str">Creates a daily summary of repository activity</span>
-
-<span class="hl-key">on</span>:
-  <span class="hl-key">schedule</span>:
-    - <span class="hl-key">cron</span>: <span class="hl-str">"0 9 * * 1-5"</span>  <span class="hl-comment"># Weekdays at 9am UTC</span>
-  <span class="hl-key">workflow_dispatch</span>:
-
-<span class="hl-key">tools</span>:
-  <span class="hl-section">github</span>:  <span class="hl-comment"># Access to repo data</span>
-
-<span class="hl-key">safe-outputs</span>:
-  <span class="hl-key">create-issue</span>:
-    <span class="hl-key">title-prefix</span>: <span class="hl-str">"[daily] "</span>
-    <span class="hl-key">labels</span>: [<span class="hl-str">daily-report</span>, <span class="hl-str">automated</span>]
-    <span class="hl-key">max</span>: <span class="hl-val">1</span>
-<span class="hl-comment">---</span>
-
-<span class="hl-comment"># Daily Repository Status Report</span>
-
-Analyze this repository and create a concise
-daily status report covering:
-
-- **New Issues**: Summarize issues opened in
-  the last 24 hours with priority assessment
-- **PR Activity**: List merged, opened, and
-  stalled pull requests
-- **CI Health**: Report on recent workflow runs,
-  flag any failures or flaky tests
-- **Key Metrics**: Lines changed, active
-  contributors, review turnaround time
-
-Format the report as a well-structured GitHub
-issue with clear sections and actionable items.
-Keep it concise — highlight what matters.`} />
+    <pre><code>{example}</code></pre>
   </div>
   <div class="code-explanation">
     <h3>What's happening here</h3>
-    <p>
-      This single Markdown file becomes a fully automated workflow. The YAML frontmatter
-      configures <em>when</em> it runs, <em>what tools</em> it can access, and
-      <em>what actions</em> it can take. The body is the natural language instruction
-      the AI agent follows.
-    </p>
+    <p>The existing Markdown-first demo now starts with a manually triggered,
+      staged proposal. It is not an autonomous issue publisher.</p>
     <ul>
-      <li><strong>Schedule trigger</strong> — runs every weekday at 9 AM UTC</li>
-      <li><strong>GitHub tools</strong> — gives the agent read access to issues, PRs, commits, and CI data</li>
-      <li><strong>Safe outputs</strong> — can only create one issue with a title prefix and specific labels; no other write access</li>
-      <li><strong>Natural language body</strong> — the agent interprets these instructions with contextual reasoning</li>
-      <li><strong>Read-only by default</strong> — writes only happen through the declared safe outputs</li>
-      <li><strong>Human review</strong> — the created issue is visible for the team to inspect and act on</li>
+      <li><strong>Trigger</strong> — a deliberate <code>workflow_dispatch</code>, not a new schedule.</li>
+      <li><strong>Inference</strong> — <code>copilot-requests: write</code> uses the Actions token
+        where organization policy and billing allow it; personal repositories may need
+        the documented PAT alternative.</li>
+      <li><strong>Repository access</strong> — scoped read permissions and GitHub toolsets.</li>
+      <li><strong>Bounded output</strong> — at most one issue proposal, with evidence and uncertainty.</li>
+      <li><strong>Staged output</strong> — previews the proposed write; it is not an approval queue.</li>
+      <li><strong>Human handoff</strong> — inspect the proposal, then explicitly decide what work to accept.</li>
     </ul>
-    <p style="margin-top:24px;">
-      Run <code>gh aw compile daily-status-report.md</code>
-      to generate the hardened <code>.lock.yml</code> file, then push both to your repo.
-    </p>
+    <p>Copy this source into a disposable repository's <code>.github/workflows/</code>,
+      compile it with <code>gh aw compile</code>, and review both the source and generated
+      <code>.lock.yml</code> before committing. Frontmatter changes require recompilation;
+      the Markdown body is loaded at runtime.</p>
+    <p><strong>Validation:</strong> compiler-checked with gh-aw v1.2.2;
+      model inference and cloud execution were not run for this refresh.</p>
+    <p><a href="https://github.github.com/gh-aw/reference/auth/">Authentication reference</a>
+      {' · '}<a href="https://github.github.com/gh-aw/reference/safe-outputs/">Safe outputs reference</a></p>
   </div>
 </div>
