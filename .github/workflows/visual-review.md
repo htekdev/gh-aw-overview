@@ -14,6 +14,13 @@ permissions:
   pull-requests: read
   copilot-requests: write
 
+# Explicit bounded migration budget: keep the existing 1,000-AIC agent cap.
+# Five legacy authentication failures lack usage artifacts and are conservatively
+# charged 1,000 AIC each by the daily guardrail (not measured provider billing).
+# Allow one additional verification run; never disable or falsify accounting.
+max-ai-credits: 1000
+max-daily-ai-credits: 6000
+
 # Compile with v1.2.2's supported rootless Docker runtime. AWF receives the
 # inference environment directly; isolation and its API proxy remain enabled.
 # Do not use an internal command override or disable strict validation.

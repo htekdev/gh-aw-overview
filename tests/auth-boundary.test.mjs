@@ -78,6 +78,15 @@ test('full-suite coverage gate is read-only and receives no inference secrets', 
   assert.doesNotMatch(agentJob, /COPILOT_GITHUB_TOKEN: \$\{\{ secrets\.COPILOT_GITHUB_TOKEN/);
 });
 
+test('bounded migration allowance preserves the daily admission gate and per-agent cap', () => {
+  assert.match(source, /^max-ai-credits: 1000$/m);
+  assert.match(source, /^max-daily-ai-credits: 6000$/m);
+  assert.match(lock, /GH_AW_MAX_DAILY_AI_CREDITS: ["']?6000["']?/);
+  assert.match(lock, /GH_AW_MAX_AI_CREDITS: ["']?1000["']?/);
+  assert.match(lock, /needs\.activation\.outputs\.daily_ai_credits_exceeded != 'true'/);
+  assert.doesNotMatch(source, /max-(?:daily-)?ai-credits: (?:0|false)|continue-on-error: true/);
+});
+
 test('authentication guidance includes documented personal-repository Actions billing', () => {
   for (const page of ['configuration', 'get-started']) {
     const content = read(`src/content/pages/${page}.mdx`);
