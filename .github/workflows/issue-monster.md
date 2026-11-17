@@ -3,13 +3,15 @@ name: Issue Monster
 description: The Cookie Monster of issues - assigns issues to Copilot agents one at a time
 on:
   workflow_dispatch:
-  schedule: every 3h
+  schedule:
+    - cron: "29 */3 * * *"
   skip-if-match:
     query: "is:pr is:open is:draft author:app/copilot-swe-agent"
     max: 5
   skip-if-no-match: "is:issue is:open"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
   pull-requests: read
@@ -40,7 +42,7 @@ jobs:
     steps:
       - name: Search for candidate issues
         id: search
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const { owner, repo } = context.repo;

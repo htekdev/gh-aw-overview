@@ -3,14 +3,20 @@ name: "Continuous Documentation"
 description: "Weekly scan of documentation for outdated content, accuracy issues, and improvements"
 
 on:
-  schedule: weekly on monday around 9am
+  schedule:
+    - cron: "36 9 * * 1"
   workflow_dispatch:
   stop-after: "+365d"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
   pull-requests: read
+
+engine:
+  id: copilot
+  copilot-sdk: true
 
 tools:
   github:

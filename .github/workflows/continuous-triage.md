@@ -12,6 +12,7 @@ on:
   stop-after: "+180d"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
 
