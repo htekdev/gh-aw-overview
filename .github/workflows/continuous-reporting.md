@@ -3,11 +3,13 @@ name: "Continuous Reporting"
 description: "Weekly repository status report summarizing activity, issues, and content health"
 
 on:
-  schedule: weekly on friday around 4pm
+  schedule:
+    - cron: "4 15 * * 5"
   workflow_dispatch:
   stop-after: "+365d"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
   pull-requests: read

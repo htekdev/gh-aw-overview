@@ -3,13 +3,19 @@ name: "Continuous Link Validation"
 description: "Daily scan of all HTML files for broken external URLs and outdated references"
 
 on:
-  schedule: daily around 6am
+  schedule:
+    - cron: "33 6 * * *"
   workflow_dispatch:
   stop-after: "+365d"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
+
+engine:
+  id: copilot
+  copilot-sdk: true
 
 tools:
   github:

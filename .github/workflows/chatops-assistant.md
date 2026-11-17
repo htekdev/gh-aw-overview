@@ -11,8 +11,13 @@ on:
   stop-after: "+365d"
 
 permissions:
+  copilot-requests: write
   contents: read
   issues: read
+
+engine:
+  id: copilot
+  copilot-sdk: true
 
 tools:
   github:
