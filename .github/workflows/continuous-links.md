@@ -41,6 +41,8 @@ safe-outputs:
     labels: [broken-link, automation]
     max: 1
     close-older-issues: true
+  noop:
+    report-as-issue: false
 
 network:
   allowed:
